@@ -25,6 +25,10 @@ defined in linker script */
 .word  _ebss
 /* stack used for SystemInit_ExtMemCtl; always internal RAM used */
 
+  //  .section  .text.entry
+  //.weak  entry
+  .type  entry, %function //BU OLMADAN RESET OLMUYOR, BOZULUYOR
+
 entry:
   ldr   sp, =_estack       /* set stack pointer */
 
@@ -32,6 +36,7 @@ entry:
   movs  r1, #0
   b  LoopCopyDataInit
 
+//BU KOPYALAMA NE İŞE YARIYOR? BU OLMADAN ÇALIŞMIYOR.
 CopyDataInit:
   ldr  r3, =_sidata
   ldr  r3, [r3, r1]
@@ -44,8 +49,10 @@ LoopCopyDataInit:
   adds  r2, r0, r1
   cmp  r2, r3
   bcc  CopyDataInit
+
   ldr  r2, =_sbss
   b  LoopFillZerobss
+
 /* Zero fill the bss segment. */
 FillZerobss:
   movs  r3, #0
@@ -61,5 +68,6 @@ LoopFillZerobss:
 /* Call static constructors */
 //    bl __libc_init_array
 /* Call the application's entry point.*/
+Main:
   bl  main
   bx  lr

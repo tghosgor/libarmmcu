@@ -10,8 +10,10 @@
 
 #include <cstdint>
 
-class RCCLayout
+class RCC
 {
+public:
+  static RCC* const get() { return reinterpret_cast<RCC*>(0x40023800); }
 
 public:
 //private:
@@ -49,7 +51,5 @@ public:
   uint32_t m_SSCGR;
   uint32_t m_PLLI2SCFGR;
 };
-
-RCCLayout* rcc = reinterpret_cast<RCCLayout*>(0x40023800); //RCC Register Map Base
 
 #endif /* RCC_H_ */

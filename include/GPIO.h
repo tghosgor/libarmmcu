@@ -10,8 +10,16 @@
 
 #include <cstdint>
 
-class GPIOLayout
+class GPIO
 {
+public:
+  enum class Port
+  {
+    A = 0x40020000,
+    G = 0x40021800
+  };
+
+  static GPIO* get(Port port) { return reinterpret_cast<GPIO*>(port); }
 
 public:
 //private:
@@ -25,9 +33,7 @@ public:
   uint32_t m_LCKR;
   uint32_t m_AFRL;
   uint32_t m_AFRH;
-};
 
-GPIOLayout* gpioA = reinterpret_cast<GPIOLayout*>(0x40020000);
-GPIOLayout* gpioG = reinterpret_cast<GPIOLayout*>(0x40021800);
+};
 
 #endif /* GPIO_H_ */
