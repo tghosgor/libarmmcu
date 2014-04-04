@@ -10,7 +10,7 @@
   .fpu softvfp
   .thumb
 
-.global entry
+.global Default_Handler
 
 /* start address for the initialization values of the .data section.
 defined in linker script */
@@ -27,9 +27,10 @@ defined in linker script */
 
   //  .section  .text.entry
   //.weak  entry
-  .type  entry, %function //BU OLMADAN RESET OLMUYOR, BOZULUYOR
+  .type  _exit, %function //BU OLMADAN RESET OLMUYOR, BOZULUYOR
+  .type  Default_Handler, %function //BU OLMADAN RESET OLMUYOR, BOZULUYOR
 
-entry:
+Default_Handler:
   ldr   sp, =_estack       /* set stack pointer */
 
 /* Copy the data segment initializers from flash to SRAM */
@@ -63,11 +64,11 @@ LoopFillZerobss:
   cmp  r2, r3
   bcc  FillZerobss
 
+Main:
 /* Call the clock system intitialization function.*/
 //  bl  SystemInit
 /* Call static constructors */
-//    bl __libc_init_array
+  bl __libc_init_array
 /* Call the application's entry point.*/
-Main:
   bl  main
   bx  lr

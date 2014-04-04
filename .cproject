@@ -59,11 +59,11 @@
 							<tool id="cdt.managedbuild.tool.gnu.cross.c.linker.1782076769" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker"/>
 							<tool command="g++" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="cdt.managedbuild.tool.gnu.cross.cpp.linker.666439160" name="Cross G++ Linker" superClass="cdt.managedbuild.tool.gnu.cross.cpp.linker">
 								<option id="gnu.cpp.link.option.other.979518200" name="Other options (-Xlinker [option])" superClass="gnu.cpp.link.option.other" valueType="stringList">
-									<listOptionValue builtIn="false" value="--script /home/abc/workspace/stm32_led/misc/stm32.ld"/>
+									<listOptionValue builtIn="false" value="--script /home/abc/workspace/stm32_led/misc/STM32F429ZI_FLASH.ld"/>
 								</option>
-								<option id="gnu.cpp.link.option.flags.93439651" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="" valueType="string"/>
-								<option id="gnu.cpp.link.option.nostdlibs.54076470" name="No startup or default libs (-nostdlib)" superClass="gnu.cpp.link.option.nostdlibs" value="true" valueType="boolean"/>
-								<option id="gnu.cpp.link.option.nodeflibs.764579341" name="Do not use default libraries (-nodefaultlibs)" superClass="gnu.cpp.link.option.nodeflibs" value="true" valueType="boolean"/>
+								<option id="gnu.cpp.link.option.flags.93439651" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="-mcpu=cortex-m4 -mthumb" valueType="string"/>
+								<option id="gnu.cpp.link.option.nostdlibs.54076470" name="No startup or default libs (-nostdlib)" superClass="gnu.cpp.link.option.nostdlibs" value="false" valueType="boolean"/>
+								<option id="gnu.cpp.link.option.nodeflibs.764579341" name="Do not use default libraries (-nodefaultlibs)" superClass="gnu.cpp.link.option.nodeflibs" value="false" valueType="boolean"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1051373378" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -76,7 +76,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="misc/startup_stm32f429xx.S|Utilities|Drivers|Drivers/BSP/STM32F4xx-Nucleo|Drivers/BSP/STM32F4-Discovery|Drivers/BSP/STM32F401-Discovery|Drivers/BSP/STM324xG_EVAL|Drivers/BSP/STM324x9I_EVAL|Drivers/BSP/Components|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_ts.c|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_sdram.c|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_lcd.c|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_gyroscope.c|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_eeprom.c|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="misc/stm32.S|Utilities|Drivers|Drivers/BSP/STM32F4xx-Nucleo|Drivers/BSP/STM32F4-Discovery|Drivers/BSP/STM32F401-Discovery|Drivers/BSP/STM324xG_EVAL|Drivers/BSP/STM324x9I_EVAL|Drivers/BSP/Components|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_ts.c|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_sdram.c|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_lcd.c|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_gyroscope.c|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_eeprom.c|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 					</sourceEntries>
 				</configuration>
@@ -152,7 +152,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="misc/startup_stm32f429xx.S|Utilities|Drivers|Drivers/BSP/STM32F4xx-Nucleo|Drivers/BSP/STM32F4-Discovery|Drivers/BSP/STM32F401-Discovery|Drivers/BSP/STM324xG_EVAL|Drivers/BSP/STM324x9I_EVAL|Drivers/BSP/Components|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_ts.c|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_sdram.c|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_lcd.c|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_gyroscope.c|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_eeprom.c|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="misc/stm32.S|Utilities|Drivers|Drivers/BSP/STM32F4xx-Nucleo|Drivers/BSP/STM32F4-Discovery|Drivers/BSP/STM32F401-Discovery|Drivers/BSP/STM324xG_EVAL|Drivers/BSP/STM324x9I_EVAL|Drivers/BSP/Components|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_ts.c|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_sdram.c|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_lcd.c|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_gyroscope.c|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_eeprom.c|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 					</sourceEntries>
 				</configuration>

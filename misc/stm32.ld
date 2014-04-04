@@ -25,13 +25,18 @@ SECTIONS
     {
         *(.text)      /* Program code */
         *(.rodata)    /* Read only data */
+        
+    	*(.eh_frame)
+    	KEEP (*(.init))
+    	KEEP (*(.fini))
     } >rom
 
     .  = 0x20000000;  /* From 0x20000000 */      
     .data : 
     {
     	_sdata = .;        /* create a global symbol at data start */
-        *(.data)      /* Data memory */
+        *(.data)      	   /* Data memory */
+  		*(.data*)        /* .rodata* sections (constants, strings, etc.) */
     	_edata = .;        /* define a global symbol at data end */
     } >ram AT >rom
     

@@ -11,13 +11,17 @@
 class SCB
 {
 public:
-  static SCB* const get() { return reinterpret_cast<SCB*>(0xE000ED00); }
+  SCB() = delete;
+
+  static volatile SCB* const instance() { return reinterpret_cast<volatile SCB*>(0xE000ED00); }
 
 public:
 //private:
   uint32_t m_CPUID;
-  uint32_t m_ICSR; //Interrupt Control and State Register
-  uint32_t m_VTOR; //Vector Table Offset Register
+  uint32_t m_ICSR;  //Interrupt Control and State Register
+  uint32_t m_VTOR;  //Vector Table Offset Register
+  uint32_t m_AIRCR; //Application Interrupt and Reset Control Register
+  uint32_t m_SCR;   //System Control Register
 };
 
 #endif /* SCB_H_ */

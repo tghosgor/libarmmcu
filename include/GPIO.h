@@ -13,13 +13,22 @@
 class GPIO
 {
 public:
+  GPIO() = delete;
+
   enum class Port
   {
     A = 0x40020000,
     G = 0x40021800
   };
 
-  static GPIO* get(Port port) { return reinterpret_cast<GPIO*>(port); }
+  };
+
+
+  static volatile GPIO* get(Port port);
+
+  void setType(uint8_t i);
+  void set(uint8_t pin);
+  void reset(uint8_t pin);
 
 public:
 //private:
