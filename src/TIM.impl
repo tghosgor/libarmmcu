@@ -35,6 +35,11 @@ void TIM::setPrescalerValue(uint16_t value) volatile
   m_PSC = value;
 }
 
+uint16_t TIM::getCounterValue() volatile
+{
+  return m_CNT;
+}
+
 void TIM::enableUEV() volatile
 {
   m_CR1 |= (0x1 <<1);
@@ -49,13 +54,6 @@ void TIM::setUEVSource(UEVSource uEVSource) volatile
 {
 }
 
-/*void TIM::setPulseMode(Pulse mode)
-{
-  auto CR1 = m_CR1;
-  CR1 &= ~0x8;
-  CR1 |= mode;
-  m_CR1 = CR1;
-}*/
 void TIM::enableOnePulseMode() volatile
 {
   m_CR1 |= 0x1 <<2;
@@ -71,14 +69,52 @@ void TIM::enableAutoReloadPreload() volatile
   m_CR1 |= 0x1 <<7;
 }
 
+void TIM::setMasterMode(TIM::MasterMode mode) volatile
+{
+  auto newCR2 = m_CR2; //TODO: BURADAKİ TEMP GEREKLİ Mİ?
+  newCR2 &= ~(0x7 <<4);
+  newCR2 |= static_cast<uint32_t>(mode) <<4;
+  m_CR2 = newCR2;
+}
+
 void TIM::disableAutoReloadPreload() volatile
 {
   m_CR1 &= ~(0x1 <<7);
 }
 
-uint16_t TIM::getCounterValue() volatile
+void TIM::enableUpdateDMARequest() volatile
 {
-  return m_CNT;
+  m_DIER |= 0x1 <<8;
+}
+
+void TIM::disableUpdateDMARequest() volatile
+{
+  m_DIER &= ~(0x1 <<8);
+}
+
+void TIM::enableUpdateInterrupt() volatile
+{
+  m_DIER |= 0x1;
+}
+
+void TIM::disableUpdateInterrupt() volatile
+{
+  m_DIER &= ~0x1;
+}
+
+bool TIM::getStatus() volatile
+{
+  return m_SR & 0x1;
+}
+
+void TIM::clearStatus() volatile
+{
+  m_SR &= ~0x1;
+}
+
+void TIM::generateEvent() volatile
+{
+  m_EGR |= 0x1;
 }
 
 #endif

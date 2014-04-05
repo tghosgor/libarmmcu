@@ -16,6 +16,13 @@ public:
 
   };
 
+  enum class MasterMode : uint32_t
+  {
+    Reset = 0x0,
+    Enable = 0x1,
+    Update = 0x2
+  };
+
   static TIM volatile* const getTIM(TIM volatile* const tim);
 
   /* Counter is automatically disabled in one-pulse mode, when an update event occurs. */
@@ -24,6 +31,9 @@ public:
 
   void setAutoReloadValue(uint16_t value) volatile;
   void setPrescalerValue(uint16_t value) volatile;
+
+  void setCounterValue(uint16_t value) volatile;
+  uint16_t getCounterValue() volatile;
 
   void enableUEV() volatile;
   void disableUEV() volatile;
@@ -35,7 +45,17 @@ public:
   void enableAutoReloadPreload() volatile;
   void disableAutoReloadPreload() volatile;
 
-  uint16_t getCounterValue() volatile;
+  void setMasterMode(MasterMode mode) volatile;
+
+  void enableUpdateDMARequest() volatile;
+  void disableUpdateDMARequest() volatile;
+  void enableUpdateInterrupt() volatile;
+  void disableUpdateInterrupt() volatile;
+
+  bool getStatus() volatile;
+  void clearStatus() volatile;
+
+  void generateEvent() volatile;
 
   static constexpr TIM volatile* _1  { reinterpret_cast<TIM volatile*>(0x40010400) };
   static constexpr TIM volatile* _2  { reinterpret_cast<TIM volatile*>(0x40000000) };
