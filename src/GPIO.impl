@@ -1,0 +1,55 @@
+
+/*
+ * GPIO.cpp
+ *
+ *  Created on: Apr 4, 2014
+ *      Author: Tolga HOŞGÖR
+ */
+
+#ifndef GPIO_CPP_
+#define CPIO_CPP_
+
+#include <GPIO.h>
+
+constexpr GPIO::Port volatile* const GPIO::getPort(GPIO::Port volatile* const port)
+{
+  return reinterpret_cast<GPIO::Port volatile* const>(port);
+}
+
+GPIO::Port::Pin GPIO::Port::getPin(uint8_t const pin) volatile
+{
+  return {*this, pin};
+}
+
+GPIO::Port::Pin::Pin(GPIO::Port volatile& port, uint8_t const pinIdx)
+  : m_port(port),
+    m_idx(pinIdx)
+{ }
+
+void GPIO::Port::Pin::setMode(Mode const mode)
+{
+  m_port.m_MODER &= ~(0x3 <<(m_idx * 2));
+  m_port.m_MODER |= static_cast<uint32_t>(mode) <<(m_idx * 2);
+}
+
+void GPIO::Port::Pin::set()
+{
+  m_port.m_BSRR |= static_cast<uint16_t>(0x1) <<m_idx;
+}
+
+void GPIO::Port::Pin::reset()
+{
+  m_port.m_BSRR |= static_cast<uint32_t>(0x1) <<(m_idx + 16);
+}
+
+bool GPIO::Port::Pin::getInputStatus()
+{
+  return (m_port.m_IDR & (static_cast<uint16_t>(0x1) <<m_idx));
+}
+
+bool GPIO::Port::Pin::getOutputStatus()
+{
+  return (m_port.m_ODR & (static_cast<uint16_t>(0x1) <<m_idx));
+}
+
+#endif /* GPIO_CPP_ */

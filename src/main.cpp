@@ -3,6 +3,8 @@
 #include <GPIO.h>
 #include <SCB.h>
 
+#include <limits>
+
 extern "C" void SystemInit()
 {
   /* Reset the RCC clock configuration to the default reset state ------------*/
@@ -30,8 +32,14 @@ extern "C" void SystemInit()
 int main()
 {
   RCC::instance()->m_AHB1ENR |= 0x1 << 6;      /* Enable the GPIOG */
-  GPIO::get(GPIO::Port::G)->m_MODER = 0x01 << 26;     /* Set GPIOG Pin 13 to output */
-  GPIO::get(GPIO::Port::G)->m_BSRR |= 0x01 << 13;     /* Set GPIOG Pin 13 to ON */
+//  GPIO::get(GPIO::Port::G)->m_MODER = 0x01 << 26;     /* Set GPIOG Pin 13 to output */
+//  GPIO::get(GPIO::Port::G)->m_BSRR |= 0x01 << 13;     /* Set GPIOG Pin 13 to ON */
+
+  GPIO::getPort(GPIO::Port::G)->getPin(13).setMode(GPIO::Port::Pin::Mode::Output);
+  GPIO::getPort(GPIO::Port::G)->getPin(13).set();
+  uint32_t i = std::numeric_limits<uint16_t>::max() * 20;
+  while(--i);
+  GPIO::getPort(GPIO::Port::G)->getPin(13).reset();
 
   while(true);
 }
