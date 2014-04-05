@@ -1,4 +1,3 @@
-
 /*
  * GPIO.cpp
  *
@@ -42,12 +41,12 @@ void GPIO::Port::Pin::reset()
   m_port.m_BSRR |= static_cast<uint32_t>(0x1) <<(m_idx + 16);
 }
 
-bool GPIO::Port::Pin::getInputStatus()
+bool GPIO::Port::Pin::getInputState()
 {
   return (m_port.m_IDR & (static_cast<uint16_t>(0x1) <<m_idx));
 }
 
-bool GPIO::Port::Pin::getOutputStatus()
+bool GPIO::Port::Pin::getOutputState()
 {
   return (m_port.m_ODR & (static_cast<uint16_t>(0x1) <<m_idx));
 }

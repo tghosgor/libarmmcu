@@ -1,7 +1,8 @@
 
-#include <RCC.h>
 #include <GPIO.h>
+#include <RCC.h>
 #include <SCB.h>
+#include <TIM.h>
 
 #include <limits>
 
@@ -31,17 +32,36 @@ extern "C" void SystemInit()
 
 int main()
 {
-  RCC::instance()->m_AHB1ENR |= 0x1 << 6;      /* Enable the GPIOG */
+  RCC::instance()->m_AHB1ENR |= 0x1 <<6;      /* Enable the GPIOG */
 //  GPIO::get(GPIO::Port::G)->m_MODER = 0x01 << 26;     /* Set GPIOG Pin 13 to output */
 //  GPIO::get(GPIO::Port::G)->m_BSRR |= 0x01 << 13;     /* Set GPIOG Pin 13 to ON */
 
   GPIO::getPort(GPIO::Port::G)->getPin(13).setMode(GPIO::Port::Pin::Mode::Output);
+  GPIO::getPort(GPIO::Port::G)->getPin(14).setMode(GPIO::Port::Pin::Mode::Output);
+
   GPIO::getPort(GPIO::Port::G)->getPin(13).set();
   uint32_t i = std::numeric_limits<uint16_t>::max() * 20;
   while(--i);
   GPIO::getPort(GPIO::Port::G)->getPin(13).reset();
 
-  while(true);
+  RCC::instance()->m_APB1ENR |= 0x1 <<4;      /* Enable the TIM6 */
+  TIM::getTIM(TIM::_6)->setAutoReloadValue(std::numeric_limits<uint16_t>::max());
+  TIM::getTIM(TIM::_6)->setPrescalerValue(1000);
+  TIM::getTIM(TIM::_6)->enable();
+
+  while(true)
+  {
+    uint16_t cntVal = TIM::getTIM(TIM::_6)->getCounterValue();
+    if(cntVal % 200 >= 180)
+      GPIO::getPort(GPIO::Port::G)->getPin(13).set();
+    else
+      GPIO::getPort(GPIO::Port::G)->getPin(13).reset();
+
+    if(cntVal >= std::numeric_limits<uint16_t>::max() / 2)
+      GPIO::getPort(GPIO::Port::G)->getPin(14).set();
+    else
+      GPIO::getPort(GPIO::Port::G)->getPin(14).reset();
+  }
 }
 
 extern "C" void _exit()

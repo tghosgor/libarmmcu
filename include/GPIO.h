@@ -30,10 +30,12 @@ public:
       };
 
       void setMode(Mode const mode);
+
       void set();
       void reset();
-      bool getInputStatus();
-      bool getOutputStatus();
+
+      bool getInputState();
+      bool getOutputState();
 
     private:
       Pin(Port volatile& port, uint8_t const pinIdx);

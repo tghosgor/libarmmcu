@@ -33,6 +33,7 @@ public:
   uint32_t m_reserved3;
   uint32_t m_AHB1ENR;
   uint32_t m_AHB2ENR;
+  uint32_t m_AHB3ENR;
   uint32_t m_reserved4;
   uint32_t m_APB1ENR;
   uint32_t m_APB2ENR;
@@ -53,5 +54,7 @@ public:
   uint32_t m_SSCGR;
   uint32_t m_PLLI2SCFGR;
 };
+
+static_assert(sizeof(RCC) == 0x88, "RCC size is wrong. Spec says its 88 bytes long.");
 
 #endif /* RCC_H_ */

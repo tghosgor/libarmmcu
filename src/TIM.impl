@@ -1,0 +1,84 @@
+/*
+ * TIM.cpp
+ *
+ *  Created on: Apr 5, 2014
+ *      Author: Tolga HOŞGÖR
+ */
+
+#ifndef TIM_CPP_
+#define TIM_CPP_
+
+#include <TIM.h>
+
+TIM volatile* const TIM::getTIM(TIM volatile* const tim)
+{
+  return tim;
+}
+
+void TIM::enable() volatile
+{
+  m_CR1 |= 0x1;
+}
+
+void TIM::disable() volatile
+{
+  m_CR1 &= ~0x1;
+}
+
+void TIM::setAutoReloadValue(uint16_t value) volatile
+{
+  m_ARR = value;
+}
+
+void TIM::setPrescalerValue(uint16_t value) volatile
+{
+  m_PSC = value;
+}
+
+void TIM::enableUEV() volatile
+{
+  m_CR1 |= (0x1 <<1);
+}
+
+void TIM::disableUEV() volatile
+{
+  m_CR1 &= ~(0x1 <<1);
+}
+
+void TIM::setUEVSource(UEVSource uEVSource) volatile
+{
+}
+
+/*void TIM::setPulseMode(Pulse mode)
+{
+  auto CR1 = m_CR1;
+  CR1 &= ~0x8;
+  CR1 |= mode;
+  m_CR1 = CR1;
+}*/
+void TIM::enableOnePulseMode() volatile
+{
+  m_CR1 |= 0x1 <<2;
+}
+
+void TIM::disableOnePulseMode() volatile
+{
+  m_CR1 &= ~(0x1 <<2);
+}
+
+void TIM::enableAutoReloadPreload() volatile
+{
+  m_CR1 |= 0x1 <<7;
+}
+
+void TIM::disableAutoReloadPreload() volatile
+{
+  m_CR1 &= ~(0x1 <<7);
+}
+
+uint16_t TIM::getCounterValue() volatile
+{
+  return m_CNT;
+}
+
+#endif
