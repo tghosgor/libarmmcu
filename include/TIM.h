@@ -23,21 +23,39 @@ public:
     Update = 0x2
   };
 
+  enum class OCMode : uint32_t
+  {
+    Frozen = 0x0,
+    ActiveOnMatch = 0x1,
+    InactiveOnMatch = 0x2,
+    Toggle = 0x3,
+    ForceInactive = 0x4,
+    ForceActive = 0x5,
+    PWM1 = 0x6,
+    PWM2 = 0x7
+  };
+
   static TIM volatile* const getTIM(TIM volatile* const tim);
 
   /* Counter is automatically disabled in one-pulse mode, when an update event occurs. */
   void enable() volatile;
   void disable() volatile;
+  template<uint8_t CCChannel>
+  void enableCC() volatile;
+  template<uint8_t CCChannel>
+  void disableCC() volatile;
 
-  void setAutoReloadValue(uint16_t value) volatile;
-  void setPrescalerValue(uint16_t value) volatile;
+  void setAutoReloadValue(uint16_t const value) volatile;
+  void setPrescalerValue(uint16_t const value) volatile;
+  template<uint8_t CCChannel>
+  void setCCValue(uint32_t const value) volatile;
 
-  void setCounterValue(uint16_t value) volatile;
+  void setCounterValue(uint16_t const value) volatile;
   uint16_t getCounterValue() volatile;
 
   void enableUEV() volatile;
   void disableUEV() volatile;
-  void setUEVSource(UEVSource) volatile;
+  void setUEVSource(UEVSource const source) volatile;
 
   void enableOnePulseMode() volatile;
   void disableOnePulseMode() volatile;
@@ -45,7 +63,12 @@ public:
   void enableAutoReloadPreload() volatile;
   void disableAutoReloadPreload() volatile;
 
-  void setMasterMode(MasterMode mode) volatile;
+  void setMasterMode(MasterMode const mode) volatile;
+
+  template<uint8_t CCChannel>
+  void setOCMode(OCMode const mode) volatile;
+  template<uint8_t CCChannel>
+  void enableOCPreload() volatile;
 
   void enableUpdateDMARequest() volatile;
   void disableUpdateDMARequest() volatile;
@@ -79,8 +102,8 @@ protected:
   uint32_t m_DIER;
   uint32_t m_SR;
   uint32_t m_EGR;
-  uint32_t m_CCMR1;
-  uint32_t m_CCMR2;
+  uint32_t m_CCMR1; //Capture/Compare Register 1
+  uint32_t m_CCMR2; //Capture/Compare Register 2
   uint32_t m_CCER;
   uint32_t m_CNT;   //Counter Register
   uint32_t m_PSC;   //Prescaler Register
@@ -95,6 +118,8 @@ protected:
   uint32_t m_DMAR;
   uint32_t m_OR;
 };
+
+static_assert(sizeof(TIM) == 0x54, "TIM size is not correct. Spec says 54 bytes.");
 
 #include "../src/TIM.impl"
 

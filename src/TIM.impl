@@ -25,14 +25,32 @@ void TIM::disable() volatile
   m_CR1 &= ~0x1;
 }
 
-void TIM::setAutoReloadValue(uint16_t value) volatile
+template<uint8_t CCChannel>
+void TIM::enableCC() volatile
+{
+  m_CCER |= 0x1 <<((CCChannel - 1) * 4);
+}
+
+template<uint8_t CCChannel>
+void TIM::disableCC() volatile
+{
+  m_CCER |= ~(0x1 <<((CCChannel - 1) * 4));
+}
+
+void TIM::setAutoReloadValue(uint16_t const value) volatile
 {
   m_ARR = value;
 }
 
-void TIM::setPrescalerValue(uint16_t value) volatile
+void TIM::setPrescalerValue(uint16_t const value) volatile
 {
   m_PSC = value;
+}
+
+template<>
+void TIM::setCCValue<1>(uint32_t const value) volatile
+{
+  m_CCR1 = value;
 }
 
 uint16_t TIM::getCounterValue() volatile
@@ -50,7 +68,7 @@ void TIM::disableUEV() volatile
   m_CR1 &= ~(0x1 <<1);
 }
 
-void TIM::setUEVSource(UEVSource uEVSource) volatile
+void TIM::setUEVSource(UEVSource const uEVSource) volatile
 {
 }
 
@@ -69,17 +87,77 @@ void TIM::enableAutoReloadPreload() volatile
   m_CR1 |= 0x1 <<7;
 }
 
-void TIM::setMasterMode(TIM::MasterMode mode) volatile
-{
-  auto newCR2 = m_CR2; //TODO: BURADAKİ TEMP GEREKLİ Mİ?
-  newCR2 &= ~(0x7 <<4);
-  newCR2 |= static_cast<uint32_t>(mode) <<4;
-  m_CR2 = newCR2;
-}
-
 void TIM::disableAutoReloadPreload() volatile
 {
   m_CR1 &= ~(0x1 <<7);
+}
+
+void TIM::setMasterMode(TIM::MasterMode const mode) volatile
+{
+  auto newCR = m_CR2; //TODO: BURADAKİ TEMP GEREKLİ Mİ?
+  newCR &= ~(0x7 <<4);
+  newCR |= static_cast<uint32_t>(mode) <<4;
+  m_CR2 = newCR;
+}
+
+template<>
+void TIM::setOCMode<1>(TIM::OCMode const mode) volatile
+{
+  auto newCCMR = m_CCMR1;
+  newCCMR &= ~(0x7 <<4);
+  newCCMR |= static_cast<uint32_t>(mode) <<4;
+  m_CCMR1 = newCCMR;
+}
+
+template<>
+void TIM::setOCMode<2>(TIM::OCMode const mode) volatile
+{
+  auto newCCMR = m_CCMR1;
+  newCCMR &= ~(0x7 <<12);
+  newCCMR |= static_cast<uint32_t>(mode) <<12;
+  m_CCMR1 = newCCMR;
+}
+
+template<>
+void TIM::setOCMode<3>(TIM::OCMode const mode) volatile
+{
+  auto newCCMR = m_CCMR2;
+  newCCMR &= ~(0x7 <<4);
+  newCCMR |= static_cast<uint32_t>(mode) <<4;
+  m_CCMR2 = newCCMR;
+}
+
+template<>
+void TIM::setOCMode<4>(TIM::OCMode const mode) volatile
+{
+  auto newCCMR = m_CCMR2;
+  newCCMR &= ~(0x7 <<12);
+  newCCMR |= static_cast<uint32_t>(mode) <<12;
+  m_CCMR2 = newCCMR;
+}
+
+template<>
+void TIM::enableOCPreload<1>() volatile
+{
+  m_CCMR1 |= 0x1 <<3;
+}
+
+template<>
+void TIM::enableOCPreload<2>() volatile
+{
+  m_CCMR1 |= 0x1 <<11;
+}
+
+template<>
+void TIM::enableOCPreload<3>() volatile
+{
+  m_CCMR2 |= 0x1 <<3;
+}
+
+template<>
+void TIM::enableOCPreload<4>() volatile
+{
+  m_CCMR2 |= 0x1 <<11;
 }
 
 void TIM::enableUpdateDMARequest() volatile

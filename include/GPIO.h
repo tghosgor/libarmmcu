@@ -8,17 +8,27 @@
 #ifndef GPIO_H_
 #define GPIO_H_
 
+#include <cstddef>
 #include <cstdint>
 
-class GPIO
+namespace GPIO
 {
-public:
-  class Port
+  /*static constexpr Port volatile* A { reinterpret_cast<Port volatile*>(0x40020000) };
+  static constexpr Port volatile* G { reinterpret_cast<Port volatile*>(0x40021800) };*/
+
+  enum class Port : std::size_t
+  {
+    G = 0x40021800
+  };
+
+  template<Port port>
+  class PortType
   {
   public:
+    template<uint8_t m_idx>
     class Pin
     {
-      friend Port;
+      friend PortType;
 
     public:
       enum class Mode
@@ -36,19 +46,10 @@ public:
 
       bool getInputState();
       bool getOutputState();
-
-    private:
-      Pin(Port volatile& port, uint8_t const pinIdx);
-
-    private:
-      volatile Port& m_port;
-      uint8_t m_idx;
     }; //END Pin
 
-    Pin getPin(uint8_t const pin) volatile;
-
-    static constexpr Port volatile* A { reinterpret_cast<Port volatile*>(0x40020000) };
-    static constexpr Port volatile* G { reinterpret_cast<Port volatile*>(0x40021800) };
+    template<uint8_t m_idx>
+    Pin<m_idx>* getPin() volatile;
 
   public:
   //private:
@@ -64,7 +65,8 @@ public:
     uint32_t m_AFRH;
   }; //END Port
 
-  static constexpr Port volatile* const getPort(Port volatile* const port);
+  template<Port port>
+  static constexpr PortType<port> volatile* const getPort();
 
 };
 //END GPIO
