@@ -16,50 +16,50 @@ namespace GPIO
 template<Port port>
 constexpr PortType<port> volatile* const getPort()
 {
-  return reinterpret_cast<PortType<port> volatile* const>(0);
+  return nullptr;
 }
 
 template<Port port>
 template<uint8_t m_idx>
 PortType<port>::Pin<m_idx>* PortType<port>::getPin() volatile
 {
-  return 0;
+  return nullptr;
 }
 
 template<Port port>
-template<uint8_t m_idx>
-void PortType<port>::Pin<m_idx>::setMode(PortType::Pin<m_idx>::Mode const mode)
+template<uint8_t idx>
+void PortType<port>::Pin<idx>::setMode(PortType::Pin<idx>::Mode const mode)
 {
-  reinterpret_cast<GPIO::PortType<port> volatile*>(port)->m_MODER &= ~(0x3 <<(m_idx * 2));
-  reinterpret_cast<GPIO::PortType<port> volatile*>(port)->m_MODER |= static_cast<uint32_t>(mode) <<(m_idx * 2);
+  reinterpret_cast<GPIO::PortType<port> volatile*>(port)->m_MODER &= ~(0x3 <<(idx * 2));
+  reinterpret_cast<GPIO::PortType<port> volatile*>(port)->m_MODER |= static_cast<uint32_t>(mode) <<(idx * 2);
 }
 
 template<Port port>
-template<uint8_t m_idx>
-void PortType<port>::Pin<m_idx>::set()
+template<uint8_t idx>
+void PortType<port>::Pin<idx>::set()
 {
-  reinterpret_cast<GPIO::PortType<port> volatile*>(port)->m_BSRR |= static_cast<uint16_t>(0x1) <<m_idx;
+  reinterpret_cast<GPIO::PortType<port> volatile*>(port)->m_BSRR |= static_cast<uint16_t>(0x1) <<idx;
 }
 
 template<Port port>
-template<uint8_t m_idx>
-void PortType<port>::Pin<m_idx>::reset()
+template<uint8_t idx>
+void PortType<port>::Pin<idx>::reset()
 {
-  reinterpret_cast<GPIO::PortType<port> volatile*>(port)->m_BSRR |= static_cast<uint32_t>(0x1) <<(m_idx + 16);
+  reinterpret_cast<GPIO::PortType<port> volatile*>(port)->m_BSRR |= static_cast<uint32_t>(0x1) <<(idx + 16);
 }
 
 template<Port port>
-template<uint8_t m_idx>
-bool PortType<port>::Pin<m_idx>::getInputState()
+template<uint8_t idx>
+bool PortType<port>::Pin<idx>::getInputState()
 {
-  return (reinterpret_cast<GPIO::PortType<port> volatile*>(port)->m_IDR & (static_cast<uint16_t>(0x1) <<m_idx));
+  return (reinterpret_cast<GPIO::PortType<port> volatile*>(port)->m_IDR & (static_cast<uint16_t>(0x1) <<idx));
 }
 
 template<Port port>
-template<uint8_t m_idx>
-bool PortType<port>::Pin<m_idx>::getOutputState()
+template<uint8_t idx>
+bool PortType<port>::Pin<idx>::getOutputState()
 {
-  return (reinterpret_cast<GPIO::PortType<port> volatile*>(port)->m_ODR & (static_cast<uint16_t>(0x1) <<m_idx));
+  return (reinterpret_cast<GPIO::PortType<port> volatile*>(port)->m_ODR & (static_cast<uint16_t>(0x1) <<idx));
 }
 
 }

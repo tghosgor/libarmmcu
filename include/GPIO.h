@@ -25,7 +25,7 @@ namespace GPIO
   class PortType
   {
   public:
-    template<uint8_t m_idx>
+    template<uint8_t idx>
     class Pin
     {
       friend PortType;
@@ -48,8 +48,8 @@ namespace GPIO
       bool getOutputState();
     }; //END Pin
 
-    template<uint8_t m_idx>
-    Pin<m_idx>* getPin() volatile;
+    template<uint8_t idx>
+    Pin<idx>* getPin() volatile;
 
   public:
   //private:
