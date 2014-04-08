@@ -39,7 +39,32 @@ namespace GPIO
         Analog = 0x3
       };
 
+      enum class AF : uint32_t
+      {
+        AF0 = 0x0, AF1, AF2, AF3, AF4,
+        AF5, AF6, AF7, AF8, AF9, AF10,
+        AF11, AF12, AF13, AF14, AF15
+      };
+
+      enum class OutputSpeed : uint32_t
+      {
+        LowSpeed = 0,
+        MediumSpeed,
+        FastSpeed,
+        HighSpeed
+      };
+
+      enum class PushPullMode : uint32_t
+      {
+        None = 0x0,
+        PullUp = 0x1,
+        PullDown = 0x2
+      };
+
       void setMode(Mode const mode);
+      void setAF(AF const af);
+      void setOutputSpeed(OutputSpeed const ospeed);
+      void setPushPullMode(PushPullMode const ppm);
 
       void set();
       void reset();
@@ -55,7 +80,7 @@ namespace GPIO
   //private:
     uint32_t m_MODER;
     uint32_t m_OTYPER;
-    uint32_t m_OSPEEDER;
+    uint32_t m_OSPEEDR;
     uint32_t m_PUPDR;
     uint32_t m_IDR;
     uint32_t m_ODR;
