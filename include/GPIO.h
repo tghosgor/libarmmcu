@@ -18,6 +18,9 @@ namespace GPIO
 
   enum class Port : std::size_t
   {
+    A = 0x40020000,
+    B = 0x40020400,
+    C = 0x40020800,
     G = 0x40021800
   };
 
@@ -41,17 +44,17 @@ namespace GPIO
 
       enum class AF : uint32_t
       {
-        AF0 = 0x0, AF1, AF2, AF3, AF4,
-        AF5, AF6, AF7, AF8, AF9, AF10,
-        AF11, AF12, AF13, AF14, AF15
+        _0 = 0x0, _1, _2, _3, _4,
+        _5, _6, _7, _8, _9, _10,
+        _11, _12, _13, _14, _15
       };
 
       enum class OutputSpeed : uint32_t
       {
-        LowSpeed = 0,
-        MediumSpeed,
-        FastSpeed,
-        HighSpeed
+        Low = 0,
+        Medium,
+        Fast,
+        High
       };
 
       enum class PushPullMode : uint32_t
@@ -91,7 +94,7 @@ namespace GPIO
   }; //END Port
 
   template<Port port>
-  static constexpr PortType<port> volatile* const getPort();
+  constexpr PortType<port> volatile* const getPort();
 
 };
 //END GPIO

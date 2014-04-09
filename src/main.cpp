@@ -33,7 +33,8 @@ extern "C" void SystemInit()
 int main()
 {
   RCC::instance()->m_AHB1ENR |= 0x1 <<6;      /* Enable the GPIOG */
-  auto portGpin13 = GPIO::getPort<GPIO::Port::G>()->getPin<13>();
+  auto gpioG = GPIO::getPort<GPIO::Port::G>();
+  auto portGpin13 = gpioG->getPin<13>();
   portGpin13->setMode(GPIO::PortType<GPIO::Port::G>::Pin<13>::Mode::Output);
   portGpin13->set();
   //GPIO::getPort(GPIO::G)->getPin(13).set();
@@ -49,24 +50,26 @@ int main()
   while(--i);
   GPIO::getPort(GPIO::G)->getPin<13>().reset();*/
 
-
   //Port To Use With PWM TIM::_2
-  auto portGpin14 = GPIO::getPort<GPIO::Port::G>()->getPin<14>();
-  portGpin14->setMode(GPIO::PortType<GPIO::Port::G>::Pin<14>::Mode::Alternate);
-  portGpin14->setAF(GPIO::PortType<GPIO::Port::G>::Pin<14>::AF::AF1);
-  portGpin14->setOutputSpeed(GPIO::PortType<GPIO::Port::G>::Pin<14>::OutputSpeed::MediumSpeed);
+  RCC::instance()->m_AHB1ENR |= 0x1 <<1;      /* Enable the GPIOB */
+  auto gpioB = GPIO::getPort<GPIO::Port::B>();
+  auto PWMPin = gpioB->getPin<5>();
+  PWMPin->setMode(GPIO::PortType<GPIO::Port::B>::Pin<5>::Mode::Alternate);
+  PWMPin->setAF(GPIO::PortType<GPIO::Port::B>::Pin<5>::AF::_2);
+  //PWMPin->setOutputSpeed(GPIO::PortType<GPIO::Port::B>::Pin<5>::OutputSpeed::Low);
+  PWMPin->setPushPullMode(GPIO::PortType<GPIO::Port::B>::Pin<5>::PushPullMode::PullUp);
 
   //PWM
-  RCC::instance()->m_APB1ENR |= 0x1;      /* Enable the TIM2 */
-  auto TIM2 = TIM::getTIM(TIM::_2);
-  TIM::getTIM(TIM::_2)->enableAutoReloadPreload();
-  TIM::getTIM(TIM::_2)->setCCValue<1>(60);
-  TIM::getTIM(TIM::_2)->setAutoReloadValue(120);
-  TIM::getTIM(TIM::_2)->setOCMode<1>(TIM::OCMode::PWM1);
-  TIM::getTIM(TIM::_2)->enableCC<1>();
-  TIM::getTIM(TIM::_2)->enableOCPreload<1>();
-  TIM::getTIM(TIM::_2)->generateEvent();
-  TIM::getTIM(TIM::_2)->enable();
+  RCC::instance()->m_APB1ENR |= 0x1 <<1;      /* Enable the TIM2 */
+  auto TIM3 = TIM::getTIM(TIM::_3);
+  TIM::getTIM(TIM::_3)->enableAutoReloadPreload();
+  TIM::getTIM(TIM::_3)->setCCValue<2>(60);
+  TIM::getTIM(TIM::_3)->setAutoReloadValue(120);
+  TIM::getTIM(TIM::_3)->setOCMode<2>(TIM::OCMode::PWM1);
+  TIM::getTIM(TIM::_3)->enableCC<2>();
+  TIM::getTIM(TIM::_3)->enableOCPreload<2>();
+  TIM::getTIM(TIM::_3)->generateEvent();
+  TIM::getTIM(TIM::_3)->enable();
 
   //Simple Loop Blink
   RCC::instance()->m_APB1ENR |= 0x1 <<4;      /* Enable the TIM6 */
@@ -75,11 +78,11 @@ int main()
   TIM::getTIM(TIM::_6)->enable();
   while(true)
   {
-    //uint16_t cntVal = TIM::getTIM(TIM::_6)->getCounterValue();
-    //if(cntVal >= std::numeric_limits<uint16_t>::max() / 2)
-    //  GPIO::getPort<GPIO::Port::G>()->getPin<14>()->set();
-    //else
-    //  GPIO::getPort<GPIO::Port::G>()->getPin<14>()->reset();
+    uint16_t cntVal = TIM::getTIM(TIM::_6)->getCounterValue();
+    if(cntVal >= std::numeric_limits<uint16_t>::max() / 2)
+      GPIO::getPort<GPIO::Port::G>()->getPin<13>()->set();
+    else
+      GPIO::getPort<GPIO::Port::G>()->getPin<13>()->reset();
   }
 }
 

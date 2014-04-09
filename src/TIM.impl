@@ -53,6 +53,24 @@ void TIM::setCCValue<1>(uint32_t const value) volatile
   m_CCR1 = value;
 }
 
+template<>
+void TIM::setCCValue<2>(uint32_t const value) volatile
+{
+  m_CCR2 = value;
+}
+
+template<>
+void TIM::setCCValue<3>(uint32_t const value) volatile
+{
+  m_CCR3 = value;
+}
+
+template<>
+void TIM::setCCValue<4>(uint32_t const value) volatile
+{
+  m_CCR4 = value;
+}
+
 uint16_t TIM::getCounterValue() volatile
 {
   return m_CNT;
