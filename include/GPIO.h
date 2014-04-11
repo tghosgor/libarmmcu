@@ -10,28 +10,26 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <type_traits>
 
 namespace GPIO
 {
-  /*static constexpr Port volatile* A { reinterpret_cast<Port volatile*>(0x40020000) };
-  static constexpr Port volatile* G { reinterpret_cast<Port volatile*>(0x40021800) };*/
-
-  enum class Port : std::size_t
+  enum : std::size_t
   {
-    A = 0x40020000,
-    B = 0x40020400,
-    C = 0x40020800,
-    G = 0x40021800
+    PortA = 0x40020000,
+    PortB = 0x40020400,
+    PortC = 0x40020800,
+    PortG = 0x40021800
   };
 
-  template<Port port>
-  class PortType
+  template<std::size_t port>
+  class Port
   {
   public:
     template<uint8_t idx>
     class Pin
     {
-      friend PortType;
+      friend Port;
 
     public:
       enum class Mode
@@ -74,6 +72,25 @@ namespace GPIO
 
       bool getInputState();
       bool getOutputState();
+
+    private:
+      template<uint8_t Enabler>
+      typename std::enable_if<(Enabler < 8)>::type
+      setAF_(AF const af)
+      {
+        constexpr uint32_t shiftBy { idx * 4 };
+        reinterpret_cast<GPIO::Port<port> volatile*>(port)->m_AFRL &= ~(0x4 <<shiftBy);
+        reinterpret_cast<GPIO::Port<port> volatile*>(port)->m_AFRL |= static_cast<uint32_t>(af) <<shiftBy;
+      }
+
+      template<uint8_t Enabler>
+      typename std::enable_if<(Enabler >= 8 && Enabler <= 15)>::type
+      setAF_(AF const af)
+      {
+        constexpr uint32_t shiftBy { idx * 4 };
+        reinterpret_cast<GPIO::Port<port> volatile*>(port)->m_AFRH &= ~(0x4 <<shiftBy);
+        reinterpret_cast<GPIO::Port<port> volatile*>(port)->m_AFRH |= static_cast<uint32_t>(af) <<shiftBy;
+      }
     }; //END Pin
 
     template<uint8_t idx>
@@ -93,8 +110,8 @@ namespace GPIO
     uint32_t m_AFRH;
   }; //END Port
 
-  template<Port port>
-  constexpr PortType<port> volatile* const getPort();
+  template<std::size_t port>
+  constexpr Port<port> volatile* const getPort();
 
 };
 //END GPIO
