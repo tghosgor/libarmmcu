@@ -61,24 +61,25 @@ int main()
 
   //PWM
   RCC::instance()->m_APB1ENR |= 0x1 <<1;      /* Enable the TIM2 */
-  auto TIM3 = TIM::getTIM(TIM::_3);
-  TIM::getTIM(TIM::_3)->enableAutoReloadPreload();
-  TIM::getTIM(TIM::_3)->setCCValue<2>(60);
-  TIM::getTIM(TIM::_3)->setAutoReloadValue(120);
-  TIM::getTIM(TIM::_3)->setOCMode<2>(TIM::OCMode::PWM1);
-  TIM::getTIM(TIM::_3)->enableCC<2>();
-  TIM::getTIM(TIM::_3)->enableOCPreload<2>();
-  TIM::getTIM(TIM::_3)->generateEvent();
-  TIM::getTIM(TIM::_3)->enable();
+  auto TIM3 = TIM::getTIM<TIM::_3>();
+  TIM3->enableAutoReloadPreload();
+  auto TIM3CC2 = TIM3->getCC<2>();
+  TIM3CC2.setValue(60);
+  TIM3->setAutoReloadValue(120);
+  TIM3CC2.setOCMode(TIM::TIM<TIM::_3>::CC<2>::OCMode::PWM1);
+  TIM3CC2.enable();
+  TIM3CC2.enableOCPreload();
+  TIM3->generateEvent();
+  TIM3->enable();
 
   //Simple Loop Blink
   RCC::instance()->m_APB1ENR |= 0x1 <<4;      /* Enable the TIM6 */
-  TIM::getTIM(TIM::_6)->setAutoReloadValue(std::numeric_limits<uint16_t>::max());
-  TIM::getTIM(TIM::_6)->setPrescalerValue(1000);
-  TIM::getTIM(TIM::_6)->enable();
+  TIM::getTIM<TIM::_6>()->setAutoReloadValue(std::numeric_limits<uint16_t>::max());
+  TIM::getTIM<TIM::_6>()->setPrescalerValue(1000);
+  TIM::getTIM<TIM::_6>()->enable();
   while(true)
   {
-    uint16_t cntVal = TIM::getTIM(TIM::_6)->getCounterValue();
+    uint16_t cntVal = TIM::getTIM<TIM::_6>()->getCounterValue();
     if(cntVal >= std::numeric_limits<uint16_t>::max() / 2)
       GPIO::getPort<GPIO::PortG>()->getPin<13>()->set();
     else
@@ -97,5 +98,23 @@ extern "C" void _getpid()
 {
 }
 extern "C" void _sbrk()
+{
+}
+extern "C" void _write()
+{
+}
+extern "C" void _close()
+{
+}
+extern "C" void _fstat()
+{
+}
+extern "C" void _isatty()
+{
+}
+extern "C" void _lseek()
+{
+}
+extern "C" void _read()
 {
 }

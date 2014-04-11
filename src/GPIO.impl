@@ -9,6 +9,7 @@
 #define CPIO_CPP_
 
 #include <GPIO.h>
+
 #include <type_traits>
 
 namespace GPIO
@@ -17,7 +18,7 @@ namespace GPIO
 template<std::size_t port>
 constexpr Port<port> volatile* const getPort()
 {
-  return reinterpret_cast<GPIO::Port<port> volatile*>(port);
+  return reinterpret_cast<Port<port> volatile*>(port);
 }
 
 template<std::size_t port>
@@ -32,8 +33,8 @@ template<uint8_t idx>
 void Port<port>::Pin<idx>::setMode(Port::Pin<idx>::Mode const mode)
 {
   constexpr uint32_t shiftBy { (idx * 2) };
-  reinterpret_cast<GPIO::Port<port> volatile*>(port)->m_MODER &= ~(0x3 <<shiftBy);
-  reinterpret_cast<GPIO::Port<port> volatile*>(port)->m_MODER |= static_cast<uint32_t>(mode) <<shiftBy;
+  reinterpret_cast<Port<port> volatile*>(port)->m_MODER &= ~(0x3 <<shiftBy);
+  reinterpret_cast<Port<port> volatile*>(port)->m_MODER |= static_cast<uint32_t>(mode) <<shiftBy;
 }
 
 template<std::size_t port>
@@ -48,8 +49,8 @@ template<uint8_t idx>
 void Port<port>::Pin<idx>::setOutputSpeed(Port::Pin<idx>::OutputSpeed const ospeed)
 {
   constexpr uint32_t shiftBy { idx * 2 };
-  reinterpret_cast<GPIO::Port<port> volatile*>(port)->m_OSPEEDR &= ~(0x3 <<shiftBy);
-  reinterpret_cast<GPIO::Port<port> volatile*>(port)->m_OSPEEDR |= static_cast<uint32_t>(ospeed) <<shiftBy;
+  reinterpret_cast<Port<port> volatile*>(port)->m_OSPEEDR &= ~(0x3 <<shiftBy);
+  reinterpret_cast<Port<port> volatile*>(port)->m_OSPEEDR |= static_cast<uint32_t>(ospeed) <<shiftBy;
 }
 
 template<std::size_t port>
@@ -57,36 +58,36 @@ template<uint8_t idx>
 void Port<port>::Pin<idx>::setPushPullMode(Port::Pin<idx>::PushPullMode const ppm)
 {
   constexpr uint32_t shiftBy { idx * 2 };
-  reinterpret_cast<GPIO::Port<port> volatile*>(port)->m_PUPDR &= ~(0x3 <<shiftBy);
-  reinterpret_cast<GPIO::Port<port> volatile*>(port)->m_PUPDR |= static_cast<uint32_t>(ppm) <<shiftBy;
+  reinterpret_cast<Port<port> volatile*>(port)->m_PUPDR &= ~(0x3 <<shiftBy);
+  reinterpret_cast<Port<port> volatile*>(port)->m_PUPDR |= static_cast<uint32_t>(ppm) <<shiftBy;
 }
 
 template<std::size_t port>
 template<uint8_t idx>
 void Port<port>::Pin<idx>::set()
 {
-  reinterpret_cast<GPIO::Port<port> volatile*>(port)->m_BSRR |= static_cast<uint16_t>(0x1) <<idx;
+  reinterpret_cast<Port<port> volatile*>(port)->m_BSRR |= static_cast<uint16_t>(0x1) <<idx;
 }
 
 template<std::size_t port>
 template<uint8_t idx>
 void Port<port>::Pin<idx>::reset()
 {
-  reinterpret_cast<GPIO::Port<port> volatile*>(port)->m_BSRR |= static_cast<uint32_t>(0x1) <<(idx + 16);
+  reinterpret_cast<Port<port> volatile*>(port)->m_BSRR |= static_cast<uint32_t>(0x1) <<(idx + 16);
 }
 
 template<std::size_t port>
 template<uint8_t idx>
 bool Port<port>::Pin<idx>::getInputState()
 {
-  return (reinterpret_cast<GPIO::Port<port> volatile*>(port)->m_IDR & (static_cast<uint16_t>(0x1) <<idx));
+  return (reinterpret_cast<Port<port> volatile*>(port)->m_IDR & (static_cast<uint16_t>(0x1) <<idx));
 }
 
 template<std::size_t port>
 template<uint8_t idx>
 bool Port<port>::Pin<idx>::getOutputState()
 {
-  return (reinterpret_cast<GPIO::Port<port> volatile*>(port)->m_ODR & (static_cast<uint16_t>(0x1) <<idx));
+  return (reinterpret_cast<Port<port> volatile*>(port)->m_ODR & (static_cast<uint16_t>(0x1) <<idx));
 }
 
 }

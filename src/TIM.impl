@@ -10,107 +10,95 @@
 
 #include <TIM.h>
 
-TIM volatile* const TIM::getTIM(TIM volatile* const tim)
+namespace TIM
 {
-  return tim;
+
+template<std::size_t tim>
+constexpr TIM<tim> volatile* const getTIM()
+{
+  return reinterpret_cast<TIM<tim> volatile*>(tim);
 }
 
-void TIM::enable() volatile
+template<std::size_t tim>
+void TIM<tim>::enable() volatile
 {
   m_CR1 |= 0x1;
 }
 
-void TIM::disable() volatile
+template<std::size_t tim>
+void TIM<tim>::disable() volatile
 {
   m_CR1 &= ~0x1;
 }
 
-template<uint8_t CCChannel>
-void TIM::enableCC() volatile
-{
-  m_CCER |= 0x1 <<((CCChannel - 1) * 4);
-}
-
-template<uint8_t CCChannel>
-void TIM::disableCC() volatile
-{
-  m_CCER |= ~(0x1 <<((CCChannel - 1) * 4));
-}
-
-void TIM::setAutoReloadValue(uint16_t const value) volatile
+template<std::size_t tim>
+void TIM<tim>::setAutoReloadValue(uint16_t const value) volatile
 {
   m_ARR = value;
 }
 
-void TIM::setPrescalerValue(uint16_t const value) volatile
+template<std::size_t tim>
+void TIM<tim>::setPrescalerValue(uint16_t const value) volatile
 {
   m_PSC = value;
 }
 
-template<>
-void TIM::setCCValue<1>(uint32_t const value) volatile
-{
-  m_CCR1 = value;
-}
-
-template<>
-void TIM::setCCValue<2>(uint32_t const value) volatile
-{
-  m_CCR2 = value;
-}
-
-template<>
-void TIM::setCCValue<3>(uint32_t const value) volatile
-{
-  m_CCR3 = value;
-}
-
-template<>
-void TIM::setCCValue<4>(uint32_t const value) volatile
-{
-  m_CCR4 = value;
-}
-
-uint16_t TIM::getCounterValue() volatile
+template<std::size_t tim>
+uint16_t TIM<tim>::getCounterValue() volatile
 {
   return m_CNT;
 }
 
-void TIM::enableUEV() volatile
+template<std::size_t tim>
+template<uint8_t idx>
+constexpr TIM<tim>::CC<idx> TIM<tim>::getCC() volatile
+{
+  return TIM<tim>::CC<idx>{};
+}
+
+template<std::size_t tim>
+void TIM<tim>::enableUEV() volatile
 {
   m_CR1 |= (0x1 <<1);
 }
 
-void TIM::disableUEV() volatile
+template<std::size_t tim>
+void TIM<tim>::disableUEV() volatile
 {
   m_CR1 &= ~(0x1 <<1);
 }
 
-void TIM::setUEVSource(UEVSource const uEVSource) volatile
+template<std::size_t tim>
+void TIM<tim>::setUEVSource(UEVSource const uEVSource) volatile
 {
 }
 
-void TIM::enableOnePulseMode() volatile
+template<std::size_t tim>
+void TIM<tim>::enableOnePulseMode() volatile
 {
   m_CR1 |= 0x1 <<2;
 }
 
-void TIM::disableOnePulseMode() volatile
+template<std::size_t tim>
+void TIM<tim>::disableOnePulseMode() volatile
 {
   m_CR1 &= ~(0x1 <<2);
 }
 
-void TIM::enableAutoReloadPreload() volatile
+template<std::size_t tim>
+void TIM<tim>::enableAutoReloadPreload() volatile
 {
   m_CR1 |= 0x1 <<7;
 }
 
-void TIM::disableAutoReloadPreload() volatile
+template<std::size_t tim>
+void TIM<tim>::disableAutoReloadPreload() volatile
 {
   m_CR1 &= ~(0x1 <<7);
 }
 
-void TIM::setMasterMode(TIM::MasterMode const mode) volatile
+template<std::size_t tim>
+void TIM<tim>::setMasterMode(TIM<tim>::MasterMode const mode) volatile
 {
   auto newCR = m_CR2; //TODO: BURADAKİ TEMP GEREKLİ Mİ?
   newCR &= ~(0x7 <<4);
@@ -118,99 +106,84 @@ void TIM::setMasterMode(TIM::MasterMode const mode) volatile
   m_CR2 = newCR;
 }
 
-template<>
-void TIM::setOCMode<1>(TIM::OCMode const mode) volatile
+template<std::size_t tim>
+template<uint8_t idx>
+void TIM<tim>::CC<idx>::enable() volatile
 {
-  auto newCCMR = m_CCMR1;
-  newCCMR &= ~(0x7 <<4);
-  newCCMR |= static_cast<uint32_t>(mode) <<4;
-  m_CCMR1 = newCCMR;
+  reinterpret_cast<TIM<tim> volatile*>(tim)->m_CCER |= 0x1 <<((idx - 1) * 4);
 }
 
-template<>
-void TIM::setOCMode<2>(TIM::OCMode const mode) volatile
+template<std::size_t tim>
+template<uint8_t idx>
+void TIM<tim>::CC<idx>::disable() volatile
 {
-  auto newCCMR = m_CCMR1;
-  newCCMR &= ~(0x7 <<12);
-  newCCMR |= static_cast<uint32_t>(mode) <<12;
-  m_CCMR1 = newCCMR;
+  reinterpret_cast<TIM<tim> volatile*>(tim)->m_CCER |= ~(0x1 <<((idx - 1) * 4));
 }
 
-template<>
-void TIM::setOCMode<3>(TIM::OCMode const mode) volatile
+template<std::size_t tim>
+template<uint8_t idx>
+void TIM<tim>::CC<idx>::setValue(uint32_t const value) volatile
 {
-  auto newCCMR = m_CCMR2;
-  newCCMR &= ~(0x7 <<4);
-  newCCMR |= static_cast<uint32_t>(mode) <<4;
-  m_CCMR2 = newCCMR;
+  uint32_t volatile* CCR1 = &(reinterpret_cast<TIM<tim> volatile*>(tim)->m_CCR1);
+  *(CCR1 + (idx - 1)) =  value;
 }
 
-template<>
-void TIM::setOCMode<4>(TIM::OCMode const mode) volatile
+template<std::size_t tim>
+template<uint8_t idx>
+void TIM<tim>::CC<idx>::setOCMode(TIM<tim>::CC<idx>::OCMode const mode) volatile
 {
-  auto newCCMR = m_CCMR2;
-  newCCMR &= ~(0x7 <<12);
-  newCCMR |= static_cast<uint32_t>(mode) <<12;
-  m_CCMR2 = newCCMR;
+  setOCMode_<idx>(mode);
 }
 
-template<>
-void TIM::enableOCPreload<1>() volatile
+template<std::size_t tim>
+template<uint8_t idx>
+void TIM<tim>::CC<idx>::enableOCPreload() volatile
 {
-  m_CCMR1 |= 0x1 <<3;
+  enableOCPreload_<idx>();
 }
 
-template<>
-void TIM::enableOCPreload<2>() volatile
-{
-  m_CCMR1 |= 0x1 <<11;
-}
-
-template<>
-void TIM::enableOCPreload<3>() volatile
-{
-  m_CCMR2 |= 0x1 <<3;
-}
-
-template<>
-void TIM::enableOCPreload<4>() volatile
-{
-  m_CCMR2 |= 0x1 <<11;
-}
-
-void TIM::enableUpdateDMARequest() volatile
+template<std::size_t tim>
+void TIM<tim>::enableUpdateDMARequest() volatile
 {
   m_DIER |= 0x1 <<8;
 }
 
-void TIM::disableUpdateDMARequest() volatile
+template<std::size_t tim>
+void TIM<tim>::disableUpdateDMARequest() volatile
 {
   m_DIER &= ~(0x1 <<8);
 }
 
-void TIM::enableUpdateInterrupt() volatile
+template<std::size_t tim>
+void TIM<tim>::enableUpdateInterrupt() volatile
 {
   m_DIER |= 0x1;
 }
 
-void TIM::disableUpdateInterrupt() volatile
+template<std::size_t tim>
+void TIM<tim>::disableUpdateInterrupt() volatile
 {
   m_DIER &= ~0x1;
 }
 
-bool TIM::getStatus() volatile
+template<std::size_t tim>
+bool TIM<tim>::getStatus() volatile
 {
   return m_SR & 0x1;
 }
 
-void TIM::clearStatus() volatile
+template<std::size_t tim>
+void TIM<tim>::clearStatus() volatile
 {
   m_SR &= ~0x1;
 }
 
-void TIM::generateEvent() volatile
+template<std::size_t tim>
+void TIM<tim>::generateEvent() volatile
 {
   m_EGR |= 0x1;
 }
+
+} //NS TIM
 
 #endif
