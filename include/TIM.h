@@ -50,7 +50,7 @@ enum : std::size_t
   _14 = 0x40002000
 };
 
-template<std::size_t tim>
+template<std::size_t module>
 class TIM
 {
 public:
@@ -69,7 +69,7 @@ public:
   template<uint8_t idx>
   class CC
   {
-    friend TIM;
+    friend class TIM;
 
   public:
     enum class OCMode : uint32_t
@@ -169,8 +169,8 @@ private:
 
 static_assert(sizeof(TIM<0>) == 0x54, "TIM size is not correct. Spec says 54 bytes.");
 
-template<std::size_t tim>
-constexpr TIM<tim> volatile* const getTIM();
+template<std::size_t module>
+constexpr TIM<module> volatile* const getPeriph();
 
 } //NS TIM
 } //NS stm32f429

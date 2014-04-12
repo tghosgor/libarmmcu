@@ -31,18 +31,25 @@
 
 namespace stm32f429
 {
+namespace ADC
+{
 
+enum
+{
+  _1 = 0x40012000,
+  _2 = 0x40012100,
+  _3 = 0x40012200
+};
+
+namespace
+{
+uint32_t volatile* commonRegisters = 0x40012300;
+}
+
+template<std::size_t module>
 class ADC
 {
 public:
-  enum class Module
-  {
-    ADC1 = 0x40012000,
-    ADC2 = 0x40012100,
-    ADC2 = 0x40012200
-  };
-
-  static volatile ADC* get(Module module) { return reinterpret_cast<volatile ADC*>(module); }
 
 public:
 //private:
@@ -66,9 +73,12 @@ public:
   uint32_t m_JDR3;
   uint32_t m_JDR4;
   uint32_t m_DR;
-
 };
 
-}
+template<std::size_t module>
+constexpr ADC<module> volatile* getPeriph() { return reinterpret_cast<ADC<module> volatile*>(module); }
+
+} //NS ADC
+} //NS stm32f429
 
 #endif /* ADC_H_ */

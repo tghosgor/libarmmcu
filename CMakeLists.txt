@@ -15,7 +15,7 @@ if (NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Debug")
 endif()
 
-include_directories (include) 
+include_directories(include)
 
 set(CMAKE_C_FLAGS "-std=c++11 -mcpu=cortex-m4 -mthumb")
 set(CMAKE_CXX_FLAGS "-std=c++11 -mcpu=cortex-m4 -mthumb")
@@ -28,5 +28,5 @@ set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "") #-rdynamic suppression
 set(CMAKE_EXE_LINKER_FLAGS "-Xlinker --script ${libarmmcu_SOURCE_DIR}/misc/STM32F429ZI_FLASH.ld")
 set(CMAKE_EXE_LINKER_FLAGS_RELEASE "-s")
 
-add_executable(stm32f429i-disco tests/main.cpp misc/startup_stm32f429xx.S)
+add_executable(stm32f429i-disco tests/main.cpp misc/startup_stm32f429xx.S include/RCC.h include/SCB.h include/GPIO.h include/TIM.h include/ADC.h include/impl/GPIO.impl include/impl/TIM.impl)
 

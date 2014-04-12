@@ -31,13 +31,13 @@
 
 namespace stm32f429
 {
+namespace RCC
+{
 
 class RCC
 {
 public:
   RCC() = delete;
-
-  static volatile RCC* const instance() { return reinterpret_cast<volatile RCC*>(0x40023800); }
 
 public:
 //private:
@@ -79,6 +79,9 @@ public:
 
 static_assert(sizeof(RCC) == 0x88, "RCC size is wrong. Spec says its 88 bytes long.");
 
+constexpr RCC volatile* const getReg() { return reinterpret_cast<RCC volatile*>(0x40023800); }
+
+} //NS RCC
 } //NS stm32f429
 
 #endif /* RCC_H_ */

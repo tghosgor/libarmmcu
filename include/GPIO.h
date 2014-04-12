@@ -37,20 +37,20 @@ namespace GPIO
 
 enum : std::size_t
 {
-  PortA = 0x40020000,
-  PortB = 0x40020400,
-  PortC = 0x40020800,
-  PortG = 0x40021800
+  A = 0x40020000,
+  B = 0x40020400,
+  C = 0x40020800,
+  G = 0x40021800
 };
 
-template<std::size_t port>
-class Port
+template<std::size_t module>
+class GPIO
 {
 public:
   template<uint8_t idx>
   class Pin
   {
-    friend Port;
+    friend class GPIO;
 
   public:
     enum class Mode
@@ -133,8 +133,8 @@ private:
   uint32_t m_AFRH;
 }; //END Port
 
-template<std::size_t port>
-constexpr Port<port> volatile* const getPort();
+template<std::size_t module>
+constexpr GPIO<module> volatile* const getPeriph();
 
 } //NS GPIO
 } //NS stm32f429
