@@ -143,6 +143,52 @@ void TIM<tim>::CC<idx>::enableOCPreload() volatile
 }
 
 template<std::size_t tim>
+template<uint8_t idx>
+template<uint8_t idx_>
+typename std::enable_if<(idx >= 1 && idx_ <= 2)>::type
+TIM<tim>::CC<idx>::setOCMode_(OCMode const mode) volatile
+{
+  constexpr uint8_t shiftBy{4 + (idx - 1) * 8};
+  auto newCCMR = reinterpret_cast<TIM<tim> volatile*>(tim)->m_CCMR1;
+  newCCMR &= ~(0x7 <<shiftBy);
+  newCCMR |= static_cast<uint32_t>(mode) <<shiftBy;
+  reinterpret_cast<TIM<tim> volatile*>(tim)->m_CCMR1 = newCCMR;
+}
+
+template<std::size_t tim>
+template<uint8_t idx>
+template<uint8_t idx_>
+typename std::enable_if<(idx_ >= 3 && idx_ <= 4)>::type
+TIM<tim>::CC<idx>::setOCMode_(OCMode const mode) volatile
+{
+  constexpr uint8_t shiftBy{4 + (idx - 3) * 8};
+  auto newCCMR = reinterpret_cast<TIM<tim> volatile*>(tim)->m_CCMR2;
+  newCCMR &= ~(0x7 <<shiftBy);
+  newCCMR |= static_cast<uint32_t>(mode) <<shiftBy;
+  reinterpret_cast<TIM<tim> volatile*>(tim)->m_CCMR2 = newCCMR;
+}
+
+template<std::size_t tim>
+template<uint8_t idx>
+template<uint8_t idx_>
+typename std::enable_if<(idx_ >= 1 && idx_ <= 2)>::type
+TIM<tim>::CC<idx>::enableOCPreload_() volatile
+{
+  constexpr uint8_t shiftBy{ 3 + (idx - 1) * 8};
+  reinterpret_cast<TIM<tim> volatile*>(tim)->m_CCMR1 |= 0x1 <<shiftBy;
+}
+
+template<std::size_t tim>
+template<uint8_t idx>
+template<uint8_t idx_>
+typename std::enable_if<(idx_ >= 3 && idx_ <= 4)>::type
+TIM<tim>::CC<idx>::enableOCPreload_() volatile
+{
+  constexpr uint8_t shiftBy{ 3 + (idx - 3) * 8};
+  reinterpret_cast<TIM<tim> volatile*>(tim)->m_CCMR2 |= 0x1 <<shiftBy;
+}
+
+template<std::size_t tim>
 void TIM<tim>::enableUpdateDMARequest() volatile
 {
   m_DIER |= 0x1 <<8;

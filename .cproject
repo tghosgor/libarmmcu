@@ -51,7 +51,7 @@
 								</option>
 								<option id="gnu.cpp.compiler.option.other.other.54072199" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -mcpu=cortex-m4 -mthumb" valueType="string"/>
 								<option id="gnu.cpp.compiler.option.dialect.std.676907227" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.c++11" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.include.files.49291231" name="Include files (-include)" superClass="gnu.cpp.compiler.option.include.files" useByScannerDiscovery="false" valueType="includeFiles"/>
+								<option id="gnu.cpp.compiler.option.include.files.49291231" name="Include files (-include)" superClass="gnu.cpp.compiler.option.include.files" useByScannerDiscovery="false"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.171476925" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.cross.c.linker.1782076769" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker"/>
@@ -112,7 +112,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/include}&quot;"/>
 								</option>
 								<option id="gnu.c.compiler.option.dialect.std.1514296148" name="Language standard" superClass="gnu.c.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.c.compiler.dialect.c11" valueType="enumerated"/>
-								<option id="gnu.c.compiler.option.misc.other.466641616" name="Other flags" superClass="gnu.c.compiler.option.misc.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -mcpu=cortex-m4 -mthumb" valueType="string"/>
+								<option id="gnu.c.compiler.option.misc.other.466641616" name="Other flags" superClass="gnu.c.compiler.option.misc.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -mcpu=cortex-m4 -mthumb -flto" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1254368465" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="cdt.managedbuild.tool.gnu.cross.cpp.compiler.1185547032" name="Cross G++ Compiler" superClass="cdt.managedbuild.tool.gnu.cross.cpp.compiler">
@@ -126,19 +126,20 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Drivers/CMSIS/Include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/include}&quot;"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.other.other.1072241984" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -mcpu=cortex-m4 -mthumb" valueType="string"/>
+								<option id="gnu.cpp.compiler.option.other.other.1072241984" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -mcpu=cortex-m4 -mthumb -flto" valueType="string"/>
 								<option id="gnu.cpp.compiler.option.dialect.std.2004528545" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.c++11" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.include.files.395850900" name="Include files (-include)" superClass="gnu.cpp.compiler.option.include.files" useByScannerDiscovery="false" valueType="includeFiles"/>
+								<option id="gnu.cpp.compiler.option.include.files.395850900" name="Include files (-include)" superClass="gnu.cpp.compiler.option.include.files" useByScannerDiscovery="false"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1662657236" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.cross.c.linker.1760944945" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker"/>
 							<tool errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="cdt.managedbuild.tool.gnu.cross.cpp.linker.1163091003" name="Cross G++ Linker" superClass="cdt.managedbuild.tool.gnu.cross.cpp.linker">
-								<option id="gnu.cpp.link.option.flags.846730117" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="-mcpu=cortex-m4 -mthumb" valueType="string"/>
+								<option id="gnu.cpp.link.option.flags.846730117" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="-mcpu=cortex-m4 -mthumb -flto" valueType="string"/>
 								<option id="gnu.cpp.link.option.nodeflibs.821453696" name="Do not use default libraries (-nodefaultlibs)" superClass="gnu.cpp.link.option.nodeflibs" value="false" valueType="boolean"/>
 								<option id="gnu.cpp.link.option.nostdlibs.1780768937" name="No startup or default libs (-nostdlib)" superClass="gnu.cpp.link.option.nostdlibs" value="false" valueType="boolean"/>
 								<option id="gnu.cpp.link.option.other.1097556902" name="Other options (-Xlinker [option])" superClass="gnu.cpp.link.option.other" valueType="stringList">
 									<listOptionValue builtIn="false" value="--script /home/abc/workspace/stm32_led/misc/STM32F429ZI_FLASH.ld"/>
 								</option>
+								<option id="gnu.cpp.link.option.strip.1733726808" name="Omit all symbol information (-s)" superClass="gnu.cpp.link.option.strip" value="true" valueType="boolean"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1094589559" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>

@@ -72,41 +72,19 @@ public:
   private:
     template<uint8_t idx_>
     typename std::enable_if<(idx >= 1 && idx_ <= 2)>::type
-    setOCMode_(OCMode const mode) volatile
-    {
-      constexpr uint8_t shiftBy{4 + (idx - 1) * 8};
-      auto newCCMR = reinterpret_cast<TIM<tim> volatile*>(tim)->m_CCMR1;
-      newCCMR &= ~(0x7 <<shiftBy);
-      newCCMR |= static_cast<uint32_t>(mode) <<shiftBy;
-      reinterpret_cast<TIM<tim> volatile*>(tim)->m_CCMR1 = newCCMR;
-    }
+    setOCMode_(OCMode const mode) volatile;
 
     template<uint8_t idx_>
     typename std::enable_if<(idx_ >= 3 && idx_ <= 4)>::type
-    setOCMode_(OCMode const mode) volatile
-    {
-      constexpr uint8_t shiftBy{4 + (idx - 3) * 8};
-      auto newCCMR = reinterpret_cast<TIM<tim> volatile*>(tim)->m_CCMR2;
-      newCCMR &= ~(0x7 <<shiftBy);
-      newCCMR |= static_cast<uint32_t>(mode) <<shiftBy;
-      reinterpret_cast<TIM<tim> volatile*>(tim)->m_CCMR2 = newCCMR;
-    }
+    setOCMode_(OCMode const mode) volatile;
 
     template<uint8_t idx_>
     typename std::enable_if<(idx_ >= 1 && idx_ <= 2)>::type
-    enableOCPreload_() volatile
-    {
-      constexpr uint8_t shiftBy{ 3 + (idx - 1) * 8};
-      reinterpret_cast<TIM<tim> volatile*>(tim)->m_CCMR1 |= 0x1 <<shiftBy;
-    }
+    enableOCPreload_() volatile;
 
     template<uint8_t idx_>
     typename std::enable_if<(idx_ >= 3 && idx_ <= 4)>::type
-    enableOCPreload_() volatile
-    {
-      constexpr uint8_t shiftBy{ 3 + (idx - 3) * 8};
-      reinterpret_cast<TIM<tim> volatile*>(tim)->m_CCMR2 |= 0x1 <<shiftBy;
-    }
+    enableOCPreload_() volatile;
   };
 
   /* Counter is automatically disabled in one-pulse mode, when an update event occurs. */

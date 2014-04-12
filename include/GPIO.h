@@ -75,37 +75,29 @@ public:
       PullDown = 0x2
     };
 
-    void setMode(Mode const mode);
-    void setAF(AF const af);
-    void setOutputSpeed(OutputSpeed const ospeed);
-    void setPushPullMode(PushPullMode const ppm);
+    void setMode(Mode const mode) volatile;
+    void setAF(AF const af) volatile;
+    void setOutputSpeed(OutputSpeed const ospeed) volatile;
+    void setPushPullMode(PushPullMode const ppm) volatile;
 
-    void set();
-    void reset();
+    void set() volatile;
+    void reset() volatile;
 
-    bool getInputState();
-    bool getOutputState();
+    bool getInputState() volatile;
+    bool getOutputState() volatile;
 
   private:
-    template<uint8_t Enabler>
-    typename std::enable_if<(Enabler < 8)>::type setAF_(AF const af)
-    {
-      constexpr uint32_t shiftBy{idx * 4};
-      reinterpret_cast<GPIO::Port<port> volatile*>(port)->m_AFRL &= ~(0x4 << shiftBy);
-      reinterpret_cast<GPIO::Port<port> volatile*>(port)->m_AFRL |= static_cast<uint32_t>(af) << shiftBy;
-    }
+    template<uint8_t idx_>
+    typename std::enable_if<(idx_ < 8)>::type
+    setAF_(AF const af) volatile;
 
-    template<uint8_t Enabler>
-    typename std::enable_if<(Enabler >= 8 && Enabler <= 15)>::type setAF_(AF const af)
-    {
-      constexpr uint32_t shiftBy{idx * 4};
-      reinterpret_cast<GPIO::Port<port> volatile*>(port)->m_AFRH &= ~(0x4 << shiftBy);
-      reinterpret_cast<GPIO::Port<port> volatile*>(port)->m_AFRH |= static_cast<uint32_t>(af) << shiftBy;
-    }
+    template<uint8_t idx_>
+    typename std::enable_if<(idx_ >= 8 && idx_ <= 15)>::type
+    setAF_(AF const af) volatile;
   }; //END Pin
 
   template<uint8_t idx>
-  Pin<idx>* getPin() volatile;
+  Pin<idx> getPin() volatile;
 
 private:
   uint32_t m_MODER;
@@ -118,14 +110,13 @@ private:
   uint32_t m_LCKR;
   uint32_t m_AFRL;
   uint32_t m_AFRH;
-};
-//END Port
+}; //END Port
 
 template<std::size_t port>
 constexpr Port<port> volatile* const getPort();
 
-};
-//END GPIO
+}; //END GPIO
+
 
 #include "../src/GPIO.impl"
 
