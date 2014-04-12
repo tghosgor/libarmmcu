@@ -62,6 +62,7 @@
 								<option id="gnu.cpp.link.option.flags.93439651" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="-mcpu=cortex-m4 -mthumb" valueType="string"/>
 								<option id="gnu.cpp.link.option.nostdlibs.54076470" name="No startup or default libs (-nostdlib)" superClass="gnu.cpp.link.option.nostdlibs" value="false" valueType="boolean"/>
 								<option id="gnu.cpp.link.option.nodeflibs.764579341" name="Do not use default libraries (-nodefaultlibs)" superClass="gnu.cpp.link.option.nodeflibs" value="false" valueType="boolean"/>
+								<option id="gnu.cpp.link.option.strip.1337816683" superClass="gnu.cpp.link.option.strip" value="true" valueType="boolean"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1051373378" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
