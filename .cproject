@@ -75,8 +75,9 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="misc/stm32.S|Utilities|Drivers|Drivers/BSP/STM32F4xx-Nucleo|Drivers/BSP/STM32F4-Discovery|Drivers/BSP/STM32F401-Discovery|Drivers/BSP/STM324xG_EVAL|Drivers/BSP/STM324x9I_EVAL|Drivers/BSP/Components|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_ts.c|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_sdram.c|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_lcd.c|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_gyroscope.c|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_eeprom.c|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="tests|misc/stm32.S|Utilities|Drivers|Drivers/BSP/STM32F4xx-Nucleo|Drivers/BSP/STM32F4-Discovery|Drivers/BSP/STM32F401-Discovery|Drivers/BSP/STM324xG_EVAL|Drivers/BSP/STM324x9I_EVAL|Drivers/BSP/Components|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_ts.c|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_sdram.c|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_lcd.c|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_gyroscope.c|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_eeprom.c|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="tests"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -153,8 +154,9 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="misc/stm32.S|Utilities|Drivers|Drivers/BSP/STM32F4xx-Nucleo|Drivers/BSP/STM32F4-Discovery|Drivers/BSP/STM32F401-Discovery|Drivers/BSP/STM324xG_EVAL|Drivers/BSP/STM324x9I_EVAL|Drivers/BSP/Components|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_ts.c|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_sdram.c|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_lcd.c|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_gyroscope.c|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_eeprom.c|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="tests|misc/stm32.S|Utilities|Drivers|Drivers/BSP/STM32F4xx-Nucleo|Drivers/BSP/STM32F4-Discovery|Drivers/BSP/STM32F401-Discovery|Drivers/BSP/STM324xG_EVAL|Drivers/BSP/STM324x9I_EVAL|Drivers/BSP/Components|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_ts.c|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_sdram.c|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_lcd.c|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_gyroscope.c|Drivers/BSP/STM32F429I-Discovery/stm32f429i_discovery_eeprom.c|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="tests"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
