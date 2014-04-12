@@ -11,7 +11,7 @@ set(CMAKE_CXX_COMPILER "arm-none-eabi-g++")
 set(CMAKE_ASM_COMPILER "arm-none-eabi-as")
 
 if (NOT CMAKE_BUILD_TYPE)
-  message(STATUS "No build type selected, default to Debug.")
+  message(STATUS "No build type selected, defaulting to Debug.")
   set(CMAKE_BUILD_TYPE "Debug")
 endif()
 
