@@ -29,6 +29,7 @@
 #include <SCB.h>
 #include <TIM.h>
 
+#include <cstdint>
 #include <limits>
 
 using namespace stm32f429;
