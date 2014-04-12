@@ -8,6 +8,8 @@
 #ifndef TIM_H_
 #define TIM_H_
 
+namespace stm32f429
+{
 namespace TIM
 {
 
@@ -152,6 +154,7 @@ template<std::size_t tim>
 constexpr TIM<tim> volatile* const getTIM();
 
 } //NS TIM
+} //NS stm32f429
 
 #include "../src/TIM.impl"
 

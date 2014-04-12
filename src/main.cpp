@@ -6,6 +6,8 @@
 
 #include <limits>
 
+using namespace stm32f429;
+
 extern "C" void SystemInit()
 {
   /* Reset the RCC clock configuration to the default reset state ------------*/

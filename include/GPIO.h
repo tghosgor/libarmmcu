@@ -11,6 +11,8 @@
 #include <cstdint>
 #include <type_traits>
 
+namespace stm32f429
+{
 namespace GPIO
 {
 
@@ -115,7 +117,8 @@ private:
 template<std::size_t port>
 constexpr Port<port> volatile* const getPort();
 
-}; //END GPIO
+} //NS GPIO
+} //NS stm32f429
 
 
 #include "../src/GPIO.impl"

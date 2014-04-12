@@ -10,6 +10,9 @@
 
 #include <cstdint>
 
+namespace stm32f429
+{
+
 class RCC
 {
 public:
@@ -56,5 +59,7 @@ public:
 };
 
 static_assert(sizeof(RCC) == 0x88, "RCC size is wrong. Spec says its 88 bytes long.");
+
+} //NS stm32f429
 
 #endif /* RCC_H_ */

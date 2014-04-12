@@ -10,6 +10,9 @@
 
 #include <cstdint>
 
+namespace stm32f429
+{
+
 class ADC
 {
 public:
@@ -46,5 +49,7 @@ public:
   uint32_t m_DR;
 
 };
+
+}
 
 #endif /* ADC_H_ */

@@ -12,6 +12,8 @@
 
 #include <type_traits>
 
+namespace stm32f429
+{
 namespace GPIO
 {
 
@@ -112,6 +114,7 @@ bool Port<port>::Pin<idx>::getOutputState() volatile
   return (reinterpret_cast<Port<port> volatile*>(port)->m_ODR & (static_cast<uint16_t>(0x1) <<idx));
 }
 
-}
+} //NS GPIO
+} //NS stm32f429
 
 #endif /* GPIO_CPP_ */

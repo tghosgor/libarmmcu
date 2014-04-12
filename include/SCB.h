@@ -8,6 +8,9 @@
 #ifndef SCB_H_
 #define SCB_H_
 
+namespace stm32f429
+{
+
 class SCB
 {
 public:
@@ -23,5 +26,7 @@ public:
   uint32_t m_AIRCR; //Application Interrupt and Reset Control Register
   uint32_t m_SCR;   //System Control Register
 };
+
+} //NS stm32f429
 
 #endif /* SCB_H_ */

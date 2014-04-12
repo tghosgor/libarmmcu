@@ -10,6 +10,8 @@
 
 #include <TIM.h>
 
+namespace stm32f429
+{
 namespace TIM
 {
 
@@ -231,5 +233,6 @@ void TIM<tim>::generateEvent() volatile
 }
 
 } //NS TIM
+} //NS stm32f429
 
 #endif
