@@ -140,7 +140,7 @@ constexpr Port<port> volatile* const getPort();
 } //NS stm32f429
 
 
-#include "../src/GPIO.impl"
+#include "impl/GPIO.impl"
 
 #endif /* GPIO_H_ */
 

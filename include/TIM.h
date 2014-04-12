@@ -175,6 +175,6 @@ constexpr TIM<tim> volatile* const getTIM();
 } //NS TIM
 } //NS stm32f429
 
-#include "../src/TIM.impl"
+#include "impl/TIM.impl"
 
 #endif /* TIM_H_ */
