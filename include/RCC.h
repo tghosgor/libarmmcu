@@ -29,45 +29,52 @@
 
 #include <cstdint>
 
+#include <util.h>
+
 namespace stm32f429
 {
 namespace RCC
 {
 
-template<std::size_t offset_, uint8_t shift_>
-struct ModuleInfo
-{
-  static constexpr std::size_t address = 0x40023800 + offset_;
-  static constexpr uint8_t shift = shift_;
-};
-
 namespace GPIO
 {
-  typedef ModuleInfo<0x30, 0> A;
-  typedef ModuleInfo<0x30, 1> B;
-  typedef ModuleInfo<0x30, 2> C;
-  typedef ModuleInfo<0x30, 3> D;
-  typedef ModuleInfo<0x30, 4> E;
-  typedef ModuleInfo<0x30, 5> F;
-  typedef ModuleInfo<0x30, 6> G;
+
+template<std::size_t offset_, uint8_t shift_>
+struct Module : public util::ModuleInfo<offset_, shift_>
+{ };
+
+typedef Module<0x30, 0> A;
+typedef Module<0x30, 1> B;
+typedef Module<0x30, 2> C;
+typedef Module<0x30, 3> D;
+typedef Module<0x30, 4> E;
+typedef Module<0x30, 5> F;
+typedef Module<0x30, 6> G;
+
 }
 
 namespace TIM
 {
-  typedef ModuleInfo<0x44, 0> _1;
-  typedef ModuleInfo<0x40, 0> _2;
-  typedef ModuleInfo<0x40, 1> _3;
-  typedef ModuleInfo<0x40, 2> _4;
-  typedef ModuleInfo<0x40, 3> _5;
-  typedef ModuleInfo<0x40, 4> _6;
-  typedef ModuleInfo<0x40, 5> _7;
-  typedef ModuleInfo<0x44, 1> _8;
-  typedef ModuleInfo<0x44, 16> _9;
-  typedef ModuleInfo<0x44, 17> _10;
-  typedef ModuleInfo<0x44, 18> _11;
-  typedef ModuleInfo<0x40, 6> _12;
-  typedef ModuleInfo<0x40, 7> _13;
-  typedef ModuleInfo<0x40, 8> _14;
+
+template<std::size_t offset_, uint8_t shift_>
+struct Module : public util::ModuleInfo<offset_, shift_>
+{ };
+
+typedef Module<0x44, 0> _1;
+typedef Module<0x40, 0> _2;
+typedef Module<0x40, 1> _3;
+typedef Module<0x40, 2> _4;
+typedef Module<0x40, 3> _5;
+typedef Module<0x40, 4> _6;
+typedef Module<0x40, 5> _7;
+typedef Module<0x44, 1> _8;
+typedef Module<0x44, 16> _9;
+typedef Module<0x44, 17> _10;
+typedef Module<0x44, 18> _11;
+typedef Module<0x40, 6> _12;
+typedef Module<0x40, 7> _13;
+typedef Module<0x40, 8> _14;
+
 }
 
 template<class Module>
