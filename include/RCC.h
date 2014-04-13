@@ -38,7 +38,6 @@ namespace RCC
 
 namespace GPIO
 {
-
 template<std::size_t offset_, uint8_t shift_>
 struct Module : public util::ModuleInfo<offset_, shift_>
 { };
@@ -50,12 +49,10 @@ typedef Module<0x30, 3> D;
 typedef Module<0x30, 4> E;
 typedef Module<0x30, 5> F;
 typedef Module<0x30, 6> G;
-
 }
 
 namespace TIM
 {
-
 template<std::size_t offset_, uint8_t shift_>
 struct Module : public util::ModuleInfo<offset_, shift_>
 { };
@@ -74,7 +71,6 @@ typedef Module<0x44, 18> _11;
 typedef Module<0x40, 6> _12;
 typedef Module<0x40, 7> _13;
 typedef Module<0x40, 8> _14;
-
 }
 
 template<class Module>

@@ -60,7 +60,7 @@ namespace EXTI
   typedef Module<0x14, 8> _14;
   typedef Module<0x14, 12> _15;
 
-  enum : uint32_t
+  enum class Source : uint32_t
   {
     PA = 0, PB, PC, PD, PE,
     PF, PG, PH, PI, PJ
@@ -68,11 +68,13 @@ namespace EXTI
 }
 
 template<class Module>
-class Register
+class Register;
+
+template<std::size_t offset, uint8_t shift>
+class Register<EXTI::Module<offset, shift>>
 {
 public:
-  template<class = typename std::enable_if<std::is_same<Module, EXTI::Module<Module::offset, Module::size>>::value>::type>
-  void set(uint32_t value) { }
+  void setSource(EXTI::Source const source);
 };
 
 class SYSCFG
