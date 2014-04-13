@@ -54,8 +54,6 @@ extern "C" void SystemInit()
 
   /* Disable all interrupts */
   RCC::instance()->m_CIR = 0x00000000;
-
-//  SCB::getReg()->m_VTOR = 0x08000000; //VTOR Offset
 }
 
 int main()
