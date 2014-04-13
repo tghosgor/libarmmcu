@@ -34,10 +34,76 @@ namespace stm32f429
 namespace RCC
 {
 
+template<std::size_t offset_, uint8_t shift_>
+struct RegisterAddress
+{
+  static constexpr std::size_t address = 0x40023800 + offset_;
+  static constexpr uint8_t shift = shift_;
+};
+
+struct GPIO
+{
+  typedef RegisterAddress<0x30, 0> A;
+  typedef RegisterAddress<0x30, 1> B;
+  typedef RegisterAddress<0x30, 2> C;
+  typedef RegisterAddress<0x30, 3> D;
+  typedef RegisterAddress<0x30, 4> E;
+  typedef RegisterAddress<0x30, 5> F;
+  typedef RegisterAddress<0x30, 6> G;
+};
+struct TIM
+{
+  typedef RegisterAddress<0x44, 0> _1;
+  typedef RegisterAddress<0x40, 0> _2;
+  typedef RegisterAddress<0x40, 1> _3;
+  typedef RegisterAddress<0x40, 2> _4;
+  typedef RegisterAddress<0x40, 3> _5;
+  typedef RegisterAddress<0x40, 4> _6;
+  typedef RegisterAddress<0x40, 5> _7;
+  typedef RegisterAddress<0x44, 1> _8;
+  typedef RegisterAddress<0x44, 16> _9;
+  typedef RegisterAddress<0x44, 17> _10;
+  typedef RegisterAddress<0x44, 18> _11;
+  typedef RegisterAddress<0x40, 6> _12;
+  typedef RegisterAddress<0x40, 7> _13;
+  typedef RegisterAddress<0x40, 8> _14;
+};
+
+template<class Module>
+class Periph
+{
+public:
+  void enable()
+  {
+    *reinterpret_cast<uint32_t* const>(Module::address) |= 0x1 <<Module::shift;
+  }
+
+  void enableLowPower()
+  {
+    *reinterpret_cast<uint32_t* const>(Module::address + 0x20) |= 0x1 <<Module::shift;
+  }
+};
+
+enum class Periph2 : uint32_t
+{
+  TIM2 = 0x1,
+  TIM3 = 0X1 <<1,
+  TIM4 = 0X1 <<2,
+  TIM5 = 0X1 <<3,
+  TIM6 = 0X1 <<4,
+  TIM7 = 0X1 <<5,
+  TIM12 = 0X1 <<6,
+  TIM13 = 0X1 <<7,
+  TIM14 = 0X1 <<8
+};
+
 class RCC
 {
 public:
   RCC() = delete;
+
+  template<class RegisterAddress>
+  void enablePeriphClock();
 
 public:
 //private:
@@ -79,9 +145,20 @@ public:
 
 static_assert(sizeof(RCC) == 0x88, "RCC size is wrong. Spec says its 88 bytes long.");
 
-constexpr RCC volatile* const getReg() { return reinterpret_cast<RCC volatile*>(0x40023800); }
+template<class Module>
+constexpr Periph<Module> getPeriph()
+{
+  return Periph<Module>{};
+}
+
+constexpr RCC volatile* const instance()
+{
+  return reinterpret_cast<RCC volatile* const>(0x40023800);
+}
 
 } //NS RCC
 } //NS stm32f429
+
+#include "impl/RCC.impl"
 
 #endif /* RCC_H_ */

@@ -38,48 +38,36 @@ extern "C" void SystemInit()
 {
   /* Reset the RCC clock configuration to the default reset state ------------*/
   /* Set HSION bit */
-  RCC::getReg()->m_CR |= (uint32_t)0x00000001;
+  RCC::instance()->m_CR |= (uint32_t)0x00000001;
 
   /* Reset CFGR register */
-  RCC::getReg()->m_CFGR = 0x00000000;
+  RCC::instance()->m_CFGR = 0x00000000;
 
   /* Reset HSEON, CSSON and PLLON bits */
-  RCC::getReg()->m_CR &= (uint32_t)0xFEF6FFFF;
+  RCC::instance()->m_CR &= (uint32_t)0xFEF6FFFF;
 
   /* Reset PLLCFGR register */
-  RCC::getReg()->m_PLLCFGR = 0x24003010;
+  RCC::instance()->m_PLLCFGR = 0x24003010;
 
   /* Reset HSEBYP bit */
-  RCC::getReg()->m_CR &= (uint32_t)0xFFFBFFFF;
+  RCC::instance()->m_CR &= (uint32_t)0xFFFBFFFF;
 
   /* Disable all interrupts */
-  RCC::getReg()->m_CIR = 0x00000000;
+  RCC::instance()->m_CIR = 0x00000000;
 
 //  SCB::getReg()->m_VTOR = 0x08000000; //VTOR Offset
 }
 
 int main()
 {
-  RCC::getReg()->m_AHB1ENR |= 0x1 <<6;      /* Enable the G */
+  RCC::getPeriph<RCC::GPIO::G>().enable();      /* Enable the B */
   auto gpioG = GPIO::getPeriph<GPIO::G>();
   auto portGpin13 = gpioG->getPin<13>();
   portGpin13.setMode(GPIO::GPIO<GPIO::G>::Pin<13>::Mode::Output);
   portGpin13.set();
-  //GPIO::getPeriph(GPIO::G)->getPin(13).set();
-
-//GPIO::get(GPIO::G)->m_MODER = 0x01 << 26;     /* Set G Pin 13 to output */
-//GPIO::get(GPIO::G)->m_BSRR |= 0x01 << 13;     /* Set G Pin 13 to ON */
-
-  /*GPIO::getPeriph(GPIO::G)->getPin<13>().setMode(GPIO::Port::Pin::Mode::Output);
-  GPIO::getPeriph(GPIO::G)->getPin<14>().setMode(GPIO::Port::Pin::Mode::Output);
-
-  GPIO::getPeriph(GPIO::G)->getPin<13>().set();
-  uint32_t i = std::numeric_limits<uint16_t>::max() * 20;
-  while(--i);
-  GPIO::getPeriph(GPIO::G)->getPin<13>().reset();*/
 
   //Port To Use With PWM TIM::_2
-  RCC::getReg()->m_AHB1ENR |= 0x1 <<1;      /* Enable the B */
+  RCC::getPeriph<RCC::GPIO::B>().enable();      /* Enable the B */
   auto gpioB = GPIO::getPeriph<GPIO::B>();
   auto PWMPin = gpioB->getPin<5>();
   PWMPin.setMode(GPIO::GPIO<GPIO::B>::Pin<5>::Mode::Alternate);
@@ -88,7 +76,7 @@ int main()
   PWMPin.setPushPullMode(GPIO::GPIO<GPIO::B>::Pin<5>::PushPullMode::PullUp);
 
   //PWM
-  RCC::getReg()->m_APB1ENR |= 0x1 <<1;      /* Enable the TIM2 */
+  RCC::getPeriph<RCC::TIM::_3>().enable();      /* Enable the B */
   auto TIM3 = TIM::getPeriph<TIM::_3>();
   TIM3->enableAutoReloadPreload();
   auto TIM3CC2 = TIM3->getCC<2>();
@@ -101,7 +89,7 @@ int main()
   TIM3->enable();
 
   //Simple Loop Blink
-  RCC::getReg()->m_APB1ENR |= 0x1 <<4;      /* Enable the _6 */
+  RCC::getPeriph<RCC::TIM::_6>().enable();      /* Enable the 6 */
   TIM::getPeriph<TIM::_6>()->setAutoReloadValue(std::numeric_limits<uint16_t>::max());
   TIM::getPeriph<TIM::_6>()->setPrescalerValue(1000);
   TIM::getPeriph<TIM::_6>()->enable();

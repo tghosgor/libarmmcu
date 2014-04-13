@@ -25,7 +25,7 @@
 */
 
 #ifndef GPIO_CPP_
-#define CPIO_CPP_
+#define GPIO_CPP_
 
 #include <GPIO.h>
 

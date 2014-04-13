@@ -139,7 +139,6 @@ constexpr GPIO<module> volatile* const getPeriph();
 } //NS GPIO
 } //NS stm32f429
 
-
 #include "impl/GPIO.impl"
 
 #endif /* GPIO_H_ */
