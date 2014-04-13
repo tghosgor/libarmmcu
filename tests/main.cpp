@@ -27,6 +27,7 @@
 #include <GPIO.h>
 #include <RCC.h>
 #include <SCB.h>
+#include <SYSCFG.h>
 #include <TIM.h>
 
 #include <cstdint>
