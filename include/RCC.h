@@ -74,28 +74,11 @@ template<class Module>
 class Periph
 {
 public:
-  void enable()
-  {
-    *reinterpret_cast<uint32_t* const>(Module::address) |= 0x1 <<Module::shift;
-  }
+  void enable();
+  void disable();
 
-  void enableLowPower()
-  {
-    *reinterpret_cast<uint32_t* const>(Module::address + 0x20) |= 0x1 <<Module::shift;
-  }
-};
-
-enum class Periph2 : uint32_t
-{
-  TIM2 = 0x1,
-  TIM3 = 0X1 <<1,
-  TIM4 = 0X1 <<2,
-  TIM5 = 0X1 <<3,
-  TIM6 = 0X1 <<4,
-  TIM7 = 0X1 <<5,
-  TIM12 = 0X1 <<6,
-  TIM13 = 0X1 <<7,
-  TIM14 = 0X1 <<8
+  void enableLPMode();
+  void disableLPMode();
 };
 
 class RCC
