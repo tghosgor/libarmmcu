@@ -40,7 +40,7 @@ namespace SYSCFG
 namespace EXTI
 {
   template<std::size_t offset_, uint8_t shift_>
-  struct Module : public util::ModuleInfo<offset_, shift_>
+  struct Module : public util::ModuleInfo<offset_, shift_, 0x40013800>
   { };
 
   typedef Module<0x08, 0> _0;
