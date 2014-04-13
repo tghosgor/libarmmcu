@@ -71,9 +71,8 @@ template<class Module>
 class Register
 {
 public:
-  template<class Module_ = Module>
-  typename std::enable_if<std::is_same<Module_, EXTI::Module<Module_::offset, Module_::size>>::value>::type
-  set(uint32_t value) { }
+  template<class = typename std::enable_if<std::is_same<Module, EXTI::Module<Module::offset, Module::size>>::value>::type>
+  void set(uint32_t value) { }
 };
 
 class SYSCFG
