@@ -20,6 +20,6 @@ TIM::getPeriph<TIM::_3>()->getCC<2>().setOCMode(TIM::Periph<TIM::_3>::CC<2>::OCM
 Control register access syntax is as follows:
 ```C++
 RCC::getReg<RCC::GPIOB>().enable();
-SYSCFG::getReg<SYSCFG::EXTI::_0>().setSource(SYSCFG::EXTI::Source::PA);
+SYSCFG::getReg<SYSCFG::EXTI0>().setSource(SYSCFG::EXTI0::Source::PA);
 ```
 
