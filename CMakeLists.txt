@@ -20,8 +20,10 @@ include_directories(include)
 set(CMAKE_C_FLAGS "-std=c++11 -mcpu=cortex-m4 -mthumb")
 set(CMAKE_CXX_FLAGS "-std=c++11 -mcpu=cortex-m4 -mthumb")
 set(CMAKE_CXX_FLAGS_DEBUG "-g2")
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -g3 -fno-inline")
 set(CMAKE_ASM_FLAGS "-mcpu=cortex-m4 -mthumb")
 set(CMAKE_ASM_FLAGS_RELEASE "")
+set(CMAKE_ASM_FLAGS_RELWITHDEBINFO "")
 
 set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "") #-rdynamic suppression
 

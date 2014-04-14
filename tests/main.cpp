@@ -60,41 +60,46 @@ extern "C" void SystemInit()
 
 int main()
 {
-  RCC::getReg<RCC::GPIO::G>().enable();      /* Enable the B */
+  RCC::getReg<RCC::GPIO>().enable<RCC::GPIO::G>();
   auto gpioG = GPIO::getPeriph<GPIO::G>();
   auto portGpin13 = gpioG->getPin<13>();
-  portGpin13.setMode(GPIO::GPIO<GPIO::G>::Pin<13>::Mode::Output);
+  portGpin13.setMode(GPIO::Periph<GPIO::G>::Pin<13>::Mode::Output);
   portGpin13.set();
 
   //Port To Use With PWM TIM::_2
-  RCC::getReg<RCC::GPIO::B>().enable();      /* Enable the B */
+  RCC::getReg<RCC::GPIO>().enable<RCC::GPIO::B>();
   auto gpioB = GPIO::getPeriph<GPIO::B>();
   auto PWMPin = gpioB->getPin<5>();
-  PWMPin.setMode(GPIO::GPIO<GPIO::B>::Pin<5>::Mode::Alternate);
-  PWMPin.setAF(GPIO::GPIO<GPIO::B>::Pin<5>::AF::_2);
+  PWMPin.setMode(GPIO::Periph<GPIO::B>::Pin<5>::Mode::Alternate);
+  PWMPin.setAF(GPIO::Periph<GPIO::B>::Pin<5>::AF::_2);
   //PWMPin->setOutputSpeed(GPIO::Port<GPIO::PortB>::Pin<5>::OutputSpeed::Low);
-  PWMPin.setPushPullMode(GPIO::GPIO<GPIO::B>::Pin<5>::PushPullMode::PullUp);
+  PWMPin.setPushPullMode(GPIO::Periph<GPIO::B>::Pin<5>::PushPullMode::PullUp);
+
+  //birinde template ModuleInfo diğerinde uint8_t kullanılıyor ve ötekinde constexpr ile 4 byte'ı aşan offsetleme yapılıyor
+  //çıkarılan assembly aynı
+  RCC::getReg<RCC::GPIO>().enable<RCC::GPIO::G>();
+  RCC::getReg<RCC::TIM>().enable<RCC::TIM::_3>();
+  SYSCFG::getReg<SYSCFG::EXTI>().setSource<0>(SYSCFG::EXTI::Source::PA);
 
   //PWM
-  RCC::getReg<RCC::TIM::_3>().enable();      /* Enable the B */
+  RCC::getReg<RCC::TIM>().enable<RCC::TIM::_3>();
   auto TIM3 = TIM::getPeriph<TIM::_3>();
   TIM3->enableAutoReloadPreload();
   auto TIM3CC2 = TIM3->getCC<2>();
   TIM3CC2.setValue(60);
   TIM3->setAutoReloadValue(120);
-  TIM3CC2.setOCMode(TIM::TIM<TIM::_3>::CC<2>::OCMode::PWM1);
+  TIM3CC2.setOCMode(TIM::Periph<TIM::_3>::CC<2>::OCMode::PWM1);
   TIM3CC2.enable();
   TIM3CC2.enableOCPreload();
   TIM3->generateEvent();
   TIM3->enable();
 
   //Simple Loop Blink
-  RCC::getReg<RCC::TIM::_6>().enable();      /* Enable the 6 */
+  RCC::getReg<RCC::TIM>().enable<RCC::TIM::_6>();      /* Enable the 6 */
   TIM::getPeriph<TIM::_6>()->setAutoReloadValue(std::numeric_limits<uint16_t>::max());
   TIM::getPeriph<TIM::_6>()->setPrescalerValue(1000);
   TIM::getPeriph<TIM::_6>()->enable();
 
-  SYSCFG::getReg<SYSCFG::EXTI>().setSource<0>(SYSCFG::EXTI::Source::PA);
   EXTI::getReg<EXTI::Pending>().clear<0>();
   while(true)
   {

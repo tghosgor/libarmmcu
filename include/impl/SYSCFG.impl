@@ -40,8 +40,8 @@ void Register<EXTI>::setSource(EXTI::Source const source)
   constexpr std::size_t regAddr = BaseAddress + sizeof(uint32_t) * (idx / 4);
   constexpr uint8_t shift = idx * 4;
 
-  *reinterpret_cast<uint32_t*>(regAddr) &= ~(0x7 <<shift);
-  *reinterpret_cast<uint32_t*>(regAddr) |= static_cast<uint32_t>(source) <<shift;
+  *reinterpret_cast<uint32_t volatile* const>(regAddr) &= ~(0x7 <<shift);
+  *reinterpret_cast<uint32_t volatile* const>(regAddr) |= static_cast<uint32_t>(source) <<shift;
 }
 
 } //NS SYSCFG

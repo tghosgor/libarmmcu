@@ -34,28 +34,52 @@ namespace stm32f429
 namespace RCC
 {
 
-template<class Module>
-void Register<Module>::enable()
+template<uint8_t idx>
+void GPIO::enable()
 {
-  *reinterpret_cast<uint32_t* const>(Module::address) |= 0x1 <<Module::shift;
+  *reinterpret_cast<uint32_t volatile* const>(BaseAddress + GPIO::offset) |= 0x1 <<idx;
 }
 
-template<class Module>
-void Register<Module>::disable()
+template<uint8_t idx>
+void GPIO::disable()
 {
-  *reinterpret_cast<uint32_t* const>(Module::address) &= ~(0x1 <<Module::shift);
+  *reinterpret_cast<uint32_t volatile* const>(BaseAddress + GPIO::offset) &= ~(0x1 <<idx);
 }
 
-template<class Module>
-void Register<Module>::enableLPMode()
+template<uint8_t idx>
+void GPIO::enableLPMode()
 {
-  *reinterpret_cast<uint32_t* const>(Module::address + 0x20) |= 0x1 <<Module::shift;
+  *reinterpret_cast<uint32_t volatile* const>(BaseAddress + GPIO::offset) |= 0x1 <<idx;
 }
 
-template<class Module>
-void Register<Module>::disableLPMode()
+template<uint8_t idx>
+void GPIO::disableLPMode()
 {
-  *reinterpret_cast<uint32_t* const>(Module::address + 0x20) &= ~(0x1 <<Module::shift);
+  *reinterpret_cast<uint32_t volatile* const>(BaseAddress + GPIO::offset) &= ~(0x1 <<idx);
+}
+
+template<class idx>
+void TIM::enable()
+{
+  *reinterpret_cast<uint32_t volatile* const>(idx::address) |= 0x1 <<idx::shift;
+}
+
+template<class idx>
+void TIM::disable()
+{
+  *reinterpret_cast<uint32_t volatile* const>(idx::address) |= 0x1 <<idx::shift;
+}
+
+template<class idx>
+void TIM::enableLPMode()
+{
+  *reinterpret_cast<uint32_t volatile* const>(idx::address + 0x20) |= 0x1 <<idx::shift;
+}
+
+template<class idx>
+void TIM::disableLPMode()
+{
+  *reinterpret_cast<uint32_t volatile* const>(idx::address + 0x20) &= ~(0x1 <<idx::shift);
 }
 
 } //NS RCC

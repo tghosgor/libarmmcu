@@ -38,51 +38,71 @@ namespace RCC
 
 constexpr std::size_t BaseAddress{ 0x40023800 };
 
-namespace GPIO
+class GPIO
 {
 template<std::size_t offset, uint8_t shift>
 struct Module : public util::ModuleInfo<offset, shift, BaseAddress>
 { };
 
-typedef Module<0x30, 0> A;
-typedef Module<0x30, 1> B;
-typedef Module<0x30, 2> C;
-typedef Module<0x30, 3> D;
-typedef Module<0x30, 4> E;
-typedef Module<0x30, 5> F;
-typedef Module<0x30, 6> G;
-}
+  static constexpr std::size_t offset{ 0x30 };
 
-namespace TIM
+public:
+  enum
+  {
+    A = 0x0, B, C, D, E,
+    F, G
+  };
+
+  template<uint8_t idx>
+  void enable();
+  template<uint8_t idx>
+  void disable();
+  template<uint8_t idx>
+  void enableLPMode();
+  template<uint8_t idx>
+  void disableLPMode();
+};
+
+class TIM
 {
-template<std::size_t offset, uint8_t shift>
-struct Module : public util::ModuleInfo<offset, shift, BaseAddress>
-{ };
+  template<std::size_t offset, uint8_t shift>
+  struct Module : public util::ModuleInfo<offset, shift, BaseAddress>
+  { };
 
-typedef Module<0x44, 0> _1;
-typedef Module<0x40, 0> _2;
-typedef Module<0x40, 1> _3;
-typedef Module<0x40, 2> _4;
-typedef Module<0x40, 3> _5;
-typedef Module<0x40, 4> _6;
-typedef Module<0x40, 5> _7;
-typedef Module<0x44, 1> _8;
-typedef Module<0x44, 16> _9;
-typedef Module<0x44, 17> _10;
-typedef Module<0x44, 18> _11;
-typedef Module<0x40, 6> _12;
-typedef Module<0x40, 7> _13;
-typedef Module<0x40, 8> _14;
-}
+public:
+  typedef Module<0x44, 0> _1;
+  typedef Module<0x40, 0> _2;
+  typedef Module<0x40, 1> _3;
+  typedef Module<0x40, 2> _4;
+  typedef Module<0x40, 3> _5;
+  typedef Module<0x40, 4> _6;
+  typedef Module<0x40, 5> _7;
+  typedef Module<0x44, 1> _8;
+  typedef Module<0x44, 16> _9;
+  typedef Module<0x44, 17> _10;
+  typedef Module<0x44, 18> _11;
+  typedef Module<0x40, 6> _12;
+  typedef Module<0x40, 7> _13;
+  typedef Module<0x40, 8> _14;
+
+  template<class idx>
+  void enable();
+  template<class idx>
+  void disable();
+  template<class idx>
+  void enableLPMode();
+  template<class idx>
+  void disableLPMode();
+};
 
 template<class Module>
-class Register
+class Register : public Module
 {
 public:
-  void enable();
-  void disable();
 
+  template<class idx>
   void enableLPMode();
+  template<class idx>
   void disableLPMode();
 };
 

@@ -35,91 +35,91 @@ namespace TIM
 {
 
 template<std::size_t module>
-constexpr TIM<module> volatile* const getPeriph()
+constexpr Periph<module> volatile* const getPeriph()
 {
-  return reinterpret_cast<TIM<module> volatile*>(module);
+  return reinterpret_cast<Periph<module> volatile* const>(module);
 }
 
 template<std::size_t module>
-void TIM<module>::enable() volatile
+void Periph<module>::enable() volatile
 {
   m_CR1 |= 0x1;
 }
 
 template<std::size_t module>
-void TIM<module>::disable() volatile
+void Periph<module>::disable() volatile
 {
   m_CR1 &= ~0x1;
 }
 
 template<std::size_t module>
-void TIM<module>::setAutoReloadValue(uint16_t const value) volatile
+void Periph<module>::setAutoReloadValue(uint16_t const value) volatile
 {
   m_ARR = value;
 }
 
 template<std::size_t module>
-void TIM<module>::setPrescalerValue(uint16_t const value) volatile
+void Periph<module>::setPrescalerValue(uint16_t const value) volatile
 {
   m_PSC = value;
 }
 
 template<std::size_t module>
-uint16_t TIM<module>::getCounterValue() volatile
+uint16_t Periph<module>::getCounterValue() volatile
 {
   return m_CNT;
 }
 
 template<std::size_t module>
 template<uint8_t idx>
-constexpr TIM<module>::CC<idx> TIM<module>::getCC() volatile
+constexpr Periph<module>::CC<idx> Periph<module>::getCC() volatile
 {
-  return TIM<module>::CC<idx>{};
+  return Periph<module>::CC<idx>{};
 }
 
 template<std::size_t module>
-void TIM<module>::enableUEV() volatile
+void Periph<module>::enableUEV() volatile
 {
   m_CR1 |= (0x1 <<1);
 }
 
 template<std::size_t module>
-void TIM<module>::disableUEV() volatile
+void Periph<module>::disableUEV() volatile
 {
   m_CR1 &= ~(0x1 <<1);
 }
 
 template<std::size_t module>
-void TIM<module>::setUEVSource(UEVSource const uEVSource) volatile
+void Periph<module>::setUEVSource(UEVSource const uEVSource) volatile
 {
 }
 
 template<std::size_t module>
-void TIM<module>::enableOnePulseMode() volatile
+void Periph<module>::enableOnePulseMode() volatile
 {
   m_CR1 |= 0x1 <<2;
 }
 
 template<std::size_t module>
-void TIM<module>::disableOnePulseMode() volatile
+void Periph<module>::disableOnePulseMode() volatile
 {
   m_CR1 &= ~(0x1 <<2);
 }
 
 template<std::size_t module>
-void TIM<module>::enableAutoReloadPreload() volatile
+void Periph<module>::enableAutoReloadPreload() volatile
 {
   m_CR1 |= 0x1 <<7;
 }
 
 template<std::size_t module>
-void TIM<module>::disableAutoReloadPreload() volatile
+void Periph<module>::disableAutoReloadPreload() volatile
 {
   m_CR1 &= ~(0x1 <<7);
 }
 
 template<std::size_t module>
-void TIM<module>::setMasterMode(TIM<module>::MasterMode const mode) volatile
+void Periph<module>::setMasterMode(Periph<module>::MasterMode const mode) volatile
 {
   auto newCR = m_CR2; //TODO: BURADAKİ TEMP GEREKLİ Mİ?
   newCR &= ~(0x7 <<4);
@@ -129,36 +129,36 @@ void TIM<module>::setMasterMode(TIM<module>::MasterMode const mode) volatile
 
 template<std::size_t module>
 template<uint8_t idx>
-void TIM<module>::CC<idx>::enable() volatile
+void Periph<module>::CC<idx>::enable() volatile
 {
-  reinterpret_cast<TIM<module> volatile*>(module)->m_CCER |= 0x1 <<((idx - 1) * 4);
+  reinterpret_cast<Periph<module> volatile* const>(module)->m_CCER |= 0x1 <<((idx - 1) * 4);
 }
 
 template<std::size_t module>
 template<uint8_t idx>
-void TIM<module>::CC<idx>::disable() volatile
+void Periph<module>::CC<idx>::disable() volatile
 {
-  reinterpret_cast<TIM<module> volatile*>(module)->m_CCER |= ~(0x1 <<((idx - 1) * 4));
+  reinterpret_cast<Periph<module> volatile* const>(module)->m_CCER |= ~(0x1 <<((idx - 1) * 4));
 }
 
 template<std::size_t module>
 template<uint8_t idx>
-void TIM<module>::CC<idx>::setValue(uint32_t const value) volatile
+void Periph<module>::CC<idx>::setValue(uint32_t const value) volatile
 {
-  uint32_t volatile* CCR1 = &(reinterpret_cast<TIM<module> volatile*>(module)->m_CCR1);
+  constexpr uint32_t volatile* CCR1 = &(reinterpret_cast<Periph<module> volatile* const>(module)->m_CCR1);
   *(CCR1 + (idx - 1)) =  value;
 }
 
 template<std::size_t module>
 template<uint8_t idx>
-void TIM<module>::CC<idx>::setOCMode(TIM<module>::CC<idx>::OCMode const mode) volatile
+void Periph<module>::CC<idx>::setOCMode(Periph<module>::CC<idx>::OCMode const mode) volatile
 {
   setOCMode_<idx>(mode);
 }
 
 template<std::size_t module>
 template<uint8_t idx>
-void TIM<module>::CC<idx>::enableOCPreload() volatile
+void Periph<module>::CC<idx>::enableOCPreload() volatile
 {
   enableOCPreload_<idx>();
 }
@@ -167,86 +167,86 @@ template<std::size_t module>
 template<uint8_t idx>
 template<uint8_t idx_>
 typename std::enable_if<(idx >= 1 && idx_ <= 2)>::type
-TIM<module>::CC<idx>::setOCMode_(OCMode const mode) volatile
+Periph<module>::CC<idx>::setOCMode_(OCMode const mode) volatile
 {
   constexpr uint8_t shiftBy{4 + (idx - 1) * 8};
-  auto newCCMR = reinterpret_cast<TIM<module> volatile*>(module)->m_CCMR1;
+  auto newCCMR = reinterpret_cast<Periph<module> volatile* const>(module)->m_CCMR1;
   newCCMR &= ~(0x7 <<shiftBy);
   newCCMR |= static_cast<uint32_t>(mode) <<shiftBy;
-  reinterpret_cast<TIM<module> volatile*>(module)->m_CCMR1 = newCCMR;
+  reinterpret_cast<Periph<module> volatile* const>(module)->m_CCMR1 = newCCMR;
 }
 
 template<std::size_t module>
 template<uint8_t idx>
 template<uint8_t idx_>
 typename std::enable_if<(idx_ >= 3 && idx_ <= 4)>::type
-TIM<module>::CC<idx>::setOCMode_(OCMode const mode) volatile
+Periph<module>::CC<idx>::setOCMode_(OCMode const mode) volatile
 {
   constexpr uint8_t shiftBy{4 + (idx - 3) * 8};
-  auto newCCMR = reinterpret_cast<TIM<module> volatile*>(module)->m_CCMR2;
+  auto newCCMR = reinterpret_cast<Periph<module> volatile* const>(module)->m_CCMR2;
   newCCMR &= ~(0x7 <<shiftBy);
   newCCMR |= static_cast<uint32_t>(mode) <<shiftBy;
-  reinterpret_cast<TIM<module> volatile*>(module)->m_CCMR2 = newCCMR;
+  reinterpret_cast<Periph<module> volatile* const>(module)->m_CCMR2 = newCCMR;
 }
 
 template<std::size_t module>
 template<uint8_t idx>
 template<uint8_t idx_>
 typename std::enable_if<(idx_ >= 1 && idx_ <= 2)>::type
-TIM<module>::CC<idx>::enableOCPreload_() volatile
+Periph<module>::CC<idx>::enableOCPreload_() volatile
 {
   constexpr uint8_t shiftBy{ 3 + (idx - 1) * 8};
-  reinterpret_cast<TIM<module> volatile*>(module)->m_CCMR1 |= 0x1 <<shiftBy;
+  reinterpret_cast<Periph<module> volatile* const>(module)->m_CCMR1 |= 0x1 <<shiftBy;
 }
 
 template<std::size_t module>
 template<uint8_t idx>
 template<uint8_t idx_>
 typename std::enable_if<(idx_ >= 3 && idx_ <= 4)>::type
-TIM<module>::CC<idx>::enableOCPreload_() volatile
+Periph<module>::CC<idx>::enableOCPreload_() volatile
 {
   constexpr uint8_t shiftBy{ 3 + (idx - 3) * 8};
-  reinterpret_cast<TIM<module> volatile*>(module)->m_CCMR2 |= 0x1 <<shiftBy;
+  reinterpret_cast<Periph<module> volatile* const>(module)->m_CCMR2 |= 0x1 <<shiftBy;
 }
 
 template<std::size_t module>
-void TIM<module>::enableUpdateDMARequest() volatile
+void Periph<module>::enableUpdateDMARequest() volatile
 {
   m_DIER |= 0x1 <<8;
 }
 
 template<std::size_t module>
-void TIM<module>::disableUpdateDMARequest() volatile
+void Periph<module>::disableUpdateDMARequest() volatile
 {
   m_DIER &= ~(0x1 <<8);
 }
 
 template<std::size_t module>
-void TIM<module>::enableUpdateInterrupt() volatile
+void Periph<module>::enableUpdateInterrupt() volatile
 {
   m_DIER |= 0x1;
 }
 
 template<std::size_t module>
-void TIM<module>::disableUpdateInterrupt() volatile
+void Periph<module>::disableUpdateInterrupt() volatile
 {
   m_DIER &= ~0x1;
 }
 
 template<std::size_t module>
-bool TIM<module>::getStatus() volatile
+bool Periph<module>::getStatus() volatile
 {
   return m_SR & 0x1;
 }
 
 template<std::size_t module>
-void TIM<module>::clearStatus() volatile
+void Periph<module>::clearStatus() volatile
 {
   m_SR &= ~0x1;
 }
 
 template<std::size_t module>
-void TIM<module>::generateEvent() volatile
+void Periph<module>::generateEvent() volatile
 {
   m_EGR |= 0x1;
 }

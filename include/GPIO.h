@@ -44,13 +44,13 @@ enum : std::size_t
 };
 
 template<std::size_t module>
-class GPIO
+class Periph
 {
 public:
   template<uint8_t idx>
   class Pin
   {
-    friend class GPIO;
+    friend class Periph;
 
   public:
     enum class Mode
@@ -134,7 +134,7 @@ private:
 }; //END Port
 
 template<std::size_t module>
-constexpr GPIO<module> volatile* const getPeriph();
+constexpr Periph<module> volatile* const getPeriph();
 
 } //NS GPIO
 } //NS stm32f429

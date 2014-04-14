@@ -51,7 +51,7 @@ enum : std::size_t
 };
 
 template<std::size_t module>
-class TIM
+class Periph
 {
 public:
   enum class UEVSource
@@ -69,7 +69,7 @@ public:
   template<uint8_t idx>
   class CC
   {
-    friend class TIM;
+    friend class Periph;
 
   public:
     enum class OCMode : uint32_t
@@ -167,10 +167,10 @@ private:
   uint32_t m_OR;
 };
 
-static_assert(sizeof(TIM<0>) == 0x54, "TIM size is not correct. Spec says 54 bytes.");
+static_assert(sizeof(Periph<0>) == 0x54, "TIM size is not correct. Spec says 54 bytes.");
 
 template<std::size_t module>
-constexpr TIM<module> volatile* const getPeriph();
+constexpr Periph<module> volatile* const getPeriph();
 
 } //NS TIM
 } //NS stm32f429
