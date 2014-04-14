@@ -36,10 +36,12 @@ namespace stm32f429
 namespace RCC
 {
 
+constexpr std::size_t BaseAddress{ 0x40023800 };
+
 namespace GPIO
 {
-template<std::size_t offset_, uint8_t shift_>
-struct Module : public util::ModuleInfo<offset_, shift_, 0x40023800>
+template<std::size_t offset, uint8_t shift>
+struct Module : public util::ModuleInfo<offset, shift, BaseAddress>
 { };
 
 typedef Module<0x30, 0> A;
@@ -53,8 +55,8 @@ typedef Module<0x30, 6> G;
 
 namespace TIM
 {
-template<std::size_t offset_, uint8_t shift_>
-struct Module : public util::ModuleInfo<offset_, shift_, 0x40023800>
+template<std::size_t offset, uint8_t shift>
+struct Module : public util::ModuleInfo<offset, shift, BaseAddress>
 { };
 
 typedef Module<0x44, 0> _1;
@@ -74,7 +76,7 @@ typedef Module<0x40, 8> _14;
 }
 
 template<class Module>
-class Periph
+class Register
 {
 public:
   void enable();
@@ -89,7 +91,7 @@ class RCC
 public:
   RCC() = delete;
 
-  template<class RegisterAddress>
+  template<class Module>
   void enablePeriphClock();
 
 public:
@@ -133,14 +135,14 @@ public:
 static_assert(sizeof(RCC) == 0x88, "RCC size is wrong. Spec says its 88 bytes long.");
 
 template<class Module>
-constexpr Periph<Module> getPeriph()
+constexpr Register<Module> getReg()
 {
-  return Periph<Module>{};
+  return Register<Module>{};
 }
 
 constexpr RCC volatile* const instance()
 {
-  return reinterpret_cast<RCC volatile* const>(0x40023800);
+  return reinterpret_cast<RCC volatile* const>(BaseAddress);
 }
 
 } //NS RCC

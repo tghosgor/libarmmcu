@@ -24,6 +24,7 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <EXTI.h>
 #include <GPIO.h>
 #include <RCC.h>
 #include <SCB.h>
@@ -59,14 +60,14 @@ extern "C" void SystemInit()
 
 int main()
 {
-  RCC::getPeriph<RCC::GPIO::G>().enable();      /* Enable the B */
+  RCC::getReg<RCC::GPIO::G>().enable();      /* Enable the B */
   auto gpioG = GPIO::getPeriph<GPIO::G>();
   auto portGpin13 = gpioG->getPin<13>();
   portGpin13.setMode(GPIO::GPIO<GPIO::G>::Pin<13>::Mode::Output);
   portGpin13.set();
 
   //Port To Use With PWM TIM::_2
-  RCC::getPeriph<RCC::GPIO::B>().enable();      /* Enable the B */
+  RCC::getReg<RCC::GPIO::B>().enable();      /* Enable the B */
   auto gpioB = GPIO::getPeriph<GPIO::B>();
   auto PWMPin = gpioB->getPin<5>();
   PWMPin.setMode(GPIO::GPIO<GPIO::B>::Pin<5>::Mode::Alternate);
@@ -75,7 +76,7 @@ int main()
   PWMPin.setPushPullMode(GPIO::GPIO<GPIO::B>::Pin<5>::PushPullMode::PullUp);
 
   //PWM
-  RCC::getPeriph<RCC::TIM::_3>().enable();      /* Enable the B */
+  RCC::getReg<RCC::TIM::_3>().enable();      /* Enable the B */
   auto TIM3 = TIM::getPeriph<TIM::_3>();
   TIM3->enableAutoReloadPreload();
   auto TIM3CC2 = TIM3->getCC<2>();
@@ -88,10 +89,13 @@ int main()
   TIM3->enable();
 
   //Simple Loop Blink
-  RCC::getPeriph<RCC::TIM::_6>().enable();      /* Enable the 6 */
+  RCC::getReg<RCC::TIM::_6>().enable();      /* Enable the 6 */
   TIM::getPeriph<TIM::_6>()->setAutoReloadValue(std::numeric_limits<uint16_t>::max());
   TIM::getPeriph<TIM::_6>()->setPrescalerValue(1000);
   TIM::getPeriph<TIM::_6>()->enable();
+
+  SYSCFG::getReg<SYSCFG::EXTI>().setSource<0>(SYSCFG::EXTI::Source::PA);
+  EXTI::getReg<EXTI::Pending>().clear<0>();
   while(true)
   {
     uint16_t cntVal = TIM::getPeriph<TIM::_6>()->getCounterValue();

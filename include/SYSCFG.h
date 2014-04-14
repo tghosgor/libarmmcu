@@ -37,43 +37,26 @@ namespace stm32f429
 namespace SYSCFG
 {
 
-namespace EXTI
+constexpr std::size_t BaseAddress{ 0x40013800 };
+
+class EXTI
 {
-  template<std::size_t offset_, uint8_t shift_>
-  struct Module : public util::ModuleInfo<offset_, shift_, 0x40013800>
-  { };
-
-  typedef Module<0x08, 0> _0;
-  typedef Module<0x08, 4> _1;
-  typedef Module<0x08, 8> _2;
-  typedef Module<0x08, 12> _3;
-  typedef Module<0x0C, 0> _4;
-  typedef Module<0x0C, 4> _5;
-  typedef Module<0x0C, 8> _6;
-  typedef Module<0x0C, 12> _7;
-  typedef Module<0x10, 0> _8;
-  typedef Module<0x10, 4> _9;
-  typedef Module<0x10, 8> _10;
-  typedef Module<0x10, 12> _11;
-  typedef Module<0x14, 0> _12;
-  typedef Module<0x14, 4> _13;
-  typedef Module<0x14, 8> _14;
-  typedef Module<0x14, 12> _15;
-
+public:
   enum class Source : uint32_t
   {
     PA = 0, PB, PC, PD, PE,
     PF, PG, PH, PI, PJ
   };
-}
+};
 
 template<class Module>
 class Register;
 
-template<std::size_t offset, uint8_t shift>
-class Register<EXTI::Module<offset, shift>>
+template<>
+class Register<EXTI>
 {
 public:
+  template<uint8_t idx>
   void setSource(EXTI::Source const source);
 };
 
@@ -93,12 +76,14 @@ public:
   uint32_t m_CMPCR;   //Compensation Cell Control
 };
 
+constexpr SYSCFG volatile* const instance() { return reinterpret_cast<SYSCFG volatile* const>(BaseAddress); }
+
 template<class Module>
 constexpr Register<Module> getReg() { return Register<Module>{}; }
 
-constexpr SYSCFG volatile* const instance() { return reinterpret_cast<SYSCFG volatile* const>(0xE000ED00); }
-
 } //NS SYSCFG
 } //NS stm32f429
+
+#include <impl/SYSCFG.impl>
 
 #endif /* SYSCFG_H_ */

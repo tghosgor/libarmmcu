@@ -34,8 +34,15 @@ namespace stm32f429
 namespace SYSCFG
 {
 
-template<std::size_t offset, uint8_t shift>
-void Register<EXTI::Module<offset, shift>>::setSource(EXTI::Source const source);
+template<uint8_t idx>
+void Register<EXTI>::setSource(EXTI::Source const source)
+{
+  constexpr std::size_t regAddr = BaseAddress + sizeof(uint32_t) * (idx / 4);
+  constexpr uint8_t shift = idx * 4;
+
+  *reinterpret_cast<uint32_t*>(regAddr) &= ~(0x7 <<shift);
+  *reinterpret_cast<uint32_t*>(regAddr) |= static_cast<uint32_t>(source) <<shift;
+}
 
 } //NS SYSCFG
 } //NS stm32f429

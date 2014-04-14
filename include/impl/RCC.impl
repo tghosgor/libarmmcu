@@ -35,25 +35,25 @@ namespace RCC
 {
 
 template<class Module>
-void Periph<Module>::enable()
+void Register<Module>::enable()
 {
   *reinterpret_cast<uint32_t* const>(Module::address) |= 0x1 <<Module::shift;
 }
 
 template<class Module>
-void Periph<Module>::disable()
+void Register<Module>::disable()
 {
   *reinterpret_cast<uint32_t* const>(Module::address) &= ~(0x1 <<Module::shift);
 }
 
 template<class Module>
-void Periph<Module>::enableLPMode()
+void Register<Module>::enableLPMode()
 {
   *reinterpret_cast<uint32_t* const>(Module::address + 0x20) |= 0x1 <<Module::shift;
 }
 
 template<class Module>
-void Periph<Module>::disableLPMode()
+void Register<Module>::disableLPMode()
 {
   *reinterpret_cast<uint32_t* const>(Module::address + 0x20) &= ~(0x1 <<Module::shift);
 }

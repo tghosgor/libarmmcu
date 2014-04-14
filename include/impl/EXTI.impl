@@ -34,6 +34,12 @@ namespace stm32f429
 namespace EXTI
 {
 
+template<uint8_t bit>
+void Register<Pending>::clear()
+{
+  instance()->m_PR |= 0x1 <<bit;
+}
+
 } //NS EXTI
 } //NS stm32f429
 

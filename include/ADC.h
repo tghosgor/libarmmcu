@@ -34,7 +34,7 @@ namespace stm32f429
 namespace ADC
 {
 
-enum
+enum : uint32_t
 {
   _1 = 0x40012000,
   _2 = 0x40012100,
