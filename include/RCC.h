@@ -33,78 +33,79 @@
 
 namespace stm32f429
 {
-namespace RCC
-{
-
-constexpr std::size_t BaseAddress{ 0x40023800 };
-
-class GPIO
-{
-template<std::size_t offset, uint8_t shift>
-struct Module : public util::ModuleInfo<offset, shift, BaseAddress>
-{ };
-
-  static constexpr std::size_t offset{ 0x30 };
-
-public:
-  enum
-  {
-    A = 0x0, B, C, D, E,
-    F, G
-  };
-
-  template<uint8_t idx>
-  void enable();
-  template<uint8_t idx>
-  void disable();
-  template<uint8_t idx>
-  void enableLPMode();
-  template<uint8_t idx>
-  void disableLPMode();
-};
-
-class TIM
-{
-  template<std::size_t offset, uint8_t shift>
-  struct Module : public util::ModuleInfo<offset, shift, BaseAddress>
-  { };
-
-public:
-  typedef Module<0x44, 0> _1;
-  typedef Module<0x40, 0> _2;
-  typedef Module<0x40, 1> _3;
-  typedef Module<0x40, 2> _4;
-  typedef Module<0x40, 3> _5;
-  typedef Module<0x40, 4> _6;
-  typedef Module<0x40, 5> _7;
-  typedef Module<0x44, 1> _8;
-  typedef Module<0x44, 16> _9;
-  typedef Module<0x44, 17> _10;
-  typedef Module<0x44, 18> _11;
-  typedef Module<0x40, 6> _12;
-  typedef Module<0x40, 7> _13;
-  typedef Module<0x40, 8> _14;
-
-  template<class idx>
-  void enable();
-  template<class idx>
-  void disable();
-  template<class idx>
-  void enableLPMode();
-  template<class idx>
-  void disableLPMode();
-};
+using util::Module;
 
 class RCC
 {
 public:
-  RCC() = delete;
+  static constexpr RCC volatile* const instance();
 
   template<class Module>
-  void enablePeriphClock();
+  static constexpr Module getReg();
+
+  template<class Module>
+  class GPIO;
+
+  typedef GPIO<Module<0x30, 0>> GPIOA;
+  typedef GPIO<Module<0x30, 1>> GPIOB;
+  typedef GPIO<Module<0x30, 2>> GPIOC;
+  typedef GPIO<Module<0x30, 3>> GPIOD;
+  typedef GPIO<Module<0x30, 4>> GPIOE;
+  typedef GPIO<Module<0x30, 5>> GPIOF;
+  typedef GPIO<Module<0x30, 6>> GPIOG;
+
+  template<class Module>
+  class GPIO
+  {
+    friend class RCC;
+
+  public:
+    void enable();
+    void disable();
+    void enableLPMode();
+    void disableLPMode();
+
+  private:
+    GPIO();
+  };
+
+  template<class Module>
+  class TIM;
+
+  typedef TIM<Module<0x44, 0>>  TIM1;
+  typedef TIM<Module<0x40, 0>>  TIM2;
+  typedef TIM<Module<0x40, 1>>  TIM3;
+  typedef TIM<Module<0x40, 2>>  TIM4;
+  typedef TIM<Module<0x40, 3>>  TIM5;
+  typedef TIM<Module<0x40, 4>>  TIM6;
+  typedef TIM<Module<0x40, 5>>  TIM7;
+  typedef TIM<Module<0x44, 1>>  TIM8;
+  typedef TIM<Module<0x44, 16>> TIM9;
+  typedef TIM<Module<0x44, 17>> TIM10;
+  typedef TIM<Module<0x44, 18>> TIM11;
+  typedef TIM<Module<0x40, 6>>  TIM12;
+  typedef TIM<Module<0x40, 7>>  TIM13;
+  typedef TIM<Module<0x40, 8>>  TIM14;
+
+  template<class Module>
+  class TIM
+  {
+    friend class RCC;
+
+  public:
+    void enable();
+    void disable();
+    void enableLPMode();
+    void disableLPMode();
+
+  private:
+    TIM();
+  };
 
 public:
-//private:
+  RCC() = delete;
+
+public:
   uint32_t m_CR; //Clock Control
   uint32_t m_PLLCFGR;
   uint32_t m_CFGR;
@@ -139,22 +140,13 @@ public:
   uint32_t m_reserved11;
   uint32_t m_SSCGR;
   uint32_t m_PLLI2SCFGR;
+
+private:
+  static constexpr std::size_t BaseAddress{ 0x40023800 };
 };
 
 static_assert(sizeof(RCC) == 0x88, "RCC size is wrong. Spec says its 88 bytes long.");
 
-template<class Module>
-constexpr Module getReg()
-{
-  return Module{};
-}
-
-constexpr RCC volatile* const instance()
-{
-  return reinterpret_cast<RCC volatile* const>(BaseAddress);
-}
-
-} //NS RCC
 } //NS stm32f429
 
 #include "impl/RCC.impl"

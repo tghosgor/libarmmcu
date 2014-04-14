@@ -60,12 +60,12 @@ extern "C" void SystemInit()
 
 int main()
 {
-  RCC::getReg<RCC::GPIO>().enable<RCC::GPIO::G>();
+  RCC::getReg<RCC::GPIOG>().enable();
   GPIO::getPeriph<GPIO::G>()->getPin<13>().setMode(GPIO::Periph<GPIO::G>::Pin<13>::Mode::Output);
   GPIO::getPeriph<GPIO::G>()->getPin<13>().set();
 
   //Port To Use With PWM TIM::_2
-  RCC::getReg<RCC::GPIO>().enable<RCC::GPIO::B>();
+  RCC::RCC::getReg<RCC::GPIOB>().enable();
   auto gpioB = GPIO::getPeriph<GPIO::B>();
   auto PWMPin = gpioB->getPin<5>();
   PWMPin.setMode(GPIO::Periph<GPIO::B>::Pin<5>::Mode::Alternate);
@@ -75,12 +75,12 @@ int main()
 
   //birinde template ModuleInfo diğerinde uint8_t kullanılıyor ve ötekinde constexpr ile 4 byte'ı aşan offsetleme yapılıyor
   //çıkarılan assembly aynı
-  RCC::getReg<RCC::GPIO>().enable<RCC::GPIO::G>();
-  RCC::getReg<RCC::TIM>().enable<RCC::TIM::_3>();
-  SYSCFG::getReg<SYSCFG::EXTI>().setSource<SYSCFG::EXTI::_0>(SYSCFG::EXTI::Source::PA);
+  RCC::getReg<RCC::GPIOG>().enable();
+  RCC::getReg<RCC::TIM3>().enable();
+  SYSCFG::getReg<SYSCFG::EXTI0>().setSource(SYSCFG::EXTI0::Source::PA);
 
   //PWM
-  RCC::getReg<RCC::TIM>().enable<RCC::TIM::_3>();
+  RCC::getReg<RCC::TIM1>().enable();
   auto TIM3 = TIM::getPeriph<TIM::_3>();
   TIM3->enableAutoReloadPreload();
   auto TIM3CC2 = TIM3->getCC<2>();
@@ -93,7 +93,7 @@ int main()
   TIM3->enable();
 
   //Simple Loop Blink
-  RCC::getReg<RCC::TIM>().enable<RCC::TIM::_6>();      /* Enable the 6 */
+  RCC::getReg<RCC::TIM6>().enable();
   TIM::getPeriph<TIM::_6>()->setAutoReloadValue(std::numeric_limits<uint16_t>::max());
   TIM::getPeriph<TIM::_6>()->setPrescalerValue(1000);
   TIM::getPeriph<TIM::_6>()->enable();

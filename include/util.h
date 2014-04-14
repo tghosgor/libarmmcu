@@ -33,10 +33,10 @@ namespace stm32f429
 namespace util
 {
 
-template<std::size_t offset_, uint8_t shift_, std::size_t base_ = 0>
-struct ModuleInfo
+template<std::size_t offset_, uint8_t shift_>
+struct Module
 {
-  static constexpr std::size_t address = offset_ + base_;
+  static constexpr std::size_t offset = offset_;
   static constexpr uint8_t shift = shift_;
 };
 

@@ -31,20 +31,25 @@
 
 namespace stm32f429
 {
-namespace SYSCFG
-{
 
-template<uint8_t idx>
-void EXTI::setSource(EXTI::Source const source)
+constexpr SYSCFG volatile* const SYSCFG::instance() { return reinterpret_cast<SYSCFG volatile* const>(BaseAddress); }
+
+template<class Module>
+constexpr Module SYSCFG::getReg() { return Module{}; }
+
+template<class Module>
+SYSCFG::EXTI<Module>::EXTI() { }
+
+template<class Module>
+void SYSCFG::EXTI<Module>::setSource(EXTI::Source const source)
 {
-  constexpr std::size_t regAddr = BaseAddress + sizeof(uint32_t) * (idx / 4);
-  constexpr uint8_t shift = idx * 4;
+  constexpr std::size_t regAddr = BaseAddress + Module::offset;
+  constexpr uint8_t shift = Module::shift;
 
   *reinterpret_cast<uint32_t volatile* const>(regAddr) &= ~(0x7 <<shift);
   *reinterpret_cast<uint32_t volatile* const>(regAddr) |= static_cast<uint32_t>(source) <<shift;
 }
 
-} //NS SYSCFG
 } //NS stm32f429
 
 #endif /* SYSCFG_CPP_ */

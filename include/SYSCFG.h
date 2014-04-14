@@ -34,40 +34,57 @@
 
 namespace stm32f429
 {
-namespace SYSCFG
-{
-
-constexpr std::size_t BaseAddress{ 0x40013800 };
-
-class EXTI
-{
-public:
-  enum : uint32_t
-  {
-    _0, _1, _2, _3, _4,
-    _5, _6, _7, _8, _9,
-    _10, _11, _12, _13, _14,
-    _15, _16, _17, _18, _19,
-    _20, _21, _22
-  };
-
-  enum class Source : uint32_t
-  {
-    PA = 0, PB, PC, PD, PE,
-    PF, PG, PH, PI, PJ
-  };
-
-  template<uint8_t idx>
-  void setSource(EXTI::Source const source);
-};
 
 class SYSCFG
 {
 public:
   SYSCFG() = delete;
 
+  static constexpr SYSCFG volatile* const instance();
+
+  template<class Module>
+  static constexpr Module getReg();
+
+  template<class Module>
+  class EXTI;
+
+  typedef EXTI<Module<0x08, 0>>  EXTI0;
+  typedef EXTI<Module<0x08, 4>>  EXTI1;
+  typedef EXTI<Module<0x08, 8>>  EXTI2;
+  typedef EXTI<Module<0x08, 12>> EXTI3;
+  typedef EXTI<Module<0x0C, 0>>  EXTI4;
+  typedef EXTI<Module<0x0C, 4>>  EXTI5;
+  typedef EXTI<Module<0x0C, 8>>  EXTI6;
+  typedef EXTI<Module<0x0C, 12>> EXTI7;
+  typedef EXTI<Module<0x10, 0>>  EXTI8;
+  typedef EXTI<Module<0x10, 4>>  EXTI9;
+  typedef EXTI<Module<0x10, 8>>  EXTI10;
+  typedef EXTI<Module<0x10, 12>> EXTI11;
+  typedef EXTI<Module<0x14, 0>>  EXTI12;
+  typedef EXTI<Module<0x14, 4>>  EXTI13;
+  typedef EXTI<Module<0x14, 8>>  EXTI14;
+  typedef EXTI<Module<0x14, 12>> EXTI15;
+
+  template<class Module>
+  class EXTI
+  {
+    friend class SYSCFG;
+
+  public:
+    enum class Source : uint32_t
+    {
+      PA = 0, PB, PC, PD, PE,
+      PF, PG, PH, PI, PJ
+    };
+
+  public:
+    void setSource(EXTI::Source const source);
+
+  private:
+    EXTI();
+  }; //class EXTI
+
 public:
-//private:
   uint32_t m_MEMRM;   //Memory Remap
   uint32_t m_PMC;     //Peripheral Mode Configuration
   uint32_t m_EXTICR1; //External Interrupt Configuration 1
@@ -75,14 +92,11 @@ public:
   uint32_t m_EXTICR3; //External Interrupt Configuration 3
   uint32_t m_EXTICR4; //External Interrupt Configuration 4
   uint32_t m_CMPCR;   //Compensation Cell Control
+
+private:
+  static constexpr std::size_t BaseAddress{ 0x40013800 };
 };
 
-constexpr SYSCFG volatile* const instance() { return reinterpret_cast<SYSCFG volatile* const>(BaseAddress); }
-
-template<class Module>
-constexpr Module getReg() { return Module{}; }
-
-} //NS SYSCFG
 } //NS stm32f429
 
 #include <impl/SYSCFG.impl>
