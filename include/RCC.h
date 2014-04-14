@@ -95,17 +95,6 @@ public:
   void disableLPMode();
 };
 
-template<class Module>
-class Register : public Module
-{
-public:
-
-  template<class idx>
-  void enableLPMode();
-  template<class idx>
-  void disableLPMode();
-};
-
 class RCC
 {
 public:
@@ -155,9 +144,9 @@ public:
 static_assert(sizeof(RCC) == 0x88, "RCC size is wrong. Spec says its 88 bytes long.");
 
 template<class Module>
-constexpr Register<Module> getReg()
+constexpr Module getReg()
 {
-  return Register<Module>{};
+  return Module{};
 }
 
 constexpr RCC volatile* const instance()

@@ -61,10 +61,8 @@ extern "C" void SystemInit()
 int main()
 {
   RCC::getReg<RCC::GPIO>().enable<RCC::GPIO::G>();
-  auto gpioG = GPIO::getPeriph<GPIO::G>();
-  auto portGpin13 = gpioG->getPin<13>();
-  portGpin13.setMode(GPIO::Periph<GPIO::G>::Pin<13>::Mode::Output);
-  portGpin13.set();
+  GPIO::getPeriph<GPIO::G>()->getPin<13>().setMode(GPIO::Periph<GPIO::G>::Pin<13>::Mode::Output);
+  GPIO::getPeriph<GPIO::G>()->getPin<13>().set();
 
   //Port To Use With PWM TIM::_2
   RCC::getReg<RCC::GPIO>().enable<RCC::GPIO::B>();
@@ -79,7 +77,7 @@ int main()
   //çıkarılan assembly aynı
   RCC::getReg<RCC::GPIO>().enable<RCC::GPIO::G>();
   RCC::getReg<RCC::TIM>().enable<RCC::TIM::_3>();
-  SYSCFG::getReg<SYSCFG::EXTI>().setSource<0>(SYSCFG::EXTI::Source::PA);
+  SYSCFG::getReg<SYSCFG::EXTI>().setSource<SYSCFG::EXTI::_0>(SYSCFG::EXTI::Source::PA);
 
   //PWM
   RCC::getReg<RCC::TIM>().enable<RCC::TIM::_3>();

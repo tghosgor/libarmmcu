@@ -42,20 +42,21 @@ constexpr std::size_t BaseAddress{ 0x40013800 };
 class EXTI
 {
 public:
+  enum : uint32_t
+  {
+    _0, _1, _2, _3, _4,
+    _5, _6, _7, _8, _9,
+    _10, _11, _12, _13, _14,
+    _15, _16, _17, _18, _19,
+    _20, _21, _22
+  };
+
   enum class Source : uint32_t
   {
     PA = 0, PB, PC, PD, PE,
     PF, PG, PH, PI, PJ
   };
-};
 
-template<class Module>
-class Register;
-
-template<>
-class Register<EXTI>
-{
-public:
   template<uint8_t idx>
   void setSource(EXTI::Source const source);
 };
@@ -79,7 +80,7 @@ public:
 constexpr SYSCFG volatile* const instance() { return reinterpret_cast<SYSCFG volatile* const>(BaseAddress); }
 
 template<class Module>
-constexpr Register<Module> getReg() { return Register<Module>{}; }
+constexpr Module getReg() { return Module{}; }
 
 } //NS SYSCFG
 } //NS stm32f429

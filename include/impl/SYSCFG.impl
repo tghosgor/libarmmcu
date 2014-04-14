@@ -35,7 +35,7 @@ namespace SYSCFG
 {
 
 template<uint8_t idx>
-void Register<EXTI>::setSource(EXTI::Source const source)
+void EXTI::setSource(EXTI::Source const source)
 {
   constexpr std::size_t regAddr = BaseAddress + sizeof(uint32_t) * (idx / 4);
   constexpr uint8_t shift = idx * 4;
