@@ -34,7 +34,7 @@ namespace stm32f429
 namespace ADC
 {
 
-enum : uint32_t
+enum : std::size_t
 {
   _1 = 0x40012000,
   _2 = 0x40012100,
@@ -47,7 +47,7 @@ uint32_t volatile* commonRegisters = 0x40012300;
 }
 
 template<std::size_t module>
-class ADC
+class Periph
 {
 public:
 
@@ -76,7 +76,7 @@ public:
 };
 
 template<std::size_t module>
-constexpr ADC<module> volatile* getPeriph() { return reinterpret_cast<ADC<module> volatile*>(module); }
+constexpr Periph<module> volatile* getPeriph() { return reinterpret_cast<Periph<module> volatile*>(module); }
 
 } //NS ADC
 } //NS stm32f429
