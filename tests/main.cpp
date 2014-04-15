@@ -79,7 +79,7 @@ int main()
   RCC::getReg<RCC::GPIOG>().enable();
   RCC::getReg<RCC::TIM3>().enable();
   SYSCFG::getReg<SYSCFG::EXTI0>().setSource(SYSCFG::EXTI0::Source::PA);
-  EXTI::getPeriph<EXTI::_0>().clearPending();
+  EXTI::getPeriph<EXTI::_0>()->clearPending();
 
   //PWM
   RCC::getReg<RCC::TIM1>().enable();
@@ -95,10 +95,13 @@ int main()
   TIM3->enable();
 
   //Configure EXTI0 to PA0 Rising Edge
-  EXTI::getPeriph<EXTI::_0>().clearPending();
+  EXTI::getPeriph<EXTI::_0>()->clearPending();
   SYSCFG::getReg<SYSCFG::EXTI0>().setSource(SYSCFG::EXTI0::Source::PA);
-  EXTI::getPeriph<EXTI::_0>().disableInterruptMask();
-  EXTI::getPeriph<EXTI::_0>().enableRisingTrigger();
+  EXTI::getPeriph<EXTI::_0>()->disableInterruptMask();
+  EXTI::getPeriph<EXTI::_0>()->enableRisingTrigger();
+
+  EXTI::Periph<EXTI::_0> volatile* EXTI0 = EXTI::getPeriph<EXTI::_0>();
+  EXTI::getPeriph<EXTI::_0>()->generateSoftwareInterrupt();
 
   //Simple Loop Blink
   RCC::getReg<RCC::TIM6>().enable();
@@ -106,7 +109,7 @@ int main()
   TIM::getPeriph<TIM::_6>()->setPrescalerValue(1000);
   TIM::getPeriph<TIM::_6>()->enable();
 
-  EXTI::getPeriph<0>().clearPending();
+  EXTI::getPeriph<0>()->clearPending();
   while(true)
   {
     uint16_t cntVal = TIM::getPeriph<TIM::_6>()->getCounterValue();
@@ -115,6 +118,11 @@ int main()
     else
       GPIO::getPeriph<GPIO::G>()->getPin<13>().reset();
   }
+}
+
+extern "C" void EXTI0_IRQHandler()
+{
+  while(true);
 }
 
 extern "C" void _exit()

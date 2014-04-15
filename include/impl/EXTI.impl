@@ -31,52 +31,59 @@
 
 namespace stm32f429
 {
+
 template<uint8_t line>
-void EXTI::Periph<line>::clearPending()
+constexpr EXTI::Periph<line> volatile* EXTI::getPeriph()
+{
+  return reinterpret_cast<EXTI::Periph<line> volatile*>(0x40013C00);
+}
+
+template<uint8_t line>
+void EXTI::Periph<line>::clearPending() volatile
 {
   instance()->m_PR |= 0x1 <<line;
 }
 
 template<uint8_t line>
-void EXTI::Periph<line>::enableInterruptMask()
+void EXTI::Periph<line>::enableInterruptMask() volatile
 {
   instance()->m_IMR |= 0x1 <<line;
 }
 
 template<uint8_t line>
-void EXTI::Periph<line>::disableInterruptMask()
+void EXTI::Periph<line>::disableInterruptMask() volatile
 {
   instance()->m_IMR |= ~(0x1 <<line);
 }
 
 template<uint8_t line>
-void EXTI::Periph<line>::enableRisingTrigger()
+void EXTI::Periph<line>::enableRisingTrigger() volatile
 {
   instance()->m_RTSR |= 0x1 <<line;
 }
 
 template<uint8_t line>
-void EXTI::Periph<line>::disableRisingTrigger()
+void EXTI::Periph<line>::disableRisingTrigger() volatile
 {
   instance()->m_RTSR |= ~(0x1 <<line);
 }
 
 template<uint8_t line>
-void EXTI::Periph<line>::enableFallingTrigger()
+void EXTI::Periph<line>::enableFallingTrigger() volatile
 {
   instance()->m_FTSR |= 0x1 <<line;
 }
 
 template<uint8_t line>
-void EXTI::Periph<line>::disableFallingTrigger()
+void EXTI::Periph<line>::disableFallingTrigger() volatile
 {
   instance()->m_RTSR |= ~(0x1 <<line);
 }
 
 template<uint8_t line>
-void EXTI::Periph<line>::generateSoftwareInterrupt()
+void EXTI::Periph<line>::generateSoftwareInterrupt() volatile
 {
-  instance()->m_SWIER |= ~(0x1 <<line);
+  instance()->m_SWIER |= 0x1 <<line;
 }
 
 } //NS stm32f429

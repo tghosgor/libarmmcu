@@ -48,21 +48,21 @@ public:
   class Periph
   {
   public:
-    void clearPending();
-    void enableInterruptMask();
-    void disableInterruptMask();
-    void enableRisingTrigger();
-    void disableRisingTrigger();
-    void enableFallingTrigger();
-    void disableFallingTrigger();
-    void generateSoftwareInterrupt();
+    void clearPending() volatile;
+    void enableInterruptMask() volatile;
+    void disableInterruptMask() volatile;
+    void enableRisingTrigger() volatile;
+    void disableRisingTrigger() volatile;
+    void enableFallingTrigger() volatile;
+    void disableFallingTrigger() volatile;
+    void generateSoftwareInterrupt() volatile;
 
   };
 
   static constexpr EXTI volatile* const instance() { return reinterpret_cast<EXTI volatile* const>(0x40013C00); }
 
   template<uint8_t line>
-  static constexpr Periph<line> getPeriph() { return Periph<line>{}; }
+  static constexpr Periph<line> volatile* getPeriph();
 
 
 public:
