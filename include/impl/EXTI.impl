@@ -32,9 +32,21 @@
 namespace stm32f429
 {
 template<uint8_t line>
-void EXTI::Line<line>::clearPending()
+void EXTI::Periph<line>::clearPending()
 {
   instance()->m_PR |= 0x1 <<line;
+}
+
+template<uint8_t line>
+void EXTI::Periph<line>::enableInterruptMask()
+{
+  instance()->m_IMR |= 0x1 <<line;
+}
+
+template<uint8_t line>
+void EXTI::Periph<line>::disableInterruptMask()
+{
+  instance()->m_IMR |= ~(0x1 <<line);
 }
 
 } //NS stm32f429

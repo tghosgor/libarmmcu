@@ -45,17 +45,19 @@ public:
   };
 
   template<uint8_t line>
-  class Line
+  class Periph
   {
   public:
     void clearPending();
+    void enableInterruptMask();
+    void disableInterruptMask();
 
   };
 
   static constexpr EXTI volatile* const instance() { return reinterpret_cast<EXTI volatile* const>(0x40013C00); }
 
   template<uint8_t line>
-  static constexpr Line<line> getPeriph() { return Line<line>{}; }
+  static constexpr Periph<line> getPeriph() { return Periph<line>{}; }
 
 
 public:
