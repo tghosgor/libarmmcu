@@ -35,16 +35,33 @@ class SCB
 public:
   SCB() = delete;
 
-  static volatile SCB* const instance() { return reinterpret_cast<volatile SCB*>(0xE000ED00); }
+  static volatile SCB* const instance() { return reinterpret_cast<volatile SCB*>(BaseAddress); }
 
-public:
-//private:
+public: //Registers
+  uint32_t m_ACTLR;
+  uint8_t PADDING1[3316];
   uint32_t m_CPUID;
-  uint32_t m_ICSR;  //Interrupt Control and State Register
-  uint32_t m_VTOR;  //Vector Table Offset Register
-  uint32_t m_AIRCR; //Application Interrupt and Reset Control Register
-  uint32_t m_SCR;   //System Control Register
+  uint32_t m_ICSR;  //Interrupt Control and State
+  uint32_t m_VTOR;  //Vector Table Offset
+  uint32_t m_AIRCR; //Application Interrupt and Reset Control
+  uint32_t m_SCR;   //System Control
+  uint32_t m_CCR;   //Configuration and Control
+  uint32_t m_SHPR1; //System Handler Priority 1
+  uint32_t m_SHPR2; //System Handler Priority 2
+  uint32_t m_SHPR3; //System Handler Priority 3
+  uint32_t m_SHCRS; //System Handler Control and State
+  uint32_t m_CFSR;  //Configurable Fault Status
+  uint32_t m_HFSR;  //HardFault Status
+  uint8_t PADDING2[1];
+  uint32_t m_MMAR;  //MemManage Fault Address
+  uint32_t m_BFAR;  //BusFault Address
+  uint32_t m_AFSR;  //Auxiliary Fault
+
+private:
+  static constexpr std::size_t BaseAddress{ 0xE000E008 };
 };
+
+static_assert(sizeof(SCB) == (0xE000ED3C - 0xE000E008) + 4, "SCB size is wrong.");
 
 } //NS stm32f429
 

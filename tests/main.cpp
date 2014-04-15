@@ -61,13 +61,19 @@ extern "C" void SystemInit()
 
 int main()
 {
+  RCC::getReg<RCC::GPIOA>().enable();
   RCC::getReg<RCC::GPIOG>().enable();
+  RCC::getReg<RCC::GPIOB>().enable();
+  RCC::getReg<RCC::GPIOG>().enable();
+
+  RCC::getReg<RCC::TIM1>().enable();
+  RCC::getReg<RCC::TIM3>().enable();
+
   GPIO::getPeriph<GPIO::G>()->getPin<13>().setMode(GPIO::Periph<GPIO::G>::Pin<13>::Mode::Output);
   GPIO::getPeriph<GPIO::G>()->getPin<13>().set();
 
-  //Port To Use With PWM TIM::_2
-  RCC::RCC::getReg<RCC::GPIOB>().enable();
   auto gpioB = GPIO::getPeriph<GPIO::B>();
+  //Port To Use With PWM TIM::_2
   auto PWMPin = gpioB->getPin<5>();
   PWMPin.setMode(GPIO::Periph<GPIO::B>::Pin<5>::Mode::Alternate);
   PWMPin.setAF(GPIO::Periph<GPIO::B>::Pin<5>::AF::_2);
@@ -76,13 +82,10 @@ int main()
 
   //birinde template ModuleInfo diğerinde uint8_t kullanılıyor ve ötekinde constexpr ile 4 byte'ı aşan offsetleme yapılıyor
   //çıkarılan assembly aynı
-  RCC::getReg<RCC::GPIOG>().enable();
-  RCC::getReg<RCC::TIM3>().enable();
   SYSCFG::getReg<SYSCFG::EXTI0>().setSource(SYSCFG::EXTI0::Source::PA);
   EXTI::getPeriph<EXTI::_0>()->clearPending();
 
   //PWM
-  RCC::getReg<RCC::TIM1>().enable();
   auto TIM3 = TIM::getPeriph<TIM::_3>();
   TIM3->enableAutoReloadPreload();
   auto TIM3CC2 = TIM3->getCC<2>();
@@ -94,13 +97,17 @@ int main()
   TIM3->generateEvent();
   TIM3->enable();
 
+  //TODO: NVIC->m_ISER[0]'ın 6 biti set edilmeli, EXT0'a denk geliyor
+
   //Configure EXTI0 to PA0 Rising Edge
   EXTI::getPeriph<EXTI::_0>()->clearPending();
   SYSCFG::getReg<SYSCFG::EXTI0>().setSource(SYSCFG::EXTI0::Source::PA);
-  EXTI::getPeriph<EXTI::_0>()->disableInterruptMask();
+  //EXTI::getPeriph<EXTI::_0>()->disableInterruptMask();
   EXTI::getPeriph<EXTI::_0>()->enableRisingTrigger();
 
-  EXTI::Periph<EXTI::_0> volatile* EXTI0 = EXTI::getPeriph<EXTI::_0>();
+  auto EXTI0 = reinterpret_cast<EXTI volatile*>(EXTI::getPeriph<EXTI::_0>());
+  auto SYSCFG = SYSCFG::instance();
+
   EXTI::getPeriph<EXTI::_0>()->generateSoftwareInterrupt();
 
   //Simple Loop Blink
@@ -112,6 +119,8 @@ int main()
   EXTI::getPeriph<0>()->clearPending();
   while(true)
   {
+    if(GPIO::getPeriph<GPIO::A>()->getPin<0>().getInputState())
+      continue;
     uint16_t cntVal = TIM::getPeriph<TIM::_6>()->getCounterValue();
     if(cntVal >= std::numeric_limits<uint16_t>::max() / 2)
       GPIO::getPeriph<GPIO::G>()->getPin<13>().set();

@@ -64,7 +64,6 @@ public:
   template<uint8_t line>
   static constexpr Periph<line> volatile* getPeriph();
 
-
 public:
   uint32_t m_IMR;   //Interrupt mask
   uint32_t m_EMR;   //Event mask
