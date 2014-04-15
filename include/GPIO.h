@@ -46,13 +46,13 @@ enum : std::size_t
 template<std::size_t module>
 class Periph
 {
-public:
+public: //Declarations
   template<uint8_t idx>
   class Pin
   {
     friend class Periph;
 
-  public:
+  public: //Declarations
     enum class Mode
     {
       Input = 0x0,
@@ -84,6 +84,7 @@ public:
       PullDown = 0x2
     };
 
+  public: //Methods
     void setMode(Mode const mode) volatile;
     void setAF(AF const af) volatile;
     void setOutputSpeed(OutputSpeed const ospeed) volatile;
@@ -95,7 +96,7 @@ public:
     bool getInputState() volatile;
     bool getOutputState() volatile;
 
-  private:
+  private: //Internal Methods
     template<uint8_t idx_>
     typename std::enable_if<(idx_ < 8)>::type
     setAF_(AF const af) volatile;
@@ -105,10 +106,11 @@ public:
     setAF_(AF const af) volatile;
   }; //END Pin
 
+public: //Methods
   template<uint8_t idx>
   Pin<idx> getPin() volatile;
 
-private:
+public: //Registers
   uint32_t m_MODER;
   uint32_t m_OTYPER;
   uint32_t m_OSPEEDR;

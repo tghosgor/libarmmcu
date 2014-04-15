@@ -167,7 +167,7 @@ private:
   uint32_t m_OR;
 };
 
-static_assert(sizeof(Periph<0>) == 0x54, "TIM size is not correct. Spec says 54 bytes.");
+static_assert(sizeof(Periph<0>) == 0x54, "TIM size is not correct. Spec says 0x54 bytes.");
 
 template<std::size_t module>
 constexpr Periph<module> volatile* const getPeriph();

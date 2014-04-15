@@ -26,6 +26,7 @@
 
 #include <EXTI.h>
 #include <GPIO.h>
+#include <LCD.h>
 #include <RCC.h>
 #include <SCB.h>
 #include <SYSCFG.h>

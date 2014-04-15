@@ -37,29 +37,24 @@ using util::Module;
 
 class RCC
 {
-public:
-  static constexpr RCC volatile* const instance();
-
-  template<class Module>
-  static constexpr Module getReg();
-
+public: //Declarations
   template<class Module>
   class GPIO;
 
-  typedef GPIO<Module<0x30, 0>> GPIOA;
-  typedef GPIO<Module<0x30, 1>> GPIOB;
-  typedef GPIO<Module<0x30, 2>> GPIOC;
-  typedef GPIO<Module<0x30, 3>> GPIOD;
-  typedef GPIO<Module<0x30, 4>> GPIOE;
-  typedef GPIO<Module<0x30, 5>> GPIOF;
-  typedef GPIO<Module<0x30, 6>> GPIOG;
+  using GPIOA = GPIO<Module<0x30, 0>>;
+  using GPIOB = GPIO<Module<0x30, 1>>;
+  using GPIOC = GPIO<Module<0x30, 2>>;
+  using GPIOD = GPIO<Module<0x30, 3>>;
+  using GPIOE = GPIO<Module<0x30, 4>>;
+  using GPIOF = GPIO<Module<0x30, 5>>;
+  using GPIOG = GPIO<Module<0x30, 6>>;
 
   template<class Module>
   class GPIO
   {
     friend class RCC;
 
-  public:
+  public: //Methods
     void enable();
     void disable();
     void enableLPMode();
@@ -72,27 +67,27 @@ public:
   template<class Module>
   class TIM;
 
-  typedef TIM<Module<0x44, 0>>  TIM1;
-  typedef TIM<Module<0x40, 0>>  TIM2;
-  typedef TIM<Module<0x40, 1>>  TIM3;
-  typedef TIM<Module<0x40, 2>>  TIM4;
-  typedef TIM<Module<0x40, 3>>  TIM5;
-  typedef TIM<Module<0x40, 4>>  TIM6;
-  typedef TIM<Module<0x40, 5>>  TIM7;
-  typedef TIM<Module<0x44, 1>>  TIM8;
-  typedef TIM<Module<0x44, 16>> TIM9;
-  typedef TIM<Module<0x44, 17>> TIM10;
-  typedef TIM<Module<0x44, 18>> TIM11;
-  typedef TIM<Module<0x40, 6>>  TIM12;
-  typedef TIM<Module<0x40, 7>>  TIM13;
-  typedef TIM<Module<0x40, 8>>  TIM14;
+  using TIM1 = TIM<Module<0x44, 0>> ;
+  using TIM2 = TIM<Module<0x40, 0>> ;
+  using TIM3 = TIM<Module<0x40, 1>> ;
+  using TIM4 = TIM<Module<0x40, 2>> ;
+  using TIM5 = TIM<Module<0x40, 3>> ;
+  using TIM6 = TIM<Module<0x40, 4>> ;
+  using TIM7 = TIM<Module<0x40, 5>> ;
+  using TIM8 = TIM<Module<0x44, 1>> ;
+  using TIM9 = TIM<Module<0x44, 16>>;
+  using TIM10 = TIM<Module<0x44, 17>>;
+  using TIM11 = TIM<Module<0x44, 18>>;
+  using TIM12 = TIM<Module<0x40, 6>> ;
+  using TIM13 = TIM<Module<0x40, 7>> ;
+  using TIM14 = TIM<Module<0x40, 8>> ;
 
   template<class Module>
   class TIM
   {
     friend class RCC;
 
-  public:
+  public: //Methods
     void enable();
     void disable();
     void enableLPMode();
@@ -102,10 +97,15 @@ public:
     TIM();
   };
 
-public:
+public: //Methods
   RCC() = delete;
 
-public:
+  static constexpr RCC volatile* const instance();
+
+  template<class Module>
+  static constexpr Module getReg();
+
+public: //Registers
   uint32_t m_CR; //Clock Control
   uint32_t m_PLLCFGR;
   uint32_t m_CFGR;

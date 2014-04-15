@@ -48,22 +48,22 @@ public:
   template<class Module>
   class EXTI;
 
-  typedef EXTI<Module<0x08, 0>>  EXTI0;
-  typedef EXTI<Module<0x08, 4>>  EXTI1;
-  typedef EXTI<Module<0x08, 8>>  EXTI2;
-  typedef EXTI<Module<0x08, 12>> EXTI3;
-  typedef EXTI<Module<0x0C, 0>>  EXTI4;
-  typedef EXTI<Module<0x0C, 4>>  EXTI5;
-  typedef EXTI<Module<0x0C, 8>>  EXTI6;
-  typedef EXTI<Module<0x0C, 12>> EXTI7;
-  typedef EXTI<Module<0x10, 0>>  EXTI8;
-  typedef EXTI<Module<0x10, 4>>  EXTI9;
-  typedef EXTI<Module<0x10, 8>>  EXTI10;
-  typedef EXTI<Module<0x10, 12>> EXTI11;
-  typedef EXTI<Module<0x14, 0>>  EXTI12;
-  typedef EXTI<Module<0x14, 4>>  EXTI13;
-  typedef EXTI<Module<0x14, 8>>  EXTI14;
-  typedef EXTI<Module<0x14, 12>> EXTI15;
+  using EXTI0  = EXTI<Module<0x08, 0>>;
+  using EXTI1  = EXTI<Module<0x08, 4>>;
+  using EXTI2  = EXTI<Module<0x08, 8>>;
+  using EXTI3  = EXTI<Module<0x08, 12>>;
+  using EXTI4  = EXTI<Module<0x0C, 0>>;
+  using EXTI5  = EXTI<Module<0x0C, 4>>;
+  using EXTI6  = EXTI<Module<0x0C, 8>>;
+  using EXTI7  = EXTI<Module<0x0C, 12>>;
+  using EXTI8  = EXTI<Module<0x10, 0>>;
+  using EXTI9  = EXTI<Module<0x10, 4>>;
+  using EXTI10 = EXTI<Module<0x10, 8>>;
+  using EXTI11 = EXTI<Module<0x10, 12>>;
+  using EXTI12 = EXTI<Module<0x14, 0>>;
+  using EXTI13 = EXTI<Module<0x14, 4>>;
+  using EXTI14 = EXTI<Module<0x14, 8>>;
+  using EXTI15 = EXTI<Module<0x14, 12>>;
 
   template<class Module>
   class EXTI
