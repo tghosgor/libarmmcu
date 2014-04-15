@@ -16,7 +16,7 @@ RCC::getReg<RCC::TIM3>().enable(); //Control Register
 TIM::getPeriph<TIM::_3>()->enable();
 TIM::getPeriph<TIM::_3>()->getCC<2>().setOCMode(TIM::Periph<TIM::_3>::CC<2>::OCMode::PWM1);
 
-EXTI::getPeriph<EXTI:::_0>().clearPending();
+EXTI::getPeriph<EXTI::_0>().clearPending();
 ```
 
 Control register access syntax is as follows:
