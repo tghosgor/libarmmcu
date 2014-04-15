@@ -49,6 +49,36 @@ void EXTI::Periph<line>::disableInterruptMask()
   instance()->m_IMR |= ~(0x1 <<line);
 }
 
+template<uint8_t line>
+void EXTI::Periph<line>::enableRisingTrigger()
+{
+  instance()->m_RTSR |= 0x1 <<line;
+}
+
+template<uint8_t line>
+void EXTI::Periph<line>::disableRisingTrigger()
+{
+  instance()->m_RTSR |= ~(0x1 <<line);
+}
+
+template<uint8_t line>
+void EXTI::Periph<line>::enableFallingTrigger()
+{
+  instance()->m_FTSR |= 0x1 <<line;
+}
+
+template<uint8_t line>
+void EXTI::Periph<line>::disableFallingTrigger()
+{
+  instance()->m_RTSR |= ~(0x1 <<line);
+}
+
+template<uint8_t line>
+void EXTI::Periph<line>::generateSoftwareInterrupt()
+{
+  instance()->m_SWIER |= ~(0x1 <<line);
+}
+
 } //NS stm32f429
 
 #endif /* EXTI_CPP_ */

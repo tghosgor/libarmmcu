@@ -51,6 +51,11 @@ public:
     void clearPending();
     void enableInterruptMask();
     void disableInterruptMask();
+    void enableRisingTrigger();
+    void disableRisingTrigger();
+    void enableFallingTrigger();
+    void disableFallingTrigger();
+    void generateSoftwareInterrupt();
 
   };
 

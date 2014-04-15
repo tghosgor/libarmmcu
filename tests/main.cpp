@@ -93,6 +93,12 @@ int main()
   TIM3->generateEvent();
   TIM3->enable();
 
+  //Configure EXTI0 to PA0 Rising Edge
+  EXTI::getPeriph<EXTI::_0>().clearPending();
+  SYSCFG::getReg<SYSCFG::EXTI0>().setSource(SYSCFG::EXTI0::Source::PA);
+  EXTI::getPeriph<EXTI::_0>().disableInterruptMask();
+  EXTI::getPeriph<EXTI::_0>().enableRisingTrigger();
+
   //Simple Loop Blink
   RCC::getReg<RCC::TIM6>().enable();
   TIM::getPeriph<TIM::_6>()->setAutoReloadValue(std::numeric_limits<uint16_t>::max());
