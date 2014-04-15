@@ -7,14 +7,16 @@ Syntax and usage example is shown in _tests/main.cpp_.
 
 Peripheral access syntax is as follows:
 ```C++
-RCC::getReg<RCC::GPIOG>().enable();
+RCC::getReg<RCC::GPIOG>().enable(); //Control Register
 GPIO::getPeriph<GPIO::G>()->enable();
 GPIO::getPeriph<GPIO::G>()->getPin<13>().setMode(GPIO::Periph<GPIO::G>::Pin<13>::Mode::Output);
 GPIO::getPeriph<GPIO::G>()->getPin<13>().set();
 
-RCC::getReg<RCC::TIM3>().enable();
+RCC::getReg<RCC::TIM3>().enable(); //Control Register
 TIM::getPeriph<TIM::_3>()->enable();
 TIM::getPeriph<TIM::_3>()->getCC<2>().setOCMode(TIM::Periph<TIM::_3>::CC<2>::OCMode::PWM1);
+
+EXTI::getPeriph<EXTI:::_0>().clearPending();
 ```
 
 Control register access syntax is as follows:

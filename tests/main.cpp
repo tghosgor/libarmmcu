@@ -78,6 +78,7 @@ int main()
   RCC::getReg<RCC::GPIOG>().enable();
   RCC::getReg<RCC::TIM3>().enable();
   SYSCFG::getReg<SYSCFG::EXTI0>().setSource(SYSCFG::EXTI0::Source::PA);
+  EXTI::getPeriph<EXTI::_0>().clearPending();
 
   //PWM
   RCC::getReg<RCC::TIM1>().enable();
@@ -98,7 +99,7 @@ int main()
   TIM::getPeriph<TIM::_6>()->setPrescalerValue(1000);
   TIM::getPeriph<TIM::_6>()->enable();
 
-  EXTI::getReg<EXTI::Pending>().clear<0>();
+  EXTI::getPeriph<0>().clearPending();
   while(true)
   {
     uint16_t cntVal = TIM::getPeriph<TIM::_6>()->getCounterValue();
