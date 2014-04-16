@@ -98,7 +98,7 @@ void Periph<module>::Pin<idx>::setOutputSpeed(Periph::Pin<idx>::OutputSpeed cons
 
 template<std::size_t module>
 template<uint8_t idx>
-void Periph<module>::Pin<idx>::setPushPullMode(Periph::Pin<idx>::PushPullMode const ppm) volatile
+void Periph<module>::Pin<idx>::setPullMode(Periph::Pin<idx>::PullMode const ppm) volatile
 {
   constexpr uint32_t shiftBy { idx * 2 };
   reinterpret_cast<Periph<module> volatile* const>(module)->m_PUPDR &= ~(0x3 <<shiftBy);

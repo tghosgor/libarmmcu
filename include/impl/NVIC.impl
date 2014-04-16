@@ -24,45 +24,56 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCB_H_
-#define SCB_H_
+#ifndef NVIC_CPP_
+#define NVIC_CPP_
+
+#include <NVIC.h>
 
 namespace stm32f429
 {
 
-class SCB
+template<uint8_t N>
+void NVIC::Interrupt<N>::enable()
 {
-public:
-  SCB() = delete;
+  reinterpret_cast<NVIC volatile*>(BaseAddress)->m_ISER[N / 32] = 0x1 <<(N % 32);
+}
 
-  static volatile SCB* const instance() { return reinterpret_cast<volatile SCB*>(BaseAddress); }
+template<uint8_t N>
+void NVIC::Interrupt<N>::disable()
+{
+  reinterpret_cast<NVIC volatile*>(BaseAddress)->m_ICER[N / 32] = 0x1 <<(N % 32);
+}
 
-public: //Registers
-  uint32_t m_ACTLR;
-  uint8_t PADDING1[3316];
-  uint32_t m_CPUID;
-  uint32_t m_ICSR;  //Interrupt Control and State
-  uint32_t m_VTOR;  //Vector Table Offset
-  uint32_t m_AIRCR; //Application Interrupt and Reset Control
-  uint32_t m_SCR;   //System Control
-  uint32_t m_CCR;   //Configuration and Control
-  uint32_t m_SHPR1; //System Handler Priority 1
-  uint32_t m_SHPR2; //System Handler Priority 2
-  uint32_t m_SHPR3; //System Handler Priority 3
-  uint32_t m_SHCRS; //System Handler Control and State
-  uint32_t m_CFSR;  //Configurable Fault Status
-  uint32_t m_HFSR;  //HardFault Status
-  uint8_t PADDING2[1];
-  uint32_t m_MMAR;  //MemManage Fault Address
-  uint32_t m_BFAR;  //BusFault Address
-  uint32_t m_AFSR;  //Auxiliary Fault
+template<uint8_t N>
+void NVIC::Interrupt<N>::setPending()
+{
 
-public:
-  static constexpr std::size_t BaseAddress{ 0xE000E008 };
-};
+}
 
-static_assert(sizeof(SCB) == (0xE000ED3C - SCB::BaseAddress) + 4, "SCB size is wrong.");
+template<uint8_t N>
+void NVIC::Interrupt<N>::clearPending()
+{
+
+}
+
+template<uint8_t N>
+void NVIC::Interrupt<N>::isActive()
+{
+
+}
+
+template<uint8_t N>
+void NVIC::Interrupt<N>::setPriority()
+{
+
+}
+
+template<uint8_t N>
+void NVIC::Interrupt<N>::triggerSoftwareInterrupt()
+{
+
+}
 
 } //NS stm32f429
 
-#endif /* SCB_H_ */
+#endif /* NVIC_CPP_ */

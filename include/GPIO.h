@@ -77,7 +77,7 @@ public: //Declarations
       High
     };
 
-    enum class PushPullMode : uint32_t
+    enum class PullMode : uint32_t
     {
       None = 0x0,
       PullUp = 0x1,
@@ -88,7 +88,7 @@ public: //Declarations
     void setMode(Mode const mode) volatile;
     void setAF(AF const af) volatile;
     void setOutputSpeed(OutputSpeed const ospeed) volatile;
-    void setPushPullMode(PushPullMode const ppm) volatile;
+    void setPullMode(PullMode const ppm) volatile;
 
     void set() volatile;
     void reset() volatile;

@@ -28,6 +28,7 @@
 #include <GPIO.h>
 #include <LCD.h>
 #include <RCC.h>
+#include <NVIC.h>
 #include <SCB.h>
 #include <SYSCFG.h>
 #include <TIM.h>
@@ -70,6 +71,8 @@ int main()
   RCC::getReg<RCC::TIM3>().enable();
 
   GPIO::getPeriph<GPIO::G>()->getPin<13>().setMode(GPIO::Periph<GPIO::G>::Pin<13>::Mode::Output);
+  GPIO::getPeriph<GPIO::G>()->getPin<14>().setMode(GPIO::Periph<GPIO::G>::Pin<14>::Mode::Output);
+
   GPIO::getPeriph<GPIO::G>()->getPin<13>().set();
 
   auto gpioB = GPIO::getPeriph<GPIO::B>();
@@ -78,7 +81,7 @@ int main()
   PWMPin.setMode(GPIO::Periph<GPIO::B>::Pin<5>::Mode::Alternate);
   PWMPin.setAF(GPIO::Periph<GPIO::B>::Pin<5>::AF::_2);
   //PWMPin->setOutputSpeed(GPIO::Port<GPIO::PortB>::Pin<5>::OutputSpeed::Low);
-  PWMPin.setPushPullMode(GPIO::Periph<GPIO::B>::Pin<5>::PushPullMode::PullUp);
+  PWMPin.setPullMode(GPIO::Periph<GPIO::B>::Pin<5>::PullMode::PullUp);
 
   //birinde template ModuleInfo diğerinde uint8_t kullanılıyor ve ötekinde constexpr ile 4 byte'ı aşan offsetleme yapılıyor
   //çıkarılan assembly aynı
@@ -100,15 +103,17 @@ int main()
   //TODO: NVIC->m_ISER[0]'ın 6 biti set edilmeli, EXT0'a denk geliyor
 
   //Configure EXTI0 to PA0 Rising Edge
+  GPIO::getPeriph<GPIO::A>()->getPin<0>().setPullMode(GPIO::Periph<GPIO::A>::Pin<0>::PullMode::None);
   EXTI::getPeriph<EXTI::_0>()->clearPending();
   SYSCFG::getReg<SYSCFG::EXTI0>().setSource(SYSCFG::EXTI0::Source::PA);
-  //EXTI::getPeriph<EXTI::_0>()->disableInterruptMask();
+  EXTI::getPeriph<EXTI::_0>()->enableInterrupt();
   EXTI::getPeriph<EXTI::_0>()->enableRisingTrigger();
+  NVIC::getReg<6>().enable();
 
   auto EXTI0 = reinterpret_cast<EXTI volatile*>(EXTI::getPeriph<EXTI::_0>());
   auto SYSCFG = SYSCFG::instance();
 
-  EXTI::getPeriph<EXTI::_0>()->generateSoftwareInterrupt();
+  //EXTI::getPeriph<EXTI::_0>()->generateSoftwareInterrupt();
 
   //Simple Loop Blink
   RCC::getReg<RCC::TIM6>().enable();
@@ -131,7 +136,12 @@ int main()
 
 extern "C" void EXTI0_IRQHandler()
 {
-  while(true);
+  if(!GPIO::getPeriph<GPIO::G>()->getPin<14>().getOutputState())
+    GPIO::getPeriph<GPIO::G>()->getPin<14>().set();
+  else
+    GPIO::getPeriph<GPIO::G>()->getPin<14>().reset();
+
+  EXTI::getPeriph<EXTI::_0>()->clearPending();
 }
 
 extern "C" void _exit()

@@ -45,13 +45,13 @@ void EXTI::Periph<line>::clearPending() volatile
 }
 
 template<uint8_t line>
-void EXTI::Periph<line>::enableInterruptMask() volatile
+void EXTI::Periph<line>::enableInterrupt() volatile
 {
   instance()->m_IMR |= 0x1 <<line;
 }
 
 template<uint8_t line>
-void EXTI::Periph<line>::disableInterruptMask() volatile
+void EXTI::Periph<line>::disableInterrupt() volatile
 {
   instance()->m_IMR |= ~(0x1 <<line);
 }

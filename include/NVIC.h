@@ -24,45 +24,64 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCB_H_
-#define SCB_H_
+#ifndef NVIC_H_
+#define NVIC_H_
+
+#include <cstddef> //offsetof
+#include <cstdint>
 
 namespace stm32f429
 {
 
-class SCB
+class NVIC
 {
-public:
-  SCB() = delete;
-
-  static volatile SCB* const instance() { return reinterpret_cast<volatile SCB*>(BaseAddress); }
+public: //Declarations
+  template<uint8_t N>
+  class Interrupt
+  {
+  public:
+    void enable();
+    void disable();
+    void setPending();
+    void clearPending();
+    void isActive();
+    void setPriority();
+    void triggerSoftwareInterrupt();
+  };
 
 public: //Registers
-  uint32_t m_ACTLR;
-  uint8_t PADDING1[3316];
-  uint32_t m_CPUID;
-  uint32_t m_ICSR;  //Interrupt Control and State
-  uint32_t m_VTOR;  //Vector Table Offset
-  uint32_t m_AIRCR; //Application Interrupt and Reset Control
-  uint32_t m_SCR;   //System Control
-  uint32_t m_CCR;   //Configuration and Control
-  uint32_t m_SHPR1; //System Handler Priority 1
-  uint32_t m_SHPR2; //System Handler Priority 2
-  uint32_t m_SHPR3; //System Handler Priority 3
-  uint32_t m_SHCRS; //System Handler Control and State
-  uint32_t m_CFSR;  //Configurable Fault Status
-  uint32_t m_HFSR;  //HardFault Status
-  uint8_t PADDING2[1];
-  uint32_t m_MMAR;  //MemManage Fault Address
-  uint32_t m_BFAR;  //BusFault Address
-  uint32_t m_AFSR;  //Auxiliary Fault
+  uint32_t m_ISER[8];
+  uint8_t PADDING1[0x60];
+  uint32_t m_ICER[8];
+  uint8_t PADDING2[0x60];
+  uint32_t m_ISPR[8];
+  uint8_t PADDING3[0x60];
+  uint32_t m_ICPR[8];
+  uint8_t PADDING4[0x60];
+  uint32_t m_IABR[8];
+  uint8_t PADDING5[0xE0];
+  uint32_t m_IPR[60];
+  uint8_t PADDING6[0xA0D];
+  uint32_t m_STIR;
+
+  //E1D
 
 public:
-  static constexpr std::size_t BaseAddress{ 0xE000E008 };
+  NVIC() = delete;
+
+  static volatile NVIC* const instance() { return reinterpret_cast<volatile NVIC*>(BaseAddress); }
+  template<uint8_t N>
+  static constexpr Interrupt<N> getReg() { return Interrupt<N>{}; }
+
+public:
+  static constexpr std::size_t BaseAddress{ 0xE000E100 };
 };
 
-static_assert(sizeof(SCB) == (0xE000ED3C - SCB::BaseAddress) + 4, "SCB size is wrong.");
+static_assert(offsetof(NVIC, m_ICER[7]) == 0xE000E19C - NVIC::BaseAddress, "Test?");
+static_assert(sizeof(NVIC) == (0xE000EF00 - NVIC::BaseAddress) + 4, "NVIC size is wrong.");
 
 } //NS stm32f429
 
-#endif /* SCB_H_ */
+#include <impl/NVIC.impl>
+
+#endif /* NVIC_H_ */

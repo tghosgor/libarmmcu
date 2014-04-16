@@ -141,7 +141,7 @@ public: //Registers
   uint32_t m_SSCGR;
   uint32_t m_PLLI2SCFGR;
 
-private:
+public:
   static constexpr std::size_t BaseAddress{ 0x40023800 };
 };
 

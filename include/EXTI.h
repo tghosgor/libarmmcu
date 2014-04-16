@@ -49,8 +49,8 @@ public:
   {
   public:
     void clearPending() volatile;
-    void enableInterruptMask() volatile;
-    void disableInterruptMask() volatile;
+    void enableInterrupt() volatile;
+    void disableInterrupt() volatile;
     void enableRisingTrigger() volatile;
     void disableRisingTrigger() volatile;
     void enableFallingTrigger() volatile;
@@ -59,7 +59,7 @@ public:
 
   };
 
-  static constexpr EXTI volatile* const instance() { return reinterpret_cast<EXTI volatile* const>(0x40013C00); }
+  static constexpr EXTI volatile* const instance() { return reinterpret_cast<EXTI volatile* const>(BaseAddress); }
 
   template<uint8_t line>
   static constexpr Periph<line> volatile* getPeriph();
@@ -71,6 +71,9 @@ public:
   uint32_t m_FTSR;  //Falling trigger selection
   uint32_t m_SWIER; //Software interrupt event
   uint32_t m_PR;    //Pending
+
+public:
+  static constexpr std::size_t BaseAddress{ 0x40013C00 };
 };
 } //NS stm32f429
 

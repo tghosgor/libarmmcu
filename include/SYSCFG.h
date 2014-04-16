@@ -93,7 +93,7 @@ public:
   uint32_t m_EXTICR4; //External Interrupt Configuration 4
   uint32_t m_CMPCR;   //Compensation Cell Control
 
-private:
+public:
   static constexpr std::size_t BaseAddress{ 0x40013800 };
 };
 
