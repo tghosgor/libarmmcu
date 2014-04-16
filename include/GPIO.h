@@ -37,78 +37,29 @@ namespace GPIO
 
 enum : std::size_t
 {
-  A = 0x40020000,
-  B = 0x40020400,
-  C = 0x40020800,
-  G = 0x40021800
+  PortA = 0x40020000,
+  PortB = 0x40020400,
+  PortC = 0x40020800,
+  PortG = 0x40021800
 };
 
-template<std::size_t module>
-class Periph
+class Port
 {
 public: //Declarations
-  template<uint8_t idx>
-  class Pin
+  enum class PinMode
   {
-    friend class Periph;
+    Input = 0x0,
+    Output = 0x1,
+    Alternate = 0x2,
+    Analog = 0x3
+  };
 
-  public: //Declarations
-    enum class Mode
-    {
-      Input = 0x0,
-      Output = 0x1,
-      Alternate = 0x2,
-      Analog = 0x3
-    };
-
-    enum class AF : uint32_t
-    {
-      _0, _1, _2, _3, _4,
-      _5, _6, _7, _8, _9,
-      _10, _11, _12, _13, _14,
-      _15
-    };
-
-    enum class OutputSpeed : uint32_t
-    {
-      Low,
-      Medium,
-      Fast,
-      High
-    };
-
-    enum class PullMode : uint32_t
-    {
-      None = 0x0,
-      PullUp = 0x1,
-      PullDown = 0x2
-    };
-
-  public: //Methods
-    void setMode(Mode const mode) volatile;
-    void setAF(AF const af) volatile;
-    void setOutputSpeed(OutputSpeed const ospeed) volatile;
-    void setPullMode(PullMode const ppm) volatile;
-
-    void set() volatile;
-    void reset() volatile;
-
-    bool getInputState() volatile;
-    bool getOutputState() volatile;
-
-  private: //Internal Methods
-    template<uint8_t idx_>
-    typename std::enable_if<(idx_ < 8)>::type
-    setAF_(AF const af) volatile;
-
-    template<uint8_t idx_>
-    typename std::enable_if<(idx_ >= 8 && idx_ <= 15)>::type
-    setAF_(AF const af) volatile;
-  }; //END Pin
+  template<uint8_t nPin, PinMode mode, std::size_t port>
+  class Pin;
 
 public: //Methods
-  template<uint8_t idx>
-  Pin<idx> getPin() volatile;
+  template<uint8_t nPin, PinMode mode>
+  Pin<nPin, mode, 0> createPin() volatile;
 
 public: //Registers
   uint32_t m_MODER;
@@ -123,8 +74,102 @@ public: //Registers
   uint32_t m_AFRH;
 }; //END Port
 
-template<std::size_t module>
-constexpr Periph<module> volatile* const getPeriph();
+template<std::size_t port>
+constexpr Port volatile* const getPort();
+
+template<uint8_t nPin, std::size_t port>
+class Port::Pin<nPin, Port::PinMode::Output, port>
+{
+  friend class Port;
+
+public: //Declarations
+  enum class OutputSpeed : uint32_t
+  {
+    Low,
+    Medium,
+    Fast,
+    High
+  };
+
+  enum class PullMode : uint32_t
+  {
+    None = 0x0,
+    PullUp = 0x1,
+    PullDown = 0x2
+  };
+
+public: //Methods
+  void setOutputSpeed(OutputSpeed const ospeed) volatile;
+  void setPullMode(PullMode const ppm) volatile;
+
+  void set() volatile;
+  void reset() volatile;
+
+  bool getOutputState() volatile;
+}; //END OutputPin
+
+template<uint8_t nPin, std::size_t port>
+class Port::Pin<nPin, Port::PinMode::Input, port>
+{
+  friend class Port;
+
+public: //Declarations
+  enum class PullMode : uint32_t
+  {
+    None = 0x0,
+    PullUp = 0x1,
+    PullDown = 0x2
+  };
+
+public: //Methods
+  void setPullMode(PullMode const ppm) volatile;
+
+  bool getInputState() volatile;
+}; //END InputPin
+
+template<uint8_t nPin, std::size_t port>
+class Port::Pin<nPin, Port::PinMode::Alternate, port>
+{
+  friend class Periph;
+
+public: //Declarations
+  enum class AF : uint32_t
+  {
+    _0, _1, _2, _3, _4,
+    _5, _6, _7, _8, _9,
+    _10, _11, _12, _13, _14,
+    _15
+  };
+
+  enum class OutputSpeed : uint32_t
+  {
+    Low,
+    Medium,
+    Fast,
+    High
+  };
+
+  enum class PullMode : uint32_t
+  {
+    None = 0x0,
+    PullUp = 0x1,
+    PullDown = 0x2
+  };
+
+public: //Methods
+  void setAF(AF const af) volatile;
+  void setOutputSpeed(OutputSpeed const ospeed) volatile;
+  void setPullMode(PullMode const ppm) volatile;
+
+private: //Internal Methods
+  template<uint8_t idx_>
+  typename std::enable_if<(idx_ < 8)>::type
+  setAF_(AF const af) volatile;
+
+  template<uint8_t idx_>
+  typename std::enable_if<(idx_ >= 8 && idx_ <= 15)>::type
+  setAF_(AF const af) volatile;
+}; //END AFPin
 
 } //NS GPIO
 } //NS stm32f429

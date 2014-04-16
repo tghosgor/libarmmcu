@@ -36,102 +36,28 @@ namespace stm32f429
 namespace GPIO
 {
 
-template<std::size_t module>
-constexpr Periph<module> volatile* const getPeriph()
+template<std::size_t port>
+constexpr Port volatile* const getPort()
 {
-  return reinterpret_cast<Periph<module> volatile* const>(module);
+  return reinterpret_cast<Port volatile* const>(port);
 }
 
-template<std::size_t module>
-template<uint8_t m_idx>
-Periph<module>::Pin<m_idx> Periph<module>::getPin() volatile
+template<uint8_t nPin, Port::PinMode mode>
+Port::Pin<nPin, mode, 0> Port::createPin() volatile
 {
-  return Periph<module>::Pin<m_idx>{};
+  constexpr uint32_t shiftBy { (nPin * 2) };
+  m_MODER &= ~(0x3 <<shiftBy);
+  m_MODER |= static_cast<uint32_t>(mode) <<shiftBy;
+
+  return Port::Pin<nPin, mode, 0>{};
 }
 
-template<std::size_t module>
-template<uint8_t idx>
-void Periph<module>::Pin<idx>::setMode(Periph::Pin<idx>::Mode const mode) volatile
+template<uint8_t nPin, std::size_t port>
+void Port::Pin<nPin, Port::PinMode::Output, port>::set() volatile
 {
-  constexpr uint32_t shiftBy { (idx * 2) };
-  reinterpret_cast<Periph<module> volatile* const>(module)->m_MODER &= ~(0x3 <<shiftBy);
-  reinterpret_cast<Periph<module> volatile* const>(module)->m_MODER |= static_cast<uint32_t>(mode) <<shiftBy;
+  reinterpret_cast<Port volatile*>(port)->m_BSRR |= static_cast<uint16_t>(0x1) <<nPin;
 }
 
-template<std::size_t module>
-template<uint8_t idx>
-template<uint8_t idx_>
-typename std::enable_if<(idx_ < 8)>::type
-  Periph<module>::Pin<idx>::setAF_(AF const af) volatile
-{
-  constexpr uint32_t shiftBy{idx * 4};
-  reinterpret_cast<Periph<module> volatile* const>(module)->m_AFRL &= ~(0x4 << shiftBy);
-  reinterpret_cast<Periph<module> volatile* const>(module)->m_AFRL |= static_cast<uint32_t>(af) << shiftBy;
-}
-
-template<std::size_t module>
-template<uint8_t idx>
-template<uint8_t idx_>
-typename std::enable_if<(idx_ >= 8 && idx_ <= 15)>::type
-    Periph<module>::Pin<idx>::setAF_(AF const af) volatile
-{
-  constexpr uint32_t shiftBy{idx * 4};
-  reinterpret_cast<Periph<module> volatile* const>(module)->m_AFRH &= ~(0x4 << shiftBy);
-  reinterpret_cast<Periph<module> volatile* const>(module)->m_AFRH |= static_cast<uint32_t>(af) << shiftBy;
-}
-
-template<std::size_t module>
-template<uint8_t idx>
-void Periph<module>::Pin<idx>::setAF(Periph::Pin<idx>::AF const af) volatile
-{
-  setAF_<idx>(af);
-}
-
-template<std::size_t module>
-template<uint8_t idx>
-void Periph<module>::Pin<idx>::setOutputSpeed(Periph::Pin<idx>::OutputSpeed const ospeed) volatile
-{
-  constexpr uint32_t shiftBy { idx * 2 };
-  reinterpret_cast<Periph<module> volatile* const>(module)->m_OSPEEDR &= ~(0x3 <<shiftBy);
-  reinterpret_cast<Periph<module> volatile* const>(module)->m_OSPEEDR |= static_cast<uint32_t>(ospeed) <<shiftBy;
-}
-
-template<std::size_t module>
-template<uint8_t idx>
-void Periph<module>::Pin<idx>::setPullMode(Periph::Pin<idx>::PullMode const ppm) volatile
-{
-  constexpr uint32_t shiftBy { idx * 2 };
-  reinterpret_cast<Periph<module> volatile* const>(module)->m_PUPDR &= ~(0x3 <<shiftBy);
-  reinterpret_cast<Periph<module> volatile* const>(module)->m_PUPDR |= static_cast<uint32_t>(ppm) <<shiftBy;
-}
-
-template<std::size_t module>
-template<uint8_t idx>
-void Periph<module>::Pin<idx>::set() volatile
-{
-  reinterpret_cast<Periph<module> volatile* const>(module)->m_BSRR |= static_cast<uint16_t>(0x1) <<idx;
-}
-
-template<std::size_t module>
-template<uint8_t idx>
-void Periph<module>::Pin<idx>::reset() volatile
-{
-  reinterpret_cast<Periph<module> volatile* const>(module)->m_BSRR |= static_cast<uint32_t>(0x1) <<(idx + 16);
-}
-
-template<std::size_t module>
-template<uint8_t idx>
-bool Periph<module>::Pin<idx>::getInputState() volatile
-{
-  return (reinterpret_cast<Periph<module> volatile* const>(module)->m_IDR & (static_cast<uint16_t>(0x1) <<idx));
-}
-
-template<std::size_t module>
-template<uint8_t idx>
-bool Periph<module>::Pin<idx>::getOutputState() volatile
-{
-  return (reinterpret_cast<Periph<module> volatile* const>(module)->m_ODR & (static_cast<uint16_t>(0x1) <<idx));
-}
 
 } //NS GPIO
 } //NS stm32f429

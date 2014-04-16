@@ -62,86 +62,12 @@ extern "C" void SystemInit()
 
 int main()
 {
-  RCC::getReg<RCC::GPIOA>().enable();
-  RCC::getReg<RCC::GPIOG>().enable();
-  RCC::getReg<RCC::GPIOB>().enable();
-  RCC::getReg<RCC::GPIOG>().enable();
-
-  RCC::getReg<RCC::TIM1>().enable();
-  RCC::getReg<RCC::TIM3>().enable();
-
-  GPIO::getPeriph<GPIO::G>()->getPin<13>().setMode(GPIO::Periph<GPIO::G>::Pin<13>::Mode::Output);
-  GPIO::getPeriph<GPIO::G>()->getPin<14>().setMode(GPIO::Periph<GPIO::G>::Pin<14>::Mode::Output);
-
-  GPIO::getPeriph<GPIO::G>()->getPin<13>().set();
-
-  auto gpioB = GPIO::getPeriph<GPIO::B>();
-  //Port To Use With PWM TIM::_2
-  auto PWMPin = gpioB->getPin<5>();
-  PWMPin.setMode(GPIO::Periph<GPIO::B>::Pin<5>::Mode::Alternate);
-  PWMPin.setAF(GPIO::Periph<GPIO::B>::Pin<5>::AF::_2);
-  //PWMPin->setOutputSpeed(GPIO::Port<GPIO::PortB>::Pin<5>::OutputSpeed::Low);
-  PWMPin.setPullMode(GPIO::Periph<GPIO::B>::Pin<5>::PullMode::PullUp);
-
-  //birinde template ModuleInfo diğerinde uint8_t kullanılıyor ve ötekinde constexpr ile 4 byte'ı aşan offsetleme yapılıyor
-  //çıkarılan assembly aynı
-  SYSCFG::getReg<SYSCFG::EXTI0>().setSource(SYSCFG::EXTI0::Source::PA);
-  EXTI::getPeriph<EXTI::_0>()->clearPending();
-
-  //PWM
-  auto TIM3 = TIM::getPeriph<TIM::_3>();
-  TIM3->enableAutoReloadPreload();
-  auto TIM3CC2 = TIM3->getCC<2>();
-  TIM3CC2.setValue(60);
-  TIM3->setAutoReloadValue(120);
-  TIM3CC2.setOCMode(TIM::Periph<TIM::_3>::CC<2>::OCMode::PWM1);
-  TIM3CC2.enable();
-  TIM3CC2.enableOCPreload();
-  TIM3->generateEvent();
-  TIM3->enable();
-
-  //TODO: NVIC->m_ISER[0]'ın 6 biti set edilmeli, EXT0'a denk geliyor
-
-  //Configure EXTI0 to PA0 Rising Edge
-  GPIO::getPeriph<GPIO::A>()->getPin<0>().setPullMode(GPIO::Periph<GPIO::A>::Pin<0>::PullMode::None);
-  EXTI::getPeriph<EXTI::_0>()->clearPending();
-  SYSCFG::getReg<SYSCFG::EXTI0>().setSource(SYSCFG::EXTI0::Source::PA);
-  EXTI::getPeriph<EXTI::_0>()->enableInterrupt();
-  EXTI::getPeriph<EXTI::_0>()->enableRisingTrigger();
-  NVIC::getReg<6>().enable();
-
-  auto EXTI0 = reinterpret_cast<EXTI volatile*>(EXTI::getPeriph<EXTI::_0>());
-  auto SYSCFG = SYSCFG::instance();
-
-  //EXTI::getPeriph<EXTI::_0>()->generateSoftwareInterrupt();
-
-  //Simple Loop Blink
-  RCC::getReg<RCC::TIM6>().enable();
-  TIM::getPeriph<TIM::_6>()->setAutoReloadValue(std::numeric_limits<uint16_t>::max());
-  TIM::getPeriph<TIM::_6>()->setPrescalerValue(1000);
-  TIM::getPeriph<TIM::_6>()->enable();
-
-  EXTI::getPeriph<0>()->clearPending();
-  while(true)
-  {
-    if(GPIO::getPeriph<GPIO::A>()->getPin<0>().getInputState())
-      continue;
-    uint16_t cntVal = TIM::getPeriph<TIM::_6>()->getCounterValue();
-    if(cntVal >= std::numeric_limits<uint16_t>::max() / 2)
-      GPIO::getPeriph<GPIO::G>()->getPin<13>().set();
-    else
-      GPIO::getPeriph<GPIO::G>()->getPin<13>().reset();
-  }
+  auto Pin = GPIO::getPort<GPIO::PortA>()->createPin<13, GPIO::Port::PinMode::Output>();
+  Pin.set();
 }
 
 extern "C" void EXTI0_IRQHandler()
 {
-  if(!GPIO::getPeriph<GPIO::G>()->getPin<14>().getOutputState())
-    GPIO::getPeriph<GPIO::G>()->getPin<14>().set();
-  else
-    GPIO::getPeriph<GPIO::G>()->getPin<14>().reset();
-
-  EXTI::getPeriph<EXTI::_0>()->clearPending();
 }
 
 extern "C" void _exit()
