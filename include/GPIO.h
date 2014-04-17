@@ -43,6 +43,7 @@ enum : std::size_t
   PortG = 0x40021800
 };
 
+template<std::size_t port>
 class Port
 {
 public: //Declarations
@@ -54,12 +55,45 @@ public: //Declarations
     Analog = 0x3
   };
 
-  template<uint8_t nPin, PinMode mode, std::size_t port>
-  class Pin;
+  template<uint8_t nPin, PinMode mode>
+  class Pin
+  {
+
+  };
+
+  template<uint8_t nPin>
+  class Pin<nPin, (PinMode)1>
+  {
+  public: //Declarations
+    enum class OutputSpeed : uint32_t
+    {
+      Low,
+      Medium,
+      Fast,
+      High
+    };
+
+    enum class PullMode : uint32_t
+    {
+      None = 0x0,
+      PullUp = 0x1,
+      PullDown = 0x2
+    };
+
+  public: //Methods
+    void setOutputSpeed(OutputSpeed const ospeed) volatile;
+    void setPullMode(PullMode const ppm) volatile;
+
+    void set() volatile {
+      reinterpret_cast<Port<port> volatile*>(port)->m_BSRR |= static_cast<uint16_t>(0x1) <<nPin; }
+    void reset() volatile;
+
+    bool getOutputState() volatile;
+  }; //END OutputPin
 
 public: //Methods
   template<uint8_t nPin, PinMode mode>
-  Pin<nPin, mode, 0> createPin() volatile;
+  Pin<nPin, mode> createPin() volatile;
 
 public: //Registers
   uint32_t m_MODER;
@@ -75,43 +109,13 @@ public: //Registers
 }; //END Port
 
 template<std::size_t port>
-constexpr Port volatile* const getPort();
+constexpr Port<port> volatile* const getPort();
 
-template<uint8_t nPin, std::size_t port>
-class Port::Pin<nPin, Port::PinMode::Output, port>
+template<std::size_t port>
+template<uint8_t nPin>
+class Port<port>::Pin<nPin, Port<port>::PinMode::Input>
 {
-  friend class Port;
-
-public: //Declarations
-  enum class OutputSpeed : uint32_t
-  {
-    Low,
-    Medium,
-    Fast,
-    High
-  };
-
-  enum class PullMode : uint32_t
-  {
-    None = 0x0,
-    PullUp = 0x1,
-    PullDown = 0x2
-  };
-
-public: //Methods
-  void setOutputSpeed(OutputSpeed const ospeed) volatile;
-  void setPullMode(PullMode const ppm) volatile;
-
-  void set() volatile;
-  void reset() volatile;
-
-  bool getOutputState() volatile;
-}; //END OutputPin
-
-template<uint8_t nPin, std::size_t port>
-class Port::Pin<nPin, Port::PinMode::Input, port>
-{
-  friend class Port;
+  friend class Port<port>;
 
 public: //Declarations
   enum class PullMode : uint32_t
@@ -127,10 +131,11 @@ public: //Methods
   bool getInputState() volatile;
 }; //END InputPin
 
-template<uint8_t nPin, std::size_t port>
-class Port::Pin<nPin, Port::PinMode::Alternate, port>
+template<std::size_t port>
+template<uint8_t nPin>
+class Port<port>::Pin<nPin, Port<port>::PinMode::Alternate>
 {
-  friend class Periph;
+  friend class Port<port>;
 
 public: //Declarations
   enum class AF : uint32_t

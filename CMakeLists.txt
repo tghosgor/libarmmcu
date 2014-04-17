@@ -3,11 +3,14 @@ cmake_minimum_required(VERSION 2.8)
 
 enable_language(ASM)
 
+#set(CMAKE_VERBOSE_MAKEFILE true)
+
 set(CMAKE_SYSTEM_NAME "Bare Metal")
-set(CMAKE_SYSTEM_PROCESSOR "ARM")
+set(CMAKE_SYSTEM_PROCESSOR "ARM Cortex-M4")
 set(CMAKE_AS_COMPILER "arm-none-eabi-gcc")
 set(CMAKE_C_COMPILER "arm-none-eabi-gcc")
 set(CMAKE_CXX_COMPILER "arm-none-eabi-g++")
+set(CMAKE_LINKER "arm-none-eabi-g++")
 set(CMAKE_ASM_COMPILER "arm-none-eabi-as")
 
 if (NOT CMAKE_BUILD_TYPE)

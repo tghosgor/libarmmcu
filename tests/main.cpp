@@ -62,7 +62,7 @@ extern "C" void SystemInit()
 
 int main()
 {
-  auto Pin = GPIO::getPort<GPIO::PortA>()->createPin<13, GPIO::Port::PinMode::Output>();
+  auto Pin = GPIO::getPort<GPIO::PortG>()->createPin<13, GPIO::Port<GPIO::PortG>::PinMode::Output>();
   Pin.set();
 }
 

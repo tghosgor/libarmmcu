@@ -37,26 +37,28 @@ namespace GPIO
 {
 
 template<std::size_t port>
-constexpr Port volatile* const getPort()
+constexpr Port<port> volatile* const getPort()
 {
-  return reinterpret_cast<Port volatile* const>(port);
+  return reinterpret_cast<Port<port> volatile* const>(port);
 }
 
-template<uint8_t nPin, Port::PinMode mode>
-Port::Pin<nPin, mode, 0> Port::createPin() volatile
+template<std::size_t port>
+template<uint8_t nPin, typename Port<port>::PinMode mode>
+Port<port>::Pin<nPin, mode> Port<port>::createPin() volatile
 {
   constexpr uint32_t shiftBy { (nPin * 2) };
   m_MODER &= ~(0x3 <<shiftBy);
   m_MODER |= static_cast<uint32_t>(mode) <<shiftBy;
 
-  return Port::Pin<nPin, mode, 0>{};
+  return Port<port>::Pin<nPin, mode>{};
 }
 
-template<uint8_t nPin, std::size_t port>
-void Port::Pin<nPin, Port::PinMode::Output, port>::set() volatile
+/*template<std::size_t port>
+template<uint8_t nPin>
+void Port<port>::Pin<nPin, (typename Port<port>::PinMode)1>::set() volatile
 {
-  reinterpret_cast<Port volatile*>(port)->m_BSRR |= static_cast<uint16_t>(0x1) <<nPin;
-}
+  reinterpret_cast<Port<port> volatile*>(port)->m_BSRR |= static_cast<uint16_t>(0x1) <<nPin;
+}*/
 
 
 } //NS GPIO
