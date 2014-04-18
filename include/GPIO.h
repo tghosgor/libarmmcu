@@ -52,43 +52,11 @@ public: //Declarations
     Output = 0x1,
     Alternate = 0x2,
     Analog = 0x3,
-    Reserved = 0x4
+    Reserved = 0x4 //Used for common Pin interface
   };
 
   template<uint8_t nPin, PinMode mode>
-  class Pin
-  {
-  public:
-    enum class PullMode : uint32_t
-    {
-      None = 0x0,
-      PullUp = 0x1,
-      PullDown = 0x2
-    };
-
-    void setPullMode(PullMode const ppm) volatile;
-  };
-
-  template<uint8_t nPin>
-  class Pin<nPin, PinMode::Output> : public Pin<nPin, PinMode::Reserved>
-  {
-  public: //Declarations
-    enum class OutputSpeed : uint32_t
-    {
-      Low,
-      Medium,
-      Fast,
-      High
-    };
-
-  public: //Methods
-    void setOutputSpeed(OutputSpeed const ospeed) volatile;
-
-    void set() volatile;
-    void reset() volatile;
-
-    bool getOutputState() volatile;
-  }; //END OutputPin
+  class Pin;
 
 public: //Methods
   template<uint8_t nPin, PinMode mode>
@@ -108,6 +76,41 @@ public: //Registers
 }; //END Port
 
 Port volatile* const createPort(std::size_t port);
+
+template<uint8_t nPin, Port::PinMode mode>
+class Port::Pin //Common Pin interface
+{
+public:
+  enum class PullMode : uint32_t
+  {
+    None = 0x0,
+    PullUp = 0x1,
+    PullDown = 0x2
+  };
+
+  void setPullMode(PullMode const ppm) volatile;
+}; //END Pin
+
+template<uint8_t nPin>
+class Port::Pin<nPin, Port::PinMode::Output> : public Pin<nPin, Port::PinMode::Reserved>
+{
+public: //Declarations
+  enum class OutputSpeed : uint32_t
+  {
+    Low,
+    Medium,
+    Fast,
+    High
+  };
+
+public: //Methods
+  void setOutputSpeed(OutputSpeed const ospeed) volatile;
+
+  void set() volatile;
+  void reset() volatile;
+
+  bool getOutputState() volatile;
+}; //END OutputPin
 
 template<uint8_t nPin>
 class Port::Pin<nPin, Port::PinMode::Input> : public Pin<nPin, Port::PinMode::Reserved>
