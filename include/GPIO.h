@@ -57,7 +57,14 @@ public: //Declarations
   template<uint8_t nPin, PinMode mode>
   class Pin
   {
+    enum class PullMode : uint32_t
+    {
+      None = 0x0,
+      PullUp = 0x1,
+      PullDown = 0x2
+    };
 
+    void setPullMode(PullMode const ppm) volatile;
   };
 
   template<uint8_t nPin>
@@ -72,16 +79,8 @@ public: //Declarations
       High
     };
 
-    enum class PullMode : uint32_t
-    {
-      None = 0x0,
-      PullUp = 0x1,
-      PullDown = 0x2
-    };
-
   public: //Methods
     void setOutputSpeed(OutputSpeed const ospeed) volatile;
-    void setPullMode(PullMode const ppm) volatile;
 
     void set() volatile;
     void reset() volatile;
@@ -117,16 +116,8 @@ class Port::Pin<nPin, Port::PinMode::Input>
   friend class Port;
 
 public: //Declarations
-  enum class PullMode : uint32_t
-  {
-    None = 0x0,
-    PullUp = 0x1,
-    PullDown = 0x2
-  };
 
 public: //Methods
-  void setPullMode(PullMode const ppm) volatile;
-
   bool getInputState() volatile;
 }; //END InputPin
 
@@ -152,17 +143,9 @@ public: //Declarations
     High
   };
 
-  enum class PullMode : uint32_t
-  {
-    None = 0x0,
-    PullUp = 0x1,
-    PullDown = 0x2
-  };
-
 public: //Methods
   void setAF(AF const af) volatile;
   void setOutputSpeed(OutputSpeed const ospeed) volatile;
-  void setPullMode(PullMode const ppm) volatile;
 
 private: //Internal Methods
   template<uint8_t idx_>

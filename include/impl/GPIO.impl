@@ -48,6 +48,22 @@ Port::Pin<nPin, mode> volatile* Port::createPin() volatile
   return reinterpret_cast<Port::Pin<nPin, mode> volatile*>(this);
 }
 
+template<uint8_t nPin, Port::PinMode mode>
+void Port::Pin<nPin, mode>::setPullMode(typename Port::Pin<nPin, mode>::PullMode const ppm) volatile
+{
+  constexpr uint32_t shiftBy { nPin * 2 };
+  reinterpret_cast<Port volatile* const>(this)->m_PUPDR &= ~(0x3 <<shiftBy);
+  reinterpret_cast<Port volatile* const>(this)->m_PUPDR |= static_cast<uint32_t>(ppm) <<shiftBy;
+}
+
+template<uint8_t nPin>
+void Port::Pin<nPin, Port::PinMode::Output>::setOutputSpeed(Port::Pin<nPin, Port::PinMode::Output>::OutputSpeed const ospeed) volatile
+{
+  constexpr uint32_t shiftBy { nPin * 2 };
+  reinterpret_cast<Port volatile* const>(this)->m_OSPEEDR &= ~(0x3 <<shiftBy);
+  reinterpret_cast<Port volatile* const>(this)->m_OSPEEDR |= static_cast<uint32_t>(ospeed) <<shiftBy;
+}
+
 template<uint8_t nPin>
 void Port::Pin<nPin, Port::PinMode::Output>::set() volatile
 {
@@ -58,6 +74,18 @@ template<uint8_t nPin>
 void Port::Pin<nPin, Port::PinMode::Output>::reset() volatile
 {
   reinterpret_cast<Port volatile*>(this)->m_BSRR |= static_cast<uint16_t>(0x1) <<(nPin + 16);
+}
+
+template<uint8_t nPin>
+bool Port::Pin<nPin, Port::PinMode::Output>::getOutputState() volatile
+{
+  return (reinterpret_cast<Port volatile* const>(this)->m_ODR & (static_cast<uint16_t>(0x1) <<nPin));
+}
+
+template<uint8_t nPin>
+bool Port::Pin<nPin, Port::PinMode::Input>::getInputState() volatile
+{
+  return (reinterpret_cast<Port volatile* const>(this)->m_IDR & (static_cast<uint16_t>(0x1) <<nPin));
 }
 
 } //NS GPIO
