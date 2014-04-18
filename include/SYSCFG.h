@@ -48,34 +48,38 @@ public:
 
   static constexpr SYSCFG volatile* const instance();
 
-  using EXTI0  = Module<0x08, 0 , stm32f429::EXTI<0> , 0x40013C00>;
-  using EXTI1  = Module<0x08, 4 , stm32f429::EXTI<1> , 0x40013C00>;
-  using EXTI2  = Module<0x08, 8 , stm32f429::EXTI<2> , 0x40013C00>;
-  using EXTI3  = Module<0x08, 12, stm32f429::EXTI<3> , 0x40013C00>;
-  using EXTI4  = Module<0x0C, 0 , stm32f429::EXTI<4> , 0x40013C00>;
-  using EXTI5  = Module<0x0C, 4 , stm32f429::EXTI<5> , 0x40013C00>;
-  using EXTI6  = Module<0x0C, 8 , stm32f429::EXTI<6> , 0x40013C00>;
-  using EXTI7  = Module<0x0C, 12, stm32f429::EXTI<7> , 0x40013C00>;
-  using EXTI8  = Module<0x10, 0 , stm32f429::EXTI<8> , 0x40013C00>;
-  using EXTI9  = Module<0x10, 4 , stm32f429::EXTI<9> , 0x40013C00>;
-  using EXTI10 = Module<0x10, 8 , stm32f429::EXTI<10>, 0x40013C00>;
-  using EXTI11 = Module<0x10, 12, stm32f429::EXTI<11>, 0x40013C00>;
-  using EXTI12 = Module<0x14, 0 , stm32f429::EXTI<12>, 0x40013C00>;
-  using EXTI13 = Module<0x14, 4 , stm32f429::EXTI<13>, 0x40013C00>;
-  using EXTI14 = Module<0x14, 8 , stm32f429::EXTI<14>, 0x40013C00>;
-  using EXTI15 = Module<0x14, 12, stm32f429::EXTI<15>, 0x40013C00>;
+  template<std::uint8_t N>
+  using EXTIModule = Module<BaseAddress + 0x08 + N * 4, (N * 4) % 16, stm32f429::EXTI<N>, EXTI<N>::BaseAddress>;
 
-  struct EXTI
+  /*using EXTI0  = EXTIModule<0x08, 0 , stm32f429::EXTI<0>>;
+  using EXTI1  = EXTIModule<0x08, 4 , stm32f429::EXTI<1>>;
+  using EXTI2  = EXTIModule<0x08, 8 , stm32f429::EXTI<2>>;
+  using EXTI3  = EXTIModule<0x08, 12, stm32f429::EXTI<3>>;
+  using EXTI4  = EXTIModule<0x0C, 0 , stm32f429::EXTI<4>>;
+  using EXTI5  = EXTIModule<0x0C, 4 , stm32f429::EXTI<5>>;
+  using EXTI6  = EXTIModule<0x0C, 8 , stm32f429::EXTI<6>>;
+  using EXTI7  = EXTIModule<0x0C, 12, stm32f429::EXTI<7>>;
+  using EXTI8  = EXTIModule<0x10, 0 , stm32f429::EXTI<8>>;
+  using EXTI9  = EXTIModule<0x10, 4 , stm32f429::EXTI<9>>;
+  using EXTI10 = EXTIModule<0x10, 8 , stm32f429::EXTI<10>>;
+  using EXTI11 = EXTIModule<0x10, 12, stm32f429::EXTI<11>>;
+  using EXTI12 = EXTIModule<0x14, 0 , stm32f429::EXTI<12>>;
+  using EXTI13 = EXTIModule<0x14, 4 , stm32f429::EXTI<13>>;
+  using EXTI14 = EXTIModule<0x14, 8 , stm32f429::EXTI<14>>;
+  using EXTI15 = EXTIModule<0x14, 12, stm32f429::EXTI<15>>;*/
+
+  enum class EXTISource : uint32_t
   {
-    enum class Source : uint32_t
-    {
-      PA = 0, PB, PC, PD, PE,
-      PF, PG, PH, PI, PJ
-    };
+    PA = 0, PB, PC, PD, PE,
+    PF, PG, PH, PI, PJ
   };
 
   template<class Module>
-  static typename Module::RegType volatile* enableInterrupt(EXTI::Source const source);
+  class EXTI
+  {
+  public:
+    typename Module::RegType volatile* setSource(EXTISource const source) volatile;
+  };
 
 public:
   uint32_t m_MEMRM;     //Memory Remap

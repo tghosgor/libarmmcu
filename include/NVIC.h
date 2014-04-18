@@ -30,24 +30,48 @@
 #include <cstddef> //offsetof
 #include <cstdint>
 
+#include <SYSCFG.h>
+
 namespace stm32f429
 {
 
 class NVIC
 {
+public:
+  static constexpr std::size_t BaseAddress{ 0xE000E100 };
+
 public: //Declarations
-  template<uint8_t N>
-  class Interrupt
-  {
-  public:
-    void enable();
-    void disable();
-    void setPending();
-    void clearPending();
-    void isActive();
-    void setPriority();
-    void triggerSoftwareInterrupt();
-  };
+  using WWDG        = Module<0, 0 , EXTI<0> , 0x40013C00>;
+  using PVD         = Module<0, 1 , EXTI<0> , 0x40013C00>;
+  using TAMP_STAMP  = Module<0, 2 , EXTI<0> , 0x40013C00>;
+  using RTC_WKUP    = Module<0, 3 , EXTI<0> , 0x40013C00>;
+  using FLASH       = Module<0, 4 , EXTI<0> , 0x40013C00>;
+  using RCC         = Module<0, 5 , EXTI<0> , 0x40013C00>;
+
+  template<std::size_t offset, uint8_t shift, class T>
+  using EXTIModule = Module<BaseAddress + offset, shift, T, SYSCFG::BaseAddress>;
+
+  using EXTI0 = EXTIModule<0, 6 , SYSCFG::EXTI<SYSCFG::EXTIModule<0>>>;
+  using EXTI1 = EXTIModule<0, 7 , SYSCFG::EXTI<SYSCFG::EXTIModule<1>>>;
+  using EXTI2 = EXTIModule<0, 8 , SYSCFG::EXTI<SYSCFG::EXTIModule<2>>>;
+  using EXTI3 = EXTIModule<0, 9 , SYSCFG::EXTI<SYSCFG::EXTIModule<3>>>;
+  using EXTI4 = EXTIModule<0, 10, SYSCFG::EXTI<SYSCFG::EXTIModule<4>>>;
+
+public: //Methods
+  template<class Module>
+  static typename Module::RegType volatile* enable();
+  template<class Module>
+  static void disable();
+  template<class Module>
+  static void setPending();
+  template<class Module>
+  static void clearPending();
+  template<class Module>
+  static void isActive();
+  template<class Module>
+  static void setPriority();
+  template<class Module>
+  static void triggerSoftwareInterrupt(); //?
 
 public: //Registers
   uint32_t m_ISER[8];
@@ -70,11 +94,6 @@ public:
   NVIC() = delete;
 
   static volatile NVIC* const instance() { return reinterpret_cast<volatile NVIC*>(BaseAddress); }
-  template<uint8_t N>
-  static constexpr Interrupt<N> getReg() { return Interrupt<N>{}; }
-
-public:
-  static constexpr std::size_t BaseAddress{ 0xE000E100 };
 };
 
 static_assert(offsetof(NVIC, m_ICER[7]) == 0xE000E19C - NVIC::BaseAddress, "Test?");

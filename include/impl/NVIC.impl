@@ -32,44 +32,44 @@
 namespace stm32f429
 {
 
-template<uint8_t N>
-void NVIC::Interrupt<N>::enable()
+template<class Module>
+typename Module::RegType volatile* NVIC::enable()
 {
-  reinterpret_cast<NVIC volatile*>(BaseAddress)->m_ISER[N / 32] = 0x1 <<(N % 32);
+  reinterpret_cast<NVIC volatile*>(BaseAddress)->m_ISER[Module::ccShift / 32] |= 0x1 <<(Module::ccShift % 32);
 }
 
-template<uint8_t N>
-void NVIC::Interrupt<N>::disable()
+template<class Module>
+void NVIC::disable()
 {
-  reinterpret_cast<NVIC volatile*>(BaseAddress)->m_ICER[N / 32] = 0x1 <<(N % 32);
+  reinterpret_cast<NVIC volatile*>(BaseAddress)->m_ICER[Module::ccShift / 32] &= ~(0x1 <<(Module::ccShift % 32));
 }
 
-template<uint8_t N>
-void NVIC::Interrupt<N>::setPending()
-{
-
-}
-
-template<uint8_t N>
-void NVIC::Interrupt<N>::clearPending()
+template<class Module>
+void NVIC::setPending()
 {
 
 }
 
-template<uint8_t N>
-void NVIC::Interrupt<N>::isActive()
+template<class Module>
+void NVIC::clearPending()
 {
 
 }
 
-template<uint8_t N>
-void NVIC::Interrupt<N>::setPriority()
+template<class Module>
+void NVIC::isActive()
 {
 
 }
 
-template<uint8_t N>
-void NVIC::Interrupt<N>::triggerSoftwareInterrupt()
+template<class Module>
+void NVIC::setPriority()
+{
+
+}
+
+template<class Module>
+void NVIC::triggerSoftwareInterrupt()
 {
 
 }

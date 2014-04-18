@@ -66,7 +66,8 @@ auto portGpin14 = portG->createPin<14, GPIO::Port::PinMode::Output>();
 auto portA = RCC::enablePeriph<RCC::GPIOA>();
 auto portApin0 = portA->createPin<0, GPIO::Port::PinMode::Input>();
 
-auto exti0 = SYSCFG::enableInterrupt<SYSCFG::EXTI0>(SYSCFG::EXTI::Source::PA);
+auto extisyscfg = NVIC::enable<NVIC::EXTI0>();
+auto exti0 = extisyscfg->setSource(SYSCFG::EXTISource::PA);
 
 int main()
 {
@@ -83,7 +84,6 @@ int main()
   exti0->clearPending();
   exti0->enableRisingTrigger();
   exti0->enableInterrupt();
-  NVIC::getReg<6>().enable();
 
   while(true)
   {

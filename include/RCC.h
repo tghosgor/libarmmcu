@@ -43,13 +43,13 @@ public:
   static constexpr std::size_t BaseAddress{ 0x40023800 };
 
 public: //Declarations
-  template<class Module>
-  class GPIO;
+  template<std::size_t offset, uint8_t shift, class T, std::size_t regAddress>
+  using GPIOModule = Module<BaseAddress + offset, shift, T, regAddress>;
 
-  using GPIOA = Module<BaseAddress + 0x30, 6, GPIO::Port, GPIO::Address::PortA>;
-  using GPIOB = Module<BaseAddress + 0x30, 6, GPIO::Port, GPIO::Address::PortB>;
-  using GPIOC = Module<BaseAddress + 0x30, 6, GPIO::Port, GPIO::Address::PortC>;
-  using GPIOG = Module<BaseAddress + 0x30, 6, GPIO::Port, GPIO::Address::PortG>;
+  using GPIOA = GPIOModule<0x30, 6, GPIO::Port, GPIO::Address::PortA>;
+  using GPIOB = GPIOModule<0x30, 6, GPIO::Port, GPIO::Address::PortB>;
+  using GPIOC = GPIOModule<0x30, 6, GPIO::Port, GPIO::Address::PortC>;
+  using GPIOG = GPIOModule<0x30, 6, GPIO::Port, GPIO::Address::PortG>;
 
   template<class Module>
   class GPIO
@@ -66,23 +66,23 @@ public: //Declarations
     GPIO();
   };
 
-  template<class Module>
-  class TIM;
+  template<std::size_t offset, uint8_t shift, class T, std::size_t regAddress>
+  using TIMModule = Module<BaseAddress + offset, shift, T, regAddress>;
 
-  using TIM1  = Module<BaseAddress + 0x44, 0,  TIM::Periph<TIM::_1 >, TIM::_1 >;
-  using TIM2  = Module<BaseAddress + 0x40, 0,  TIM::Periph<TIM::_2 >, TIM::_2 >;
-  using TIM3  = Module<BaseAddress + 0x40, 1,  TIM::Periph<TIM::_3 >, TIM::_3 >;
-  using TIM4  = Module<BaseAddress + 0x40, 2,  TIM::Periph<TIM::_4 >, TIM::_4 >;
-  using TIM5  = Module<BaseAddress + 0x40, 3,  TIM::Periph<TIM::_5 >, TIM::_5 >;
-  using TIM6  = Module<BaseAddress + 0x40, 4,  TIM::Periph<TIM::_6 >, TIM::_6 >;
-  using TIM7  = Module<BaseAddress + 0x40, 5,  TIM::Periph<TIM::_7 >, TIM::_7 >;
-  using TIM8  = Module<BaseAddress + 0x44, 1,  TIM::Periph<TIM::_8 >, TIM::_8 >;
-  using TIM9  = Module<BaseAddress + 0x44, 16, TIM::Periph<TIM::_9 >, TIM::_9 >;
-  using TIM10 = Module<BaseAddress + 0x44, 17, TIM::Periph<TIM::_10>, TIM::_10>;
-  using TIM11 = Module<BaseAddress + 0x44, 18, TIM::Periph<TIM::_11>, TIM::_11>;
-  using TIM12 = Module<BaseAddress + 0x40, 6,  TIM::Periph<TIM::_12>, TIM::_12>;
-  using TIM13 = Module<BaseAddress + 0x40, 7,  TIM::Periph<TIM::_13>, TIM::_13>;
-  using TIM14 = Module<BaseAddress + 0x40, 8,  TIM::Periph<TIM::_14>, TIM::_14>;
+  using TIM1  = TIMModule<0x44, 0,  TIM::Periph<TIM::_1 >, TIM::_1 >;
+  using TIM2  = TIMModule<0x40, 0,  TIM::Periph<TIM::_2 >, TIM::_2 >;
+  using TIM3  = TIMModule<0x40, 1,  TIM::Periph<TIM::_3 >, TIM::_3 >;
+  using TIM4  = TIMModule<0x40, 2,  TIM::Periph<TIM::_4 >, TIM::_4 >;
+  using TIM5  = TIMModule<0x40, 3,  TIM::Periph<TIM::_5 >, TIM::_5 >;
+  using TIM6  = TIMModule<0x40, 4,  TIM::Periph<TIM::_6 >, TIM::_6 >;
+  using TIM7  = TIMModule<0x40, 5,  TIM::Periph<TIM::_7 >, TIM::_7 >;
+  using TIM8  = TIMModule<0x44, 1,  TIM::Periph<TIM::_8 >, TIM::_8 >;
+  using TIM9  = TIMModule<0x44, 16, TIM::Periph<TIM::_9 >, TIM::_9 >;
+  using TIM10 = TIMModule<0x44, 17, TIM::Periph<TIM::_10>, TIM::_10>;
+  using TIM11 = TIMModule<0x44, 18, TIM::Periph<TIM::_11>, TIM::_11>;
+  using TIM12 = TIMModule<0x40, 6,  TIM::Periph<TIM::_12>, TIM::_12>;
+  using TIM13 = TIMModule<0x40, 7,  TIM::Periph<TIM::_13>, TIM::_13>;
+  using TIM14 = TIMModule<0x40, 8,  TIM::Periph<TIM::_14>, TIM::_14>;
 
   template<class Module>
   class TIM
