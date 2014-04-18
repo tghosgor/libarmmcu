@@ -35,7 +35,7 @@ namespace stm32f429
 namespace GPIO
 {
 
-enum : std::size_t
+enum Address : std::size_t
 {
   PortA = 0x40020000,
   PortB = 0x40020400,
@@ -43,7 +43,6 @@ enum : std::size_t
   PortG = 0x40021800
 };
 
-template<std::size_t port>
 class Port
 {
 public: //Declarations
@@ -84,8 +83,7 @@ public: //Declarations
     void setOutputSpeed(OutputSpeed const ospeed) volatile;
     void setPullMode(PullMode const ppm) volatile;
 
-    void set() volatile {
-      reinterpret_cast<Port<port> volatile*>(port)->m_BSRR |= static_cast<uint16_t>(0x1) <<nPin; }
+    void set() volatile;
     void reset() volatile;
 
     bool getOutputState() volatile;
@@ -93,7 +91,7 @@ public: //Declarations
 
 public: //Methods
   template<uint8_t nPin, PinMode mode>
-  Pin<nPin, mode> createPin() volatile;
+  Pin<nPin, mode> volatile* createPin() volatile;
 
 public: //Registers
   uint32_t m_MODER;
@@ -106,16 +104,17 @@ public: //Registers
   uint32_t m_LCKR;
   uint32_t m_AFRL;
   uint32_t m_AFRH;
+
+public:
+  static constexpr std::size_t BaseAddress{ 0x40020000 };
 }; //END Port
 
-template<std::size_t port>
-constexpr Port<port> volatile* const getPort();
+Port volatile* const createPort(std::size_t port);
 
-template<std::size_t port>
 template<uint8_t nPin>
-class Port<port>::Pin<nPin, Port<port>::PinMode::Input>
+class Port::Pin<nPin, Port::PinMode::Input>
 {
-  friend class Port<port>;
+  friend class Port;
 
 public: //Declarations
   enum class PullMode : uint32_t
@@ -131,11 +130,10 @@ public: //Methods
   bool getInputState() volatile;
 }; //END InputPin
 
-template<std::size_t port>
 template<uint8_t nPin>
-class Port<port>::Pin<nPin, Port<port>::PinMode::Alternate>
+class Port::Pin<nPin, Port::PinMode::Alternate>
 {
-  friend class Port<port>;
+  friend class Port;
 
 public: //Declarations
   enum class AF : uint32_t

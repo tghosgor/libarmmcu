@@ -62,8 +62,23 @@ extern "C" void SystemInit()
 
 int main()
 {
-  auto Pin = GPIO::getPort<GPIO::PortG>()->createPin<13, GPIO::Port<GPIO::PortG>::PinMode::Output>();
-  Pin.set();
+  auto portG = RCC::enablePeriph<RCC::GPIOG>();
+  auto pin13 = portG->createPin<13, GPIO::Port::PinMode::Output>();
+  pin13->set();
+
+  auto TIM1 = RCC::enablePeriph<RCC::TIM1>();
+  TIM1->setAutoReloadValue(std::numeric_limits<uint16_t>::max());
+  TIM1->setPrescalerValue(1000);
+  TIM1->enable();
+
+  while(true)
+  {
+    uint16_t cntVal = TIM1->getCounterValue();
+    if(cntVal >= std::numeric_limits<uint16_t>::max() / 2)
+      pin13->set();
+    else
+      pin13->reset();
+  }
 }
 
 extern "C" void EXTI0_IRQHandler()

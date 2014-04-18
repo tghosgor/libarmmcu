@@ -1,17 +1,17 @@
 /*
   Copyright (c) 2014, Tolga HOŞGÖR
   All rights reserved.
-  
+
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions are met:
-  
+
   * Redistributions of source code must retain the above copyright notice, this
     list of conditions and the following disclaimer.
-  
+
   * Redistributions in binary form must reproduce the above copyright notice,
     this list of conditions and the following disclaimer in the documentation
     and/or other materials provided with the distribution.
-  
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,6 +27,8 @@
 #ifndef GPIO_CPP_
 #define GPIO_CPP_
 
+#include <RCC.h>
+
 #include <GPIO.h>
 
 #include <type_traits>
@@ -36,30 +38,27 @@ namespace stm32f429
 namespace GPIO
 {
 
-template<std::size_t port>
-constexpr Port<port> volatile* const getPort()
-{
-  return reinterpret_cast<Port<port> volatile* const>(port);
-}
-
-template<std::size_t port>
-template<uint8_t nPin, typename Port<port>::PinMode mode>
-Port<port>::Pin<nPin, mode> Port<port>::createPin() volatile
+template<uint8_t nPin, typename Port::PinMode mode>
+Port::Pin<nPin, mode> volatile* Port::createPin() volatile
 {
   constexpr uint32_t shiftBy { (nPin * 2) };
   m_MODER &= ~(0x3 <<shiftBy);
   m_MODER |= static_cast<uint32_t>(mode) <<shiftBy;
 
-  return Port<port>::Pin<nPin, mode>{};
+  return reinterpret_cast<Port::Pin<nPin, mode> volatile*>(this);
 }
 
-/*template<std::size_t port>
 template<uint8_t nPin>
-void Port<port>::Pin<nPin, (typename Port<port>::PinMode)1>::set() volatile
+void Port::Pin<nPin, Port::PinMode::Output>::set() volatile
 {
-  reinterpret_cast<Port<port> volatile*>(port)->m_BSRR |= static_cast<uint16_t>(0x1) <<nPin;
-}*/
+  reinterpret_cast<Port volatile*>(this)->m_BSRR |= static_cast<uint16_t>(0x1) <<nPin;
+}
 
+template<uint8_t nPin>
+void Port::Pin<nPin, Port::PinMode::Output>::reset() volatile
+{
+  reinterpret_cast<Port volatile*>(this)->m_BSRR |= static_cast<uint16_t>(0x1) <<(nPin + 16);
+}
 
 } //NS GPIO
 } //NS stm32f429

@@ -29,6 +29,8 @@
 
 #include <cstdint>
 
+#include <TIM.h>
+
 #include <util.h>
 
 namespace stm32f429
@@ -37,17 +39,17 @@ using util::Module;
 
 class RCC
 {
+public:
+  static constexpr std::size_t BaseAddress{ 0x40023800 };
+
 public: //Declarations
   template<class Module>
   class GPIO;
 
-  using GPIOA = GPIO<Module<0x30, 0>>;
-  using GPIOB = GPIO<Module<0x30, 1>>;
-  using GPIOC = GPIO<Module<0x30, 2>>;
-  using GPIOD = GPIO<Module<0x30, 3>>;
-  using GPIOE = GPIO<Module<0x30, 4>>;
-  using GPIOF = GPIO<Module<0x30, 5>>;
-  using GPIOG = GPIO<Module<0x30, 6>>;
+  using GPIOA = Module<BaseAddress + 0x30, 6, GPIO::Port, GPIO::Address::PortA>;
+  using GPIOB = Module<BaseAddress + 0x30, 6, GPIO::Port, GPIO::Address::PortB>;
+  using GPIOC = Module<BaseAddress + 0x30, 6, GPIO::Port, GPIO::Address::PortC>;
+  using GPIOG = Module<BaseAddress + 0x30, 6, GPIO::Port, GPIO::Address::PortG>;
 
   template<class Module>
   class GPIO
@@ -67,20 +69,20 @@ public: //Declarations
   template<class Module>
   class TIM;
 
-  using TIM1 = TIM<Module<0x44, 0>> ;
-  using TIM2 = TIM<Module<0x40, 0>> ;
-  using TIM3 = TIM<Module<0x40, 1>> ;
-  using TIM4 = TIM<Module<0x40, 2>> ;
-  using TIM5 = TIM<Module<0x40, 3>> ;
-  using TIM6 = TIM<Module<0x40, 4>> ;
-  using TIM7 = TIM<Module<0x40, 5>> ;
-  using TIM8 = TIM<Module<0x44, 1>> ;
-  using TIM9 = TIM<Module<0x44, 16>>;
-  using TIM10 = TIM<Module<0x44, 17>>;
-  using TIM11 = TIM<Module<0x44, 18>>;
-  using TIM12 = TIM<Module<0x40, 6>> ;
-  using TIM13 = TIM<Module<0x40, 7>> ;
-  using TIM14 = TIM<Module<0x40, 8>> ;
+  using TIM1  = Module<BaseAddress + 0x44, 0,  TIM::Periph<TIM::_1 >, TIM::_1 >;
+  using TIM2  = Module<BaseAddress + 0x40, 0,  TIM::Periph<TIM::_2 >, TIM::_2 >;
+  using TIM3  = Module<BaseAddress + 0x40, 1,  TIM::Periph<TIM::_3 >, TIM::_3 >;
+  using TIM4  = Module<BaseAddress + 0x40, 2,  TIM::Periph<TIM::_4 >, TIM::_4 >;
+  using TIM5  = Module<BaseAddress + 0x40, 3,  TIM::Periph<TIM::_5 >, TIM::_5 >;
+  using TIM6  = Module<BaseAddress + 0x40, 4,  TIM::Periph<TIM::_6 >, TIM::_6 >;
+  using TIM7  = Module<BaseAddress + 0x40, 5,  TIM::Periph<TIM::_7 >, TIM::_7 >;
+  using TIM8  = Module<BaseAddress + 0x44, 1,  TIM::Periph<TIM::_8 >, TIM::_8 >;
+  using TIM9  = Module<BaseAddress + 0x44, 16, TIM::Periph<TIM::_9 >, TIM::_9 >;
+  using TIM10 = Module<BaseAddress + 0x44, 17, TIM::Periph<TIM::_10>, TIM::_10>;
+  using TIM11 = Module<BaseAddress + 0x44, 18, TIM::Periph<TIM::_11>, TIM::_11>;
+  using TIM12 = Module<BaseAddress + 0x40, 6,  TIM::Periph<TIM::_12>, TIM::_12>;
+  using TIM13 = Module<BaseAddress + 0x40, 7,  TIM::Periph<TIM::_13>, TIM::_13>;
+  using TIM14 = Module<BaseAddress + 0x40, 8,  TIM::Periph<TIM::_14>, TIM::_14>;
 
   template<class Module>
   class TIM
@@ -103,7 +105,7 @@ public: //Methods
   static constexpr RCC volatile* const instance();
 
   template<class Module>
-  static constexpr Module getReg();
+  static typename Module::RegType volatile* enablePeriph();
 
 public: //Registers
   uint32_t m_CR; //Clock Control
@@ -140,9 +142,6 @@ public: //Registers
   uint32_t m_reserved11;
   uint32_t m_SSCGR;
   uint32_t m_PLLI2SCFGR;
-
-public:
-  static constexpr std::size_t BaseAddress{ 0x40023800 };
 };
 
 static_assert(sizeof(RCC) == 0x88, "RCC size is wrong. Spec says its 88 bytes long.");

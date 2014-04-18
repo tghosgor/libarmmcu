@@ -38,7 +38,11 @@ constexpr RCC volatile* const RCC::instance()
 }
 
 template<class Module>
-constexpr Module RCC::getReg() { return Module{}; }
+typename Module::RegType volatile* RCC::enablePeriph()
+{
+  *reinterpret_cast<uint32_t volatile*>(Module::ccAddress) = 0x1 <<Module::ccShift;
+  return reinterpret_cast<typename Module::RegType volatile*>(Module::regAddress);
+}
 
 template<class Module>
 RCC::GPIO<Module>::GPIO() { }
