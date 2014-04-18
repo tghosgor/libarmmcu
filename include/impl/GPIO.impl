@@ -88,6 +88,21 @@ bool Port::Pin<nPin, Port::PinMode::Input>::getInputState() volatile
   return (reinterpret_cast<Port volatile* const>(this)->m_IDR & (static_cast<uint16_t>(0x1) <<nPin));
 }
 
+template<uint8_t nPin>
+void Port::Pin<nPin, Port::PinMode::Alternate>::setOutputSpeed(Port::Pin<nPin, Port::PinMode::Alternate>::OutputSpeed const ospeed) volatile
+{
+  reinterpret_cast<Port::Pin<nPin, Port::PinMode::Output>*>(this)->setOutputSpeed(
+        static_cast<typename Port::Pin<nPin, Port::PinMode::Output>::OutputSpeed>(ospeed));
+}
+
+template<uint8_t nPin>
+void Port::Pin<nPin, Port::PinMode::Alternate>::setAF(Port::Pin<nPin, Port::PinMode::Alternate>::AF const af) volatile
+{
+  constexpr uint32_t shift{ nPin * 4 };
+  reinterpret_cast<Port volatile* const>(this)->m_AFR[shift / 8] &= ~(0xF <<shift);
+  reinterpret_cast<Port volatile* const>(this)->m_AFR[shift / 8] |= af <<shift;
+}
+
 } //NS GPIO
 } //NS stm32f429
 

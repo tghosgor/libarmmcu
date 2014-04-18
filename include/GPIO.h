@@ -71,8 +71,7 @@ public: //Registers
   uint32_t m_ODR;
   uint32_t m_BSRR;
   uint32_t m_LCKR;
-  uint32_t m_AFRL;
-  uint32_t m_AFRH;
+  uint32_t m_AFR[2];
 }; //END Port
 
 Port volatile* const createPort(std::size_t port);
@@ -148,16 +147,9 @@ public: //Declarations
 public: //Methods
   void setAF(AF const af) volatile;
   void setOutputSpeed(OutputSpeed const ospeed) volatile;
+};
 
-private: //Internal Methods
-  template<uint8_t idx_>
-  typename std::enable_if<(idx_ < 8)>::type
-  setAF_(AF const af) volatile;
-
-  template<uint8_t idx_>
-  typename std::enable_if<(idx_ >= 8 && idx_ <= 15)>::type
-  setAF_(AF const af) volatile;
-}; //END AFPin
+//END AFPin
 
 } //NS GPIO
 } //NS stm32f429
