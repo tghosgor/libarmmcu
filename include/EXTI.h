@@ -34,35 +34,23 @@
 namespace stm32f429
 {
 
+template<uint8_t line>
 class EXTI
 {
 public:
-  enum
-  {
-    _0, _1, _2, _3, _4, _5, _6, _7, _8, _9,
-    _10, _11, _12, _13, _14, _15, _16, _17, _18, _19,
-    _20, _21, _22
-  };
+  static constexpr std::size_t BaseAddress{ 0x40013C00 };
 
-  template<uint8_t line>
-  class Periph
-  {
-  public:
-    void clearPending() volatile;
-    void enableInterrupt() volatile;
-    void disableInterrupt() volatile;
-    void enableRisingTrigger() volatile;
-    void disableRisingTrigger() volatile;
-    void enableFallingTrigger() volatile;
-    void disableFallingTrigger() volatile;
-    void generateSoftwareInterrupt() volatile;
+public: //Declarations
 
-  };
-
-  static constexpr EXTI volatile* const instance() { return reinterpret_cast<EXTI volatile* const>(BaseAddress); }
-
-  template<uint8_t line>
-  static constexpr Periph<line> volatile* getPeriph();
+public: //Methods
+  void enableInterrupt() volatile;
+  void disableInterrupt() volatile;
+  void enableRisingTrigger() volatile;
+  void disableRisingTrigger() volatile;
+  void enableFallingTrigger() volatile;
+  void disableFallingTrigger() volatile;
+  void generateSoftwareInterrupt() volatile;
+  void clearPending() volatile;
 
 public:
   uint32_t m_IMR;   //Interrupt mask
@@ -71,9 +59,6 @@ public:
   uint32_t m_FTSR;  //Falling trigger selection
   uint32_t m_SWIER; //Software interrupt event
   uint32_t m_PR;    //Pending
-
-public:
-  static constexpr std::size_t BaseAddress{ 0x40013C00 };
 };
 } //NS stm32f429
 

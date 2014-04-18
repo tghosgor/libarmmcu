@@ -35,19 +35,15 @@ namespace stm32f429
 constexpr SYSCFG volatile* const SYSCFG::instance() { return reinterpret_cast<SYSCFG volatile* const>(BaseAddress); }
 
 template<class Module>
-constexpr Module SYSCFG::getReg() { return Module{}; }
-
-template<class Module>
-SYSCFG::EXTI<Module>::EXTI() { }
-
-template<class Module>
-void SYSCFG::EXTI<Module>::setSource(EXTI::Source const source)
+typename Module::RegType volatile* SYSCFG::enableInterrupt(EXTI::Source const source)
 {
-  constexpr std::size_t regAddr = BaseAddress + Module::offset;
-  constexpr uint8_t shift = Module::shift;
+  constexpr std::size_t ccAddress = BaseAddress + Module::ccAddress;
+  constexpr uint8_t ccShift = Module::ccShift;
 
-  *reinterpret_cast<uint32_t volatile* const>(regAddr) &= ~(0x7 <<shift);
-  *reinterpret_cast<uint32_t volatile* const>(regAddr) |= static_cast<uint32_t>(source) <<shift;
+  *reinterpret_cast<uint32_t volatile* const>(ccAddress) &= ~(0xF <<ccShift);
+  *reinterpret_cast<uint32_t volatile* const>(ccAddress) |= static_cast<uint32_t const>(source) <<ccShift;
+
+  return reinterpret_cast<typename Module::RegType volatile*>(Module::regAddress);
 }
 
 } //NS stm32f429

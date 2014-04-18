@@ -51,12 +51,14 @@ public: //Declarations
     Input = 0x0,
     Output = 0x1,
     Alternate = 0x2,
-    Analog = 0x3
+    Analog = 0x3,
+    Reserved = 0x4
   };
 
   template<uint8_t nPin, PinMode mode>
   class Pin
   {
+  public:
     enum class PullMode : uint32_t
     {
       None = 0x0,
@@ -68,7 +70,7 @@ public: //Declarations
   };
 
   template<uint8_t nPin>
-  class Pin<nPin, (PinMode)1>
+  class Pin<nPin, PinMode::Output> : public Pin<nPin, PinMode::Reserved>
   {
   public: //Declarations
     enum class OutputSpeed : uint32_t
@@ -103,15 +105,12 @@ public: //Registers
   uint32_t m_LCKR;
   uint32_t m_AFRL;
   uint32_t m_AFRH;
-
-public:
-  static constexpr std::size_t BaseAddress{ 0x40020000 };
 }; //END Port
 
 Port volatile* const createPort(std::size_t port);
 
 template<uint8_t nPin>
-class Port::Pin<nPin, Port::PinMode::Input>
+class Port::Pin<nPin, Port::PinMode::Input> : public Pin<nPin, Port::PinMode::Reserved>
 {
   friend class Port;
 
@@ -122,7 +121,7 @@ public: //Methods
 }; //END InputPin
 
 template<uint8_t nPin>
-class Port::Pin<nPin, Port::PinMode::Alternate>
+class Port::Pin<nPin, Port::PinMode::Alternate> : public Pin<nPin, Port::PinMode::Reserved>
 {
   friend class Port;
 

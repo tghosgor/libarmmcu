@@ -30,7 +30,10 @@
 #include <cstdint>
 #include <type_traits>
 
+#include <EXTI.h>
+
 #include <util.h>
+
 
 namespace stm32f429
 {
@@ -38,63 +41,47 @@ namespace stm32f429
 class SYSCFG
 {
 public:
+  static constexpr std::size_t BaseAddress{ 0x40013800 };
+
+public:
   SYSCFG() = delete;
 
   static constexpr SYSCFG volatile* const instance();
 
-  template<class Module>
-  static constexpr Module getReg();
+  using EXTI0  = Module<0x08, 0 , stm32f429::EXTI<0> , 0x40013C00>;
+  using EXTI1  = Module<0x08, 4 , stm32f429::EXTI<1> , 0x40013C00>;
+  using EXTI2  = Module<0x08, 8 , stm32f429::EXTI<2> , 0x40013C00>;
+  using EXTI3  = Module<0x08, 12, stm32f429::EXTI<3> , 0x40013C00>;
+  using EXTI4  = Module<0x0C, 0 , stm32f429::EXTI<4> , 0x40013C00>;
+  using EXTI5  = Module<0x0C, 4 , stm32f429::EXTI<5> , 0x40013C00>;
+  using EXTI6  = Module<0x0C, 8 , stm32f429::EXTI<6> , 0x40013C00>;
+  using EXTI7  = Module<0x0C, 12, stm32f429::EXTI<7> , 0x40013C00>;
+  using EXTI8  = Module<0x10, 0 , stm32f429::EXTI<8> , 0x40013C00>;
+  using EXTI9  = Module<0x10, 4 , stm32f429::EXTI<9> , 0x40013C00>;
+  using EXTI10 = Module<0x10, 8 , stm32f429::EXTI<10>, 0x40013C00>;
+  using EXTI11 = Module<0x10, 12, stm32f429::EXTI<11>, 0x40013C00>;
+  using EXTI12 = Module<0x14, 0 , stm32f429::EXTI<12>, 0x40013C00>;
+  using EXTI13 = Module<0x14, 4 , stm32f429::EXTI<13>, 0x40013C00>;
+  using EXTI14 = Module<0x14, 8 , stm32f429::EXTI<14>, 0x40013C00>;
+  using EXTI15 = Module<0x14, 12, stm32f429::EXTI<15>, 0x40013C00>;
 
-  template<class Module>
-  class EXTI;
-
-  using EXTI0  = EXTI<Module<0x08, 0>>;
-  using EXTI1  = EXTI<Module<0x08, 4>>;
-  using EXTI2  = EXTI<Module<0x08, 8>>;
-  using EXTI3  = EXTI<Module<0x08, 12>>;
-  using EXTI4  = EXTI<Module<0x0C, 0>>;
-  using EXTI5  = EXTI<Module<0x0C, 4>>;
-  using EXTI6  = EXTI<Module<0x0C, 8>>;
-  using EXTI7  = EXTI<Module<0x0C, 12>>;
-  using EXTI8  = EXTI<Module<0x10, 0>>;
-  using EXTI9  = EXTI<Module<0x10, 4>>;
-  using EXTI10 = EXTI<Module<0x10, 8>>;
-  using EXTI11 = EXTI<Module<0x10, 12>>;
-  using EXTI12 = EXTI<Module<0x14, 0>>;
-  using EXTI13 = EXTI<Module<0x14, 4>>;
-  using EXTI14 = EXTI<Module<0x14, 8>>;
-  using EXTI15 = EXTI<Module<0x14, 12>>;
-
-  template<class Module>
-  class EXTI
+  struct EXTI
   {
-    friend class SYSCFG;
-
-  public:
     enum class Source : uint32_t
     {
       PA = 0, PB, PC, PD, PE,
       PF, PG, PH, PI, PJ
     };
+  };
 
-  public:
-    void setSource(EXTI::Source const source);
-
-  private:
-    EXTI();
-  }; //class EXTI
+  template<class Module>
+  static typename Module::RegType volatile* enableInterrupt(EXTI::Source const source);
 
 public:
-  uint32_t m_MEMRM;   //Memory Remap
-  uint32_t m_PMC;     //Peripheral Mode Configuration
-  uint32_t m_EXTICR1; //External Interrupt Configuration 1
-  uint32_t m_EXTICR2; //External Interrupt Configuration 2
-  uint32_t m_EXTICR3; //External Interrupt Configuration 3
-  uint32_t m_EXTICR4; //External Interrupt Configuration 4
-  uint32_t m_CMPCR;   //Compensation Cell Control
-
-public:
-  static constexpr std::size_t BaseAddress{ 0x40013800 };
+  uint32_t m_MEMRM;     //Memory Remap
+  uint32_t m_PMC;       //Peripheral Mode Configuration
+  uint32_t m_EXTICR[4]; //External Interrupt Configuration N
+  uint32_t m_CMPCR;     //Compensation Cell Control
 };
 
 } //NS stm32f429

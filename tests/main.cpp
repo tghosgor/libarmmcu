@@ -60,29 +60,49 @@ extern "C" void SystemInit()
   RCC::instance()->m_CIR = 0x00000000;
 }
 
+auto portG = RCC::enablePeriph<RCC::GPIOG>();
+auto portGpin13 = portG->createPin<13, GPIO::Port::PinMode::Output>();
+auto portGpin14 = portG->createPin<14, GPIO::Port::PinMode::Output>();
+auto portA = RCC::enablePeriph<RCC::GPIOA>();
+auto portApin0 = portA->createPin<0, GPIO::Port::PinMode::Input>();
+
+auto exti0 = SYSCFG::enableInterrupt<SYSCFG::EXTI0>(SYSCFG::EXTI::Source::PA);
+
 int main()
 {
-  auto portG = RCC::enablePeriph<RCC::GPIOG>();
-  auto pin13 = portG->createPin<13, GPIO::Port::PinMode::Output>();
-  pin13->set();
+  portGpin13->set();
 
+  SET_UP_TIM:
   auto TIM1 = RCC::enablePeriph<RCC::TIM1>();
   TIM1->setAutoReloadValue(std::numeric_limits<uint16_t>::max());
   TIM1->setPrescalerValue(1000);
   TIM1->enable();
 
+  //Configure EXTI0 to PA0 Rising Edge
+  portApin0->setPullMode(GPIO::Port::Pin<0, GPIO::Port::PinMode::Input>::PullMode::None);
+  exti0->clearPending();
+  exti0->enableRisingTrigger();
+  exti0->enableInterrupt();
+  NVIC::getReg<6>().enable();
+
   while(true)
   {
     uint16_t cntVal = TIM1->getCounterValue();
     if(cntVal >= std::numeric_limits<uint16_t>::max() / 2)
-      pin13->set();
+      portGpin13->set();
     else
-      pin13->reset();
+      portGpin13->reset();
   }
 }
 
 extern "C" void EXTI0_IRQHandler()
 {
+  if(!portGpin14->getOutputState())
+    portGpin14->set();
+  else
+    portGpin14->reset();
+
+  exti0->clearPending();
 }
 
 extern "C" void _exit()
