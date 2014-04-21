@@ -41,15 +41,15 @@ class RCC
 {
 public:
   static constexpr std::size_t BaseAddress{ 0x40023800 };
-
-public: //Declarations
+private: //Internal Declarations
   template<std::size_t offset, uint8_t shift, class T, std::size_t regAddress>
   using Module = util::Module<BaseAddress + offset, shift, T, regAddress>;
 
-  using GPIOA = Module<0x30, 6, GPIO::Port, GPIO::Address::PortA>;
-  using GPIOB = Module<0x30, 6, GPIO::Port, GPIO::Address::PortB>;
-  using GPIOC = Module<0x30, 6, GPIO::Port, GPIO::Address::PortC>;
-  using GPIOG = Module<0x30, 6, GPIO::Port, GPIO::Address::PortG>;
+public: //Declarations
+  using GPIOA = Module<0x30, 6, GPIO::Port, GPIO::PortA>;
+  using GPIOB = Module<0x30, 6, GPIO::Port, GPIO::PortB>;
+  using GPIOC = Module<0x30, 6, GPIO::Port, GPIO::PortC>;
+  using GPIOG = Module<0x30, 6, GPIO::Port, GPIO::PortG>;
 
   using SYSCFG = Module<0x44, 14, stm32f429::SYSCFG, stm32f429::SYSCFG::BaseAddress>;
 

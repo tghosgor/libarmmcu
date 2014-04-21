@@ -44,6 +44,13 @@ class SYSCFG
 public:
   static constexpr std::size_t BaseAddress{ 0x40013800 };
 
+private: //Internal Declarations
+  template<std::uint8_t N>
+  using EXTIModule = util::Module<BaseAddress + 0x08 + (N / 4), (N * 4) % 16, stm32f429::EXTI<N>, stm32f429::EXTI<N>::BaseAddress>;
+
+  template<std::size_t offset, uint8_t shift, class T>
+  using NVICEXTIModule = util::Module<NVIC::BaseAddress + offset, shift, T, BaseAddress>;
+
 public: //Declarations
   enum class EXTISource : uint32_t
   {
@@ -58,13 +65,6 @@ public: //Declarations
     typename Module::RegType volatile* setSource(EXTISource const source) volatile;
   };
 
-  template<std::uint8_t N>
-  using EXTIModule = util::Module<BaseAddress + 0x08 + (N / 4), (N * 4) % 16, stm32f429::EXTI<N>, stm32f429::EXTI<N>::BaseAddress>;
-
-  template<std::size_t offset, uint8_t shift, class T>
-  using NVICEXTIModule = util::Module<NVIC::BaseAddress + offset, shift, T, BaseAddress>;
-
-  //To be used with enable()
   using EXTI0 = NVICEXTIModule<0, 6 , EXTI<EXTIModule<0>>>;
   using EXTI1 = NVICEXTIModule<0, 7 , EXTI<EXTIModule<1>>>;
   using EXTI2 = NVICEXTIModule<0, 8 , EXTI<EXTIModule<2>>>;

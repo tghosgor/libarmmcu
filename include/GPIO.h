@@ -35,7 +35,7 @@ namespace stm32f429
 namespace GPIO
 {
 
-enum Address : std::size_t
+enum : std::size_t
 {
   PortA = 0x40020000,
   PortB = 0x40020400,

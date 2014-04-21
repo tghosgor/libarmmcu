@@ -72,8 +72,8 @@ auto syscfg = RCC::enablePeriph<RCC::SYSCFG>();
 auto exti0syscfg = syscfg->enable<SYSCFG::EXTI0>();
 auto exti0 = exti0syscfg->setSource(SYSCFG::EXTISource::PA);
 
-//auto extis1yscfg = NVIC::enable<NVIC::EXTI1>();
-//auto exti1 = extis1yscfg->setSource(SYSCFG::EXTISource::PB);
+auto extis1yscfg = syscfg->enable<SYSCFG::EXTI1>();
+auto exti1 = extis1yscfg->setSource(SYSCFG::EXTISource::PB);
 
 int main()
 {
