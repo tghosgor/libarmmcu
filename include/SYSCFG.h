@@ -45,8 +45,8 @@ public:
   static constexpr std::size_t BaseAddress{ 0x40013800 };
 
 private: //Internal Declarations
-  template<std::uint8_t N>
-  using EXTIModule = util::Module<BaseAddress + 0x08 + (N / 4), (N * 4) % 16, stm32f429::EXTI<N>, stm32f429::EXTI<N>::BaseAddress>;
+  template<uint8_t N>
+  using EXTIModule = util::Module<BaseAddress + 0x08 + (N / 4) * 4, (N * 4) % 16, stm32f429::EXTI<N>, stm32f429::EXTI<N>::BaseAddress>;
 
   template<std::size_t offset, uint8_t shift, class T>
   using NVICEXTIModule = util::Module<NVIC::BaseAddress + offset, shift, T, BaseAddress>;
