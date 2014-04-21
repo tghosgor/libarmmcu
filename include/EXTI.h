@@ -50,6 +50,7 @@ public: //Methods
   void enableFallingTrigger() volatile;
   void disableFallingTrigger() volatile;
   void generateSoftwareInterrupt() volatile;
+  bool isPending() volatile;
   void clearPending() volatile;
 
 public:

@@ -49,7 +49,7 @@ public:
   static constexpr SYSCFG volatile* const instance();
 
   template<std::uint8_t N>
-  using EXTIModule = Module<BaseAddress + 0x08 + N * 4, (N * 4) % 16, stm32f429::EXTI<N>, EXTI<N>::BaseAddress>;
+  using EXTIModule = util::Module<BaseAddress + 0x08 + (N / 4), (N * 4) % 16, typename stm32f429::EXTI<N>, EXTI<N>::BaseAddress>;
 
   /*using EXTI0  = EXTIModule<0x08, 0 , stm32f429::EXTI<0>>;
   using EXTI1  = EXTIModule<0x08, 4 , stm32f429::EXTI<1>>;

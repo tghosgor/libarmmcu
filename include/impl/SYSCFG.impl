@@ -40,8 +40,8 @@ typename Module::RegType volatile* SYSCFG::EXTI<Module>::setSource(EXTISource co
   constexpr std::size_t ccAddress = Module::ccAddress;
   constexpr uint8_t ccShift = Module::ccShift;
 
-  *reinterpret_cast<uint32_t volatile* const>(ccAddress) &= ~(0xF <<ccShift);
-  *reinterpret_cast<uint32_t volatile* const>(ccAddress) |= static_cast<uint32_t const>(source) <<ccShift;
+  *reinterpret_cast<uint32_t volatile* const>(ccAddress) &= ~(0x0F <<ccShift);
+  *reinterpret_cast<uint32_t volatile* const>(ccAddress) |= static_cast<uint16_t const>(source) <<ccShift;
 
   return reinterpret_cast<typename Module::RegType volatile*>(Module::regAddress);
 }

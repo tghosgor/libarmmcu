@@ -75,6 +75,12 @@ void EXTI<line>::generateSoftwareInterrupt() volatile
 }
 
 template<uint8_t line>
+bool EXTI<line>::isPending() volatile
+{
+  return m_PR & (0x1 <<line);
+}
+
+template<uint8_t line>
 void EXTI<line>::clearPending() volatile
 {
   m_PR |= 0x1 <<line;

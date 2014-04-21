@@ -65,9 +65,16 @@ auto portGpin13 = portG->createPin<13, GPIO::Port::PinMode::Output>();
 auto portGpin14 = portG->createPin<14, GPIO::Port::PinMode::Output>();
 auto portA = RCC::enablePeriph<RCC::GPIOA>();
 auto portApin0 = portA->createPin<0, GPIO::Port::PinMode::Input>();
+auto portB = RCC::enablePeriph<RCC::GPIOB>();
+auto portBpin1 = portB->createPin<1, GPIO::Port::PinMode::Input>();
 
-auto extisyscfg = NVIC::enable<NVIC::EXTI0>();
-auto exti0 = extisyscfg->setSource(SYSCFG::EXTISource::PA);
+auto syscfg = RCC::enablePeriph<RCC::SYSCFG>();
+
+auto exti0syscfg = NVIC::enable<NVIC::EXTI0>();
+auto exti0 = exti0syscfg->setSource(SYSCFG::EXTISource::PA);
+
+auto extis1yscfg = NVIC::enable<NVIC::EXTI1>();
+auto exti1 = extis1yscfg->setSource(SYSCFG::EXTISource::PB);
 
 int main()
 {
@@ -79,11 +86,16 @@ int main()
   TIM1->setPrescalerValue(1000);
   TIM1->enable();
 
+  SET_UP_EXTI0:
   //Configure EXTI0 to PA0 Rising Edge
   portApin0->setPullMode(GPIO::Port::Pin<0, GPIO::Port::PinMode::Input>::PullMode::None);
+  portBpin1->setPullMode(GPIO::Port::Pin<1, GPIO::Port::PinMode::Input>::PullMode::None);
   exti0->clearPending();
   exti0->enableRisingTrigger();
   exti0->enableInterrupt();
+  exti1->clearPending();
+  exti1->enableRisingTrigger();
+  exti1->enableInterrupt();
 
   while(true)
   {
@@ -97,12 +109,21 @@ int main()
 
 extern "C" void EXTI0_IRQHandler()
 {
-  if(!portGpin14->getOutputState())
-    portGpin14->set();
-  else
-    portGpin14->reset();
+  if(exti0->isPending())
+  {
+    if(!portGpin14->getOutputState())
+     portGpin14->set();
+    else
+      portGpin14->reset();
 
-  exti0->clearPending();
+    exti0->clearPending();
+  }
+}
+
+extern "C" void EXTI1_IRQHandler()
+{
+  portGpin14->reset();
+  exti1->clearPending();
 }
 
 extern "C" void _exit()

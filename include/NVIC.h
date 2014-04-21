@@ -32,6 +32,8 @@
 
 #include <SYSCFG.h>
 
+#include <util.h>
+
 namespace stm32f429
 {
 
@@ -41,15 +43,19 @@ public:
   static constexpr std::size_t BaseAddress{ 0xE000E100 };
 
 public: //Declarations
-  using WWDG        = Module<0, 0 , EXTI<0> , 0x40013C00>;
-  using PVD         = Module<0, 1 , EXTI<0> , 0x40013C00>;
-  using TAMP_STAMP  = Module<0, 2 , EXTI<0> , 0x40013C00>;
-  using RTC_WKUP    = Module<0, 3 , EXTI<0> , 0x40013C00>;
-  using FLASH       = Module<0, 4 , EXTI<0> , 0x40013C00>;
-  using RCC         = Module<0, 5 , EXTI<0> , 0x40013C00>;
+  template<std::size_t offset, uint8_t shift, class T>
+  using Module = util::Module<offset, shift, T, 0x40013C00>;
+
+  //incomplete
+  using WWDG        = Module<0, 0 , EXTI<0>>;
+  using PVD         = Module<0, 1 , EXTI<0>>;
+  using TAMP_STAMP  = Module<0, 2 , EXTI<0>>;
+  using RTC_WKUP    = Module<0, 3 , EXTI<0>>;
+  using FLASH       = Module<0, 4 , EXTI<0>>;
+  using RCC         = Module<0, 5 , EXTI<0>>;
 
   template<std::size_t offset, uint8_t shift, class T>
-  using EXTIModule = Module<BaseAddress + offset, shift, T, SYSCFG::BaseAddress>;
+  using EXTIModule = util::Module<BaseAddress + offset, shift, T, SYSCFG::BaseAddress>;
 
   using EXTI0 = EXTIModule<0, 6 , SYSCFG::EXTI<SYSCFG::EXTIModule<0>>>;
   using EXTI1 = EXTIModule<0, 7 , SYSCFG::EXTI<SYSCFG::EXTIModule<1>>>;

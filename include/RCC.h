@@ -29,14 +29,14 @@
 
 #include <cstdint>
 
+#include <GPIO.h>
+#include <SYSCFG.h>
 #include <TIM.h>
 
 #include <util.h>
 
 namespace stm32f429
 {
-using util::Module;
-
 class RCC
 {
 public:
@@ -44,12 +44,14 @@ public:
 
 public: //Declarations
   template<std::size_t offset, uint8_t shift, class T, std::size_t regAddress>
-  using GPIOModule = Module<BaseAddress + offset, shift, T, regAddress>;
+  using Module = util::Module<BaseAddress + offset, shift, T, regAddress>;
 
-  using GPIOA = GPIOModule<0x30, 6, GPIO::Port, GPIO::Address::PortA>;
-  using GPIOB = GPIOModule<0x30, 6, GPIO::Port, GPIO::Address::PortB>;
-  using GPIOC = GPIOModule<0x30, 6, GPIO::Port, GPIO::Address::PortC>;
-  using GPIOG = GPIOModule<0x30, 6, GPIO::Port, GPIO::Address::PortG>;
+  using GPIOA = Module<0x30, 6, GPIO::Port, GPIO::Address::PortA>;
+  using GPIOB = Module<0x30, 6, GPIO::Port, GPIO::Address::PortB>;
+  using GPIOC = Module<0x30, 6, GPIO::Port, GPIO::Address::PortC>;
+  using GPIOG = Module<0x30, 6, GPIO::Port, GPIO::Address::PortG>;
+
+  using SYSCFG = Module<0x44, 14, stm32f429::SYSCFG, stm32f429::SYSCFG::BaseAddress>;
 
   template<class Module>
   class GPIO
@@ -67,7 +69,7 @@ public: //Declarations
   };
 
   template<std::size_t offset, uint8_t shift, class T, std::size_t regAddress>
-  using TIMModule = Module<BaseAddress + offset, shift, T, regAddress>;
+  using TIMModule = util::Module<BaseAddress + offset, shift, T, regAddress>;
 
   using TIM1  = TIMModule<0x44, 0,  TIM::Periph<TIM::_1 >, TIM::_1 >;
   using TIM2  = TIMModule<0x40, 0,  TIM::Periph<TIM::_2 >, TIM::_2 >;
