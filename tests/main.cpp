@@ -92,9 +92,9 @@ int main()
   exti0->clearPending();
   exti0->enableRisingTrigger();
   exti0->enableInterrupt();
-  //exti1->clearPending();
-  //exti1->enableRisingTrigger();
-  //exti1->enableInterrupt();
+  exti1->clearPending();
+  exti1->enableRisingTrigger();
+  exti1->enableInterrupt();
 
   while(true)
   {
@@ -122,7 +122,7 @@ extern "C" void EXTI0_IRQHandler()
 extern "C" void EXTI1_IRQHandler()
 {
   portGpin14->reset();
-  //exti1->clearPending();
+  exti1->clearPending();
 }
 
 extern "C" void _exit()

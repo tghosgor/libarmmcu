@@ -53,21 +53,6 @@ public: //Declarations
 
   using SYSCFG = Module<0x44, 14, stm32f429::SYSCFG, stm32f429::SYSCFG::BaseAddress>;
 
-  template<class Module>
-  class GPIO
-  {
-    friend class RCC;
-
-  public: //Methods
-    void enable();
-    void disable();
-    void enableLPMode();
-    void disableLPMode();
-
-  private:
-    GPIO();
-  };
-
   template<std::size_t offset, uint8_t shift, class T, std::size_t regAddress>
   using TIMModule = util::Module<BaseAddress + offset, shift, T, regAddress>;
 

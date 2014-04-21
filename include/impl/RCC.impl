@@ -45,33 +45,6 @@ typename Module::RegType volatile* RCC::enablePeriph()
 }
 
 template<class Module>
-RCC::GPIO<Module>::GPIO() { }
-
-template<class Module>
-void RCC::GPIO<Module>::enable()
-{
-  *reinterpret_cast<uint32_t volatile* const>(BaseAddress + Module::offset) |= 0x1 <<Module::shift;
-}
-
-template<class Module>
-void RCC::GPIO<Module>::disable()
-{
-  *reinterpret_cast<uint32_t volatile* const>(BaseAddress + Module::offset) &= ~(0x1 <<Module::shift);
-}
-
-template<class Module>
-void RCC::GPIO<Module>::enableLPMode()
-{
-  *reinterpret_cast<uint32_t volatile* const>(BaseAddress + Module::offset) |= 0x1 <<Module::shift;
-}
-
-template<class Module>
-void RCC::GPIO<Module>::disableLPMode()
-{
-  *reinterpret_cast<uint32_t volatile* const>(BaseAddress + Module::offset) &= ~(0x1 <<Module::shift);
-}
-
-template<class Module>
 RCC::TIM<Module>::TIM() { }
 
 template<class Module>
