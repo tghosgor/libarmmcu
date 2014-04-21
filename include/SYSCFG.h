@@ -31,6 +31,7 @@
 #include <type_traits>
 
 #include <EXTI.h>
+#include <NVIC.h>
 
 #include <util.h>
 
@@ -43,13 +44,40 @@ class SYSCFG
 public:
   static constexpr std::size_t BaseAddress{ 0x40013800 };
 
+public: //Declarations
+  enum class EXTISource : uint32_t
+  {
+    PA = 0, PB, PC, PD, PE,
+    PF, PG, PH, PI, PJ
+  };
+
+  template<class Module>
+  class EXTI
+  {
+  public:
+    typename Module::RegType volatile* setSource(EXTISource const source) volatile;
+  };
+
+  template<std::uint8_t N>
+  using EXTIModule = util::Module<BaseAddress + 0x08 + (N / 4), (N * 4) % 16, stm32f429::EXTI<N>, stm32f429::EXTI<N>::BaseAddress>;
+
+  template<std::size_t offset, uint8_t shift, class T>
+  using NVICEXTIModule = util::Module<NVIC::BaseAddress + offset, shift, T, BaseAddress>;
+
+  //To be used with enable()
+  using EXTI0 = NVICEXTIModule<0, 6 , EXTI<EXTIModule<0>>>;
+  using EXTI1 = NVICEXTIModule<0, 7 , EXTI<EXTIModule<1>>>;
+  using EXTI2 = NVICEXTIModule<0, 8 , EXTI<EXTIModule<2>>>;
+  using EXTI3 = NVICEXTIModule<0, 9 , EXTI<EXTIModule<3>>>;
+  using EXTI4 = NVICEXTIModule<0, 10, EXTI<EXTIModule<4>>>;
+
 public:
   SYSCFG() = delete;
 
   static constexpr SYSCFG volatile* const instance();
 
-  template<std::uint8_t N>
-  using EXTIModule = util::Module<BaseAddress + 0x08 + (N / 4), (N * 4) % 16, typename stm32f429::EXTI<N>, EXTI<N>::BaseAddress>;
+  template<class Module>
+  typename Module::RegType volatile* enable() volatile;
 
   /*using EXTI0  = EXTIModule<0x08, 0 , stm32f429::EXTI<0>>;
   using EXTI1  = EXTIModule<0x08, 4 , stm32f429::EXTI<1>>;
@@ -67,19 +95,6 @@ public:
   using EXTI13 = EXTIModule<0x14, 4 , stm32f429::EXTI<13>>;
   using EXTI14 = EXTIModule<0x14, 8 , stm32f429::EXTI<14>>;
   using EXTI15 = EXTIModule<0x14, 12, stm32f429::EXTI<15>>;*/
-
-  enum class EXTISource : uint32_t
-  {
-    PA = 0, PB, PC, PD, PE,
-    PF, PG, PH, PI, PJ
-  };
-
-  template<class Module>
-  class EXTI
-  {
-  public:
-    typename Module::RegType volatile* setSource(EXTISource const source) volatile;
-  };
 
 public:
   uint32_t m_MEMRM;     //Memory Remap

@@ -30,8 +30,6 @@
 #include <cstddef> //offsetof
 #include <cstdint>
 
-#include <SYSCFG.h>
-
 #include <util.h>
 
 namespace stm32f429
@@ -54,14 +52,14 @@ public: //Declarations
   using FLASH       = Module<0, 4 , EXTI<0>>;
   using RCC         = Module<0, 5 , EXTI<0>>;
 
-  template<std::size_t offset, uint8_t shift, class T>
+  /*template<std::size_t offset, uint8_t shift, class T>
   using EXTIModule = util::Module<BaseAddress + offset, shift, T, SYSCFG::BaseAddress>;
 
   using EXTI0 = EXTIModule<0, 6 , SYSCFG::EXTI<SYSCFG::EXTIModule<0>>>;
   using EXTI1 = EXTIModule<0, 7 , SYSCFG::EXTI<SYSCFG::EXTIModule<1>>>;
   using EXTI2 = EXTIModule<0, 8 , SYSCFG::EXTI<SYSCFG::EXTIModule<2>>>;
   using EXTI3 = EXTIModule<0, 9 , SYSCFG::EXTI<SYSCFG::EXTIModule<3>>>;
-  using EXTI4 = EXTIModule<0, 10, SYSCFG::EXTI<SYSCFG::EXTIModule<4>>>;
+  using EXTI4 = EXTIModule<0, 10, SYSCFG::EXTI<SYSCFG::EXTIModule<4>>>;*/
 
 public: //Methods
   template<class Module>

@@ -69,12 +69,11 @@ auto portB = RCC::enablePeriph<RCC::GPIOB>();
 auto portBpin1 = portB->createPin<1, GPIO::Port::PinMode::Input>();
 
 auto syscfg = RCC::enablePeriph<RCC::SYSCFG>();
-
-auto exti0syscfg = NVIC::enable<NVIC::EXTI0>();
+auto exti0syscfg = syscfg->enable<SYSCFG::EXTI0>();
 auto exti0 = exti0syscfg->setSource(SYSCFG::EXTISource::PA);
 
-auto extis1yscfg = NVIC::enable<NVIC::EXTI1>();
-auto exti1 = extis1yscfg->setSource(SYSCFG::EXTISource::PB);
+//auto extis1yscfg = NVIC::enable<NVIC::EXTI1>();
+//auto exti1 = extis1yscfg->setSource(SYSCFG::EXTISource::PB);
 
 int main()
 {
@@ -93,9 +92,9 @@ int main()
   exti0->clearPending();
   exti0->enableRisingTrigger();
   exti0->enableInterrupt();
-  exti1->clearPending();
-  exti1->enableRisingTrigger();
-  exti1->enableInterrupt();
+  //exti1->clearPending();
+  //exti1->enableRisingTrigger();
+  //exti1->enableInterrupt();
 
   while(true)
   {
@@ -123,7 +122,7 @@ extern "C" void EXTI0_IRQHandler()
 extern "C" void EXTI1_IRQHandler()
 {
   portGpin14->reset();
-  exti1->clearPending();
+  //exti1->clearPending();
 }
 
 extern "C" void _exit()

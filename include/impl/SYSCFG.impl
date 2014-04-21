@@ -35,6 +35,14 @@ namespace stm32f429
 constexpr SYSCFG volatile* const SYSCFG::instance() { return reinterpret_cast<SYSCFG volatile* const>(BaseAddress); }
 
 template<class Module>
+typename Module::RegType volatile* SYSCFG::enable() volatile
+{
+  reinterpret_cast<NVIC volatile*>(Module::ccAddress)->m_ISER[Module::ccShift / 32] |= 0x1 <<(Module::ccShift % 32);
+
+  return reinterpret_cast<typename Module::RegType volatile*>(Module::regAddress);
+}
+
+template<class Module>
 typename Module::RegType volatile* SYSCFG::EXTI<Module>::setSource(EXTISource const source) volatile
 {
   constexpr std::size_t ccAddress = Module::ccAddress;
