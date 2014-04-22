@@ -11,8 +11,9 @@ auto portG = RCC::enablePeriph<RCC::GPIOG>();
 auto portGpin13 = portG->createPin<13, GPIO::Port::PinMode::Output>();
 portGpin13->set();
 
-auto extisyscfg = NVIC::enable<NVIC::EXTI0>();
-auto exti0 = extisyscfg->setSource(SYSCFG::EXTISource::PA);
+auto syscfg = RCC::enablePeriph<RCC::SYSCFG>();
+auto exti0syscfg = syscfg->enable<SYSCFG::EXTI0>(); //Also enables NVIC
+auto exti0 = exti0syscfg->setSource(SYSCFG::EXTISource::PA);
 exti0->clearPending();
 exti0->enableRisingTrigger();
 exti0->enableInterrupt();
