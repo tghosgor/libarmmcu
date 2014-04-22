@@ -41,6 +41,7 @@ public:
   static constexpr std::size_t BaseAddress{ 0x40013C00 };
 
 public: //Declarations
+  EXTI() = delete;
 
 public: //Methods
   void enableInterrupt() volatile;

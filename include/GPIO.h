@@ -59,6 +59,8 @@ public: //Declarations
   class Pin;
 
 public: //Methods
+  Port() = delete;
+
   template<uint8_t nPin, PinMode mode>
   Pin<nPin, mode> volatile* createPin() volatile;
 
@@ -87,6 +89,9 @@ public:
     PullDown = 0x2
   };
 
+public:
+  Pin() = delete;
+
   void setPullMode(PullMode const ppm) volatile;
 }; //END Pin
 
@@ -103,6 +108,8 @@ public: //Declarations
   };
 
 public: //Methods
+  Pin() = delete;
+
   void setOutputSpeed(OutputSpeed const ospeed) volatile;
 
   void set() volatile;
@@ -145,6 +152,8 @@ public: //Declarations
   };
 
 public: //Methods
+  Pin() = delete;
+
   void setAF(AF const af) volatile;
   void setOutputSpeed(OutputSpeed const ospeed) volatile;
 };

@@ -50,6 +50,7 @@ template<std::size_t module>
 class Periph
 {
 public:
+  Periph() = delete;
 
 public:
 //private:

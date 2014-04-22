@@ -41,6 +41,7 @@ class RCC
 {
 public:
   static constexpr std::size_t BaseAddress{ 0x40023800 };
+
 private: //Internal Declarations
   template<std::size_t offset, uint8_t shift, class T, std::size_t regAddress>
   using Module = util::Module<BaseAddress + offset, shift, T, regAddress>;

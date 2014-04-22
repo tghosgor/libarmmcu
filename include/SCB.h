@@ -33,6 +33,9 @@ namespace stm32f429
 class SCB
 {
 public:
+  static constexpr std::size_t BaseAddress{ 0xE000E008 };
+
+public:
   SCB() = delete;
 
   static volatile SCB* const instance() { return reinterpret_cast<volatile SCB*>(BaseAddress); }
@@ -56,9 +59,6 @@ public: //Registers
   uint32_t m_MMAR;  //MemManage Fault Address
   uint32_t m_BFAR;  //BusFault Address
   uint32_t m_AFSR;  //Auxiliary Fault
-
-public:
-  static constexpr std::size_t BaseAddress{ 0xE000E008 };
 };
 
 static_assert(sizeof(SCB) == (0xE000ED3C - SCB::BaseAddress) + 4, "SCB size is wrong.");
