@@ -40,35 +40,8 @@ constexpr RCC volatile* const RCC::instance()
 template<class Module>
 typename Module::RegType volatile* RCC::enablePeriph()
 {
-  *reinterpret_cast<uint32_t volatile*>(Module::ccAddress) = 0x1 <<Module::ccShift;
+  *reinterpret_cast<uint32_t volatile*>(Module::ccAddress) |= 0x1 <<Module::ccShift;
   return reinterpret_cast<typename Module::RegType volatile*>(Module::regAddress);
-}
-
-template<class Module>
-RCC::TIM<Module>::TIM() { }
-
-template<class Module>
-void RCC::TIM<Module>::enable()
-{
-  *reinterpret_cast<uint32_t volatile* const>(BaseAddress + Module::offset) |= 0x1 <<Module::shift;
-}
-
-template<class Module>
-void RCC::TIM<Module>::disable()
-{
-  *reinterpret_cast<uint32_t volatile* const>(BaseAddress + Module::offset) &= ~(0x1 <<Module::shift);
-}
-
-template<class Module>
-void RCC::TIM<Module>::enableLPMode()
-{
-  *reinterpret_cast<uint32_t volatile* const>(BaseAddress + Module::offset + 0x20) |= 0x1 <<Module::shift;
-}
-
-template<class Module>
-void RCC::TIM<Module>::disableLPMode()
-{
-  *reinterpret_cast<uint32_t volatile* const>(BaseAddress + Module::offset + 0x20) &= ~(0x1 <<Module::shift);
 }
 
 } //NS stm32f429

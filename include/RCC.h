@@ -30,6 +30,7 @@
 #include <cstdint>
 
 #include <GPIO.h>
+#include <LCD.h>
 #include <SYSCFG.h>
 #include <TIM.h>
 
@@ -69,20 +70,7 @@ public: //Declarations
   using TIM13 = Module<0x40, 7,  TIM::Periph<TIM::_13>, TIM::_13>;
   using TIM14 = Module<0x40, 8,  TIM::Periph<TIM::_14>, TIM::_14>;
 
-  template<class Module>
-  class TIM
-  {
-    friend class RCC;
-
-  public: //Methods
-    void enable();
-    void disable();
-    void enableLPMode();
-    void disableLPMode();
-
-  private:
-    TIM();
-  };
+  using LCD0 = Module<0x44, 26, LCD::Periph, LCD::_0>;
 
 public: //Methods
   RCC() = delete;
