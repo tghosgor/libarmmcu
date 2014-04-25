@@ -28,6 +28,7 @@
 #define LCD_H_
 
 #include <cstdint>
+
 namespace stm32f429
 {
 namespace LCD
@@ -38,20 +39,12 @@ enum : std::size_t
    _0 = 0x40016800
 };
 
-template<std::size_t module>
 class Periph
 {
+public:
+  static constexpr std::size_t BaseAddress = 0x40016800;
+
 public: //Declarations
-  template<std::size_t layer>
-  class Layer;
-
-  enum : std::size_t
-  {
-    Layer1 = _0 + (19 * 4),           //LCD::Periph<_0>::BaseAddress + sizeof(LCD::Periph<_0>)
-    Layer2 = Layer1 + sizeof(Layer<Layer1>) + 15 * 4 //Layer1 + sizeof(Layer<Layer1>) + offset
-  };
-
-  template<std::size_t address>
   class Layer
   {
   public: //Registers
@@ -71,9 +64,25 @@ public: //Declarations
     uint32_t m_CLUTWR;
   };
 
-  static_assert(sizeof(Layer<0>) == 17 * 4, "Layer size is wrong");
+  enum : std::size_t
+  {
+    Layer1 = _0 + (19 * 4),           //LCD::Periph<_0>::BaseAddress + sizeof(LCD::Periph<_0>)
+    Layer2 = Layer1 + sizeof(Layer) + 15 * 4 //Layer1 + sizeof(Layer<Layer1>) + offset
+  };
+
+  static_assert(sizeof(Layer) == 17 * 4, "Layer size is wrong");
 
 public: //Methods
+  Periph() = delete;
+
+  void enable() volatile;
+  void setSync(uint16_t const hSync, uint16_t const vSync) volatile;
+  void setBackPorch(uint16_t const hBP, uint16_t const vBP) volatile;
+  void setActiveWidth(uint16_t const width, uint16_t const height) volatile;
+  void setTotalWidth(uint16_t const width, uint16_t const height) volatile;
+  void immediateReload() volatile;
+  void blankingReload() volatile;
+  void setBgColor(uint8_t const r, uint8_t const g, uint8_t const b) volatile;
 
 public: //Registers
   uint32_t PADDING1[2];
@@ -96,20 +105,14 @@ public: //Registers
 
   uint32_t PADDING5[14]; // 19 * 4 bytes until here
 
-  Layer<Layer1> LAYER1;
+  Layer LAYER1;
 
   uint32_t PADDING8[15];
 
-  Layer<Layer2> LAYER2;
-
-private:
-  Periph();
+  Layer LAYER2;
 };
 
-template<class Module>
-static constexpr Module getPeriph();
-
-static_assert(sizeof(Periph<0>) == 0x148, "LCD size is not correct, spec says 0x148 bytes.");
+static_assert(sizeof(Periph) == 0x148, "LCD size is not correct, spec says 0x148 bytes.");
 
 } //NS LED
 } //NS stm32f429

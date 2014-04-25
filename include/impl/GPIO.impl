@@ -98,9 +98,10 @@ void Port::Pin<nPin, Port::PinMode::Alternate>::setOutputSpeed(Port::Pin<nPin, P
 template<uint8_t nPin>
 void Port::Pin<nPin, Port::PinMode::Alternate>::setAF(Port::Pin<nPin, Port::PinMode::Alternate>::AF const af) volatile
 {
-  constexpr uint32_t shift{ nPin * 4 };
-  reinterpret_cast<Port volatile* const>(this)->m_AFR[shift / 8] &= ~(0xF <<shift);
-  reinterpret_cast<Port volatile* const>(this)->m_AFR[shift / 8] |= af <<shift;
+  constexpr uint32_t offset{ nPin / 8 };
+  constexpr uint32_t shift{ (nPin * 4) % 8 };
+  reinterpret_cast<Port volatile* const>(this)->m_AFR[offset] &= ~(0xF <<shift);
+  reinterpret_cast<Port volatile* const>(this)->m_AFR[offset] |= static_cast<uint32_t const>(af) <<shift;
 }
 
 } //NS GPIO

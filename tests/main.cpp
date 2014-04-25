@@ -25,6 +25,7 @@
 */
 
 #include <EXTI.h>
+#include <IVTable.h>
 #include <GPIO.h>
 #include <LCD.h>
 #include <RCC.h>
@@ -33,10 +34,14 @@
 #include <SYSCFG.h>
 #include <TIM.h>
 
+#include <cstring>
 #include <cstdint>
 #include <limits>
 
 using namespace stm32f429;
+
+bool exti0Handler();
+bool exti3Handler();
 
 extern "C" void SystemInit()
 {
@@ -58,22 +63,29 @@ extern "C" void SystemInit()
 
   /* Disable all interrupts */
   RCC::instance()->m_CIR = 0x00000000;
+
+  SCB::instance()->m_VTOR = reinterpret_cast<uint32_t>(&ivTable);
 }
+
+auto portA = RCC::enablePeriph<RCC::GPIOA>();
+auto portApin0 = portA->createPin<0, GPIO::Port::PinMode::Input>();
+
+auto portB = RCC::enablePeriph<RCC::GPIOB>();
+auto portBpin2 = portB->createPin<2, GPIO::Port::PinMode::Input>();
+
+auto portC = RCC::enablePeriph<RCC::GPIOC>();
+auto portCpin2 = portC->createPin<2, GPIO::Port::PinMode::Input>();
 
 auto portG = RCC::enablePeriph<RCC::GPIOG>();
 auto portGpin13 = portG->createPin<13, GPIO::Port::PinMode::Output>();
 auto portGpin14 = portG->createPin<14, GPIO::Port::PinMode::Output>();
-auto portA = RCC::enablePeriph<RCC::GPIOA>();
-auto portApin0 = portA->createPin<0, GPIO::Port::PinMode::Input>();
-auto portB = RCC::enablePeriph<RCC::GPIOB>();
-auto portBpin1 = portB->createPin<1, GPIO::Port::PinMode::Input>();
 
 auto syscfg = RCC::enablePeriph<RCC::SYSCFG>();
 auto exti0syscfg = syscfg->enable<SYSCFG::EXTI0>();
 auto exti0 = exti0syscfg->setSource(SYSCFG::EXTISource::PA);
 
-auto extis1yscfg = syscfg->enable<SYSCFG::EXTI1>();
-auto exti1 = extis1yscfg->setSource(SYSCFG::EXTISource::PB);
+auto extis2yscfg = syscfg->enable<SYSCFG::EXTI2>();
+auto exti2 = extis2yscfg->setSource(SYSCFG::EXTISource::PC);
 
 int main()
 {
@@ -87,14 +99,108 @@ int main()
 
   SET_UP_EXTI0:
   //Configure EXTI0 to PA0 Rising Edge
-  portApin0->setPullMode(GPIO::Port::Pin<0, GPIO::Port::PinMode::Input>::PullMode::None);
-  portBpin1->setPullMode(GPIO::Port::Pin<1, GPIO::Port::PinMode::Input>::PullMode::None);
+  portApin0->setPullMode(GPIO::Port::Pin<0, GPIO::Port::PinMode::Input>::PullMode::PullDown);
+  portCpin2->setPullMode(GPIO::Port::Pin<2, GPIO::Port::PinMode::Input>::PullMode::PullDown);
+  exti0->registerISR(&exti0Handler);
   exti0->clearPending();
   exti0->enableRisingTrigger();
   exti0->enableInterrupt();
-  exti1->clearPending();
-  exti1->enableRisingTrigger();
-  exti1->enableInterrupt();
+  exti2->registerISR(&exti3Handler);
+  exti2->clearPending();
+  exti2->enableRisingTrigger();
+  exti2->enableInterrupt();
+
+  SET_UP_LCD:
+  auto portApin11 = portA->createPin<11, GPIO::Port::PinMode::Alternate>();
+  portApin11->setAF(GPIO::Port::Pin<11, GPIO::Port::PinMode::Alternate>::AF::_14);
+  auto portApin12 = portA->createPin<12, GPIO::Port::PinMode::Alternate>();
+  portApin12->setAF(GPIO::Port::Pin<12, GPIO::Port::PinMode::Alternate>::AF::_14);
+  auto portApin6 = portA->createPin<6, GPIO::Port::PinMode::Alternate>();
+  portApin6->setAF(GPIO::Port::Pin<6, GPIO::Port::PinMode::Alternate>::AF::_14);
+  auto portApin3 = portA->createPin<3, GPIO::Port::PinMode::Alternate>();
+  portApin3->setAF(GPIO::Port::Pin<3, GPIO::Port::PinMode::Alternate>::AF::_14);
+  auto portApin4 = portA->createPin<4, GPIO::Port::PinMode::Alternate>();
+  portApin4->setAF(GPIO::Port::Pin<4, GPIO::Port::PinMode::Alternate>::AF::_14);
+
+  auto portBpin0 = portB->createPin<0, GPIO::Port::PinMode::Alternate>();
+  portBpin0->setAF(GPIO::Port::Pin<0, GPIO::Port::PinMode::Alternate>::AF::_9);
+  auto portBpin1 = portB->createPin<1, GPIO::Port::PinMode::Alternate>();
+  portBpin1->setAF(GPIO::Port::Pin<1, GPIO::Port::PinMode::Alternate>::AF::_9);
+  auto portBpin10 = portB->createPin<10, GPIO::Port::PinMode::Alternate>();
+  portBpin10->setAF(GPIO::Port::Pin<10, GPIO::Port::PinMode::Alternate>::AF::_14);
+  auto portBpin11 = portB->createPin<11, GPIO::Port::PinMode::Alternate>();
+  portBpin11->setAF(GPIO::Port::Pin<11, GPIO::Port::PinMode::Alternate>::AF::_14);
+  auto portBpin8 = portB->createPin<8, GPIO::Port::PinMode::Alternate>();
+  portBpin8->setAF(GPIO::Port::Pin<8, GPIO::Port::PinMode::Alternate>::AF::_14);
+  auto portBpin9 = portB->createPin<9, GPIO::Port::PinMode::Alternate>();
+  portBpin9->setAF(GPIO::Port::Pin<9, GPIO::Port::PinMode::Alternate>::AF::_14);
+
+  auto portCpin10 = portC->createPin<10, GPIO::Port::PinMode::Alternate>();
+  portCpin10->setAF(GPIO::Port::Pin<10, GPIO::Port::PinMode::Alternate>::AF::_14);
+  auto portCpin7 = portC->createPin<7, GPIO::Port::PinMode::Alternate>();
+  portCpin7->setAF(GPIO::Port::Pin<7, GPIO::Port::PinMode::Alternate>::AF::_14);
+  auto portCpin6 = portC->createPin<6, GPIO::Port::PinMode::Alternate>();
+  portCpin6->setAF(GPIO::Port::Pin<6, GPIO::Port::PinMode::Alternate>::AF::_14);
+
+  auto portD = RCC::enablePeriph<RCC::GPIOD>();
+  auto portDpin3 = portG->createPin<3, GPIO::Port::PinMode::Alternate>();
+  portDpin3->setAF(GPIO::Port::Pin<3, GPIO::Port::PinMode::Alternate>::AF::_14);
+  auto portDpin6 = portG->createPin<6, GPIO::Port::PinMode::Alternate>();
+  portDpin6->setAF(GPIO::Port::Pin<6, GPIO::Port::PinMode::Alternate>::AF::_14);
+
+  auto portF = RCC::enablePeriph<RCC::GPIOF>();
+  auto portFpin10 = portG->createPin<10, GPIO::Port::PinMode::Alternate>();
+  portFpin10->setAF(GPIO::Port::Pin<10, GPIO::Port::PinMode::Alternate>::AF::_14);
+
+  auto portGpin6 = portG->createPin<6, GPIO::Port::PinMode::Alternate>();
+  portGpin6->setAF(GPIO::Port::Pin<6, GPIO::Port::PinMode::Alternate>::AF::_14);
+  auto portGpin10 = portG->createPin<10, GPIO::Port::PinMode::Alternate>();
+  portGpin10->setAF(GPIO::Port::Pin<10, GPIO::Port::PinMode::Alternate>::AF::_9);
+  auto portGpin11 = portG->createPin<11, GPIO::Port::PinMode::Alternate>();
+  portGpin11->setAF(GPIO::Port::Pin<11, GPIO::Port::PinMode::Alternate>::AF::_14);
+  auto portGpin12 = portG->createPin<12, GPIO::Port::PinMode::Alternate>();
+  portGpin12->setAF(GPIO::Port::Pin<12, GPIO::Port::PinMode::Alternate>::AF::_9);
+  auto portGpin7 = portG->createPin<7, GPIO::Port::PinMode::Alternate>();
+  portGpin7->setAF(GPIO::Port::Pin<7, GPIO::Port::PinMode::Alternate>::AF::_14);
+
+  constexpr unsigned ActiveWidth = 294;
+  constexpr unsigned ActiveHeight = 266;
+
+  constexpr unsigned hSync = 10;
+  constexpr unsigned HBP = 20;
+  constexpr unsigned HFP = 10;
+
+  constexpr unsigned vSync = 2;
+  constexpr unsigned VBP = 2;
+  constexpr unsigned VFP = 4;
+
+  {
+    RCC::instance()->m_CR |= 0x1 <<16; //HSEON
+    //RCC::instance()->m_PLLCFGR |= 0x1 <<22; //PLL source is HSE
+    RCC::instance()->m_PLLCFGR |= 8 <<0; //PLL division PLLM
+    RCC::instance()->m_PLLCFGR |= 360 <<6; //PLL multiplication PLLN
+    RCC::instance()->m_PLLCFGR &= ~(0x3 <<16); //PLL division for main system clock PLLP
+    RCC::instance()->m_PLLCFGR |=  7 <<24; //PLL main division for usb otg fs, sdio, rng PLLQ
+    RCC::instance()->m_CR |= 0x1 <<24; //PLLON
+
+    RCC::instance()->enablePLLSAI();
+    RCC::instance()->setPLLSAIMFactor(192);
+    RCC::instance()->setPLLSAIDFactor(4);
+    RCC::instance()->setPLLSAIDIVR(RCC::PLLSAIDIVR::_8);
+    RCC::instance()->enablePLLSAI();
+    while(!RCC::instance()->isPLLSAIReady())
+    { }
+    auto lcd0 = RCC::enablePeriph<RCC::LCD0>();
+    lcd0->setBgColor(255, 0, 0);
+    lcd0->setSync(hSync, vSync);;
+    lcd0->setBackPorch(HBP, VBP);
+    lcd0->setActiveWidth(hSync + HBP + ActiveWidth,
+                         vSync + VBP + ActiveHeight);
+    lcd0->setTotalWidth(hSync + HBP + ActiveWidth + HFP,
+                        vSync + VBP + ActiveHeight + VFP);
+    lcd0->enable();
+    lcd0->immediateReload();
+  }
 
   while(true)
   {
@@ -106,7 +212,7 @@ int main()
   }
 }
 
-extern "C" void EXTI0_IRQHandler()
+bool exti0Handler()
 {
   if(exti0->isPending())
   {
@@ -119,10 +225,23 @@ extern "C" void EXTI0_IRQHandler()
   }
 }
 
-extern "C" void EXTI1_IRQHandler()
+/*extern "C" void EXTI0_IRQHandler()
+{
+  if(exti0->isPending())
+  {
+    if(!portGpin14->getOutputState())
+     portGpin14->set();
+    else
+      portGpin14->reset();
+
+    exti0->clearPending();
+  }
+}*/
+
+bool exti3Handler()
 {
   portGpin14->reset();
-  exti1->clearPending();
+  exti2->clearPending();
 }
 
 extern "C" void _exit()

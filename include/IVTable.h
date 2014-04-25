@@ -24,36 +24,30 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SYSCFG_CPP_
-#define SYSCFG_CPP_
+#ifndef IVTABLE_H_
+#define IVTABLE_H_
 
-#include <SYSCFG.h>
+#include <cstdint>
+
+#include <array>
+
+#include <util.h>
 
 namespace stm32f429
 {
 
-constexpr SYSCFG volatile* const SYSCFG::instance() { return reinterpret_cast<SYSCFG volatile* const>(BaseAddress); }
+extern "C" void Default_Handler();
 
-template<class Module>
-typename Module::RegType volatile* SYSCFG::enable() volatile
+struct IVTable
 {
-  *reinterpret_cast<uint32_t volatile* const>(Module::ccAddress) |= 0x1 <<Module::ccShift;
+  uint32_t notImplemented[16];
+  std::array<void(*)(), 32> m_IRQ;
 
-  return reinterpret_cast<typename Module::RegType volatile*>(Module::regAddress);
-}
+  IVTable() { std::fill(m_IRQ.begin(), m_IRQ.end(), Default_Handler); }
+};
 
-template<class Module>
-typename Module::RegType volatile* SYSCFG::EXTI<Module>::setSource(EXTISource const source) volatile
-{
-  constexpr std::size_t ccAddress = Module::ccAddress;
-  constexpr uint8_t ccShift = Module::ccShift;
-
-  *reinterpret_cast<uint32_t volatile* const>(ccAddress) &= ~(0x0F <<ccShift);
-  *reinterpret_cast<uint32_t volatile* const>(ccAddress) |= static_cast<uint16_t const>(source) <<ccShift;
-
-  return reinterpret_cast<typename Module::RegType volatile*>(Module::regAddress);
-}
+extern IVTable ivTable;
 
 } //NS stm32f429
 
-#endif /* SYSCFG_CPP_ */
+#endif /* IVTABLE_H_ */

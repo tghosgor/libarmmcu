@@ -22,7 +22,7 @@ include_directories(include)
 
 set(CMAKE_C_FLAGS "-std=c++11 -mcpu=cortex-m4 -mthumb")
 set(CMAKE_CXX_FLAGS "-std=c++11 -mcpu=cortex-m4 -mthumb")
-set(CMAKE_CXX_FLAGS_DEBUG "-g2")
+set(CMAKE_CXX_FLAGS_DEBUG "-g3")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -g3 -fno-inline")
 set(CMAKE_ASM_FLAGS "-mcpu=cortex-m4 -mthumb")
 set(CMAKE_ASM_FLAGS_RELEASE "")
@@ -33,5 +33,5 @@ set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "") #-rdynamic suppression
 set(CMAKE_EXE_LINKER_FLAGS "-Xlinker --script ${libarmmcu_SOURCE_DIR}/misc/STM32F429ZI_FLASH.ld")
 set(CMAKE_EXE_LINKER_FLAGS_RELEASE "-s")
 
-add_executable(stm32f429i-disco tests/main.cpp misc/startup_stm32f429xx.S misc/STM32F429ZI_FLASH.ld include/util.h include/RCC.h include/SCB.h include/NVIC.h include/GPIO.h include/TIM.h include/ADC.h include/SYSCFG.h include/EXTI.h include/LCD.h include/impl/GPIO.impl include/impl/TIM.impl include/impl/RCC.impl  include/impl/NVIC.impl include/impl/SYSCFG.impl include/impl/EXTI.impl include/impl/LCD.impl README.md)
+add_executable(stm32f429i-disco tests/main.cpp misc/startup_stm32f429xx.S misc/STM32F429ZI_FLASH.ld include/util.h include/IVTable.h include/RCC.h include/SCB.h include/NVIC.h include/GPIO.h include/TIM.h include/ADC.h include/SYSCFG.h include/EXTI.h include/LCD.h include/PLL.h src/IVTable.cpp include/impl/GPIO.impl include/impl/TIM.impl include/impl/RCC.impl  include/impl/NVIC.impl include/impl/SYSCFG.impl include/impl/EXTI.impl include/impl/LCD.impl include/impl/PLL.impl README.md)
 

@@ -28,9 +28,16 @@
 #define EXTI_CPP_
 
 #include <EXTI.h>
+#include <IVTable.h>
 
 namespace stm32f429
 {
+
+template<uint8_t line>
+void EXTI<line>::registerISR(bool (*f)()) volatile
+{
+  ivTable.m_IRQ[line + 6] = reinterpret_cast<void(*)()>(f);
+}
 
 template<uint8_t line>
 void EXTI<line>::enableInterrupt() volatile

@@ -29,6 +29,8 @@
 
 #include <cstdint>
 
+#include <functional>
+
 #include <util.h>
 
 namespace stm32f429
@@ -44,6 +46,7 @@ public: //Declarations
   EXTI() = delete;
 
 public: //Methods
+  void registerISR(bool (*f)()) volatile;
   void enableInterrupt() volatile;
   void disableInterrupt() volatile;
   void enableRisingTrigger() volatile;

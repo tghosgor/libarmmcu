@@ -24,36 +24,31 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SYSCFG_CPP_
-#define SYSCFG_CPP_
+#ifndef PLL_CPP_
+#define PLL_CPP_
 
-#include <SYSCFG.h>
+#include <PLL.h>
 
 namespace stm32f429
 {
 
-constexpr SYSCFG volatile* const SYSCFG::instance() { return reinterpret_cast<SYSCFG volatile* const>(BaseAddress); }
-
-template<class Module>
-typename Module::RegType volatile* SYSCFG::enable() volatile
+void PLL::setMultiplicationFactor(uint16_t const factor) volatile
 {
-  *reinterpret_cast<uint32_t volatile* const>(Module::ccAddress) |= 0x1 <<Module::ccShift;
-
-  return reinterpret_cast<typename Module::RegType volatile*>(Module::regAddress);
+//  m_PLLSAICFGR &= ~(0x01FF <<6);
+//  m_PLLSAICFGR |= factor <<6;
 }
 
-template<class Module>
-typename Module::RegType volatile* SYSCFG::EXTI<Module>::setSource(EXTISource const source) volatile
+void PLL::setDivisionFactor(uint8_t const factor) volatile
 {
-  constexpr std::size_t ccAddress = Module::ccAddress;
-  constexpr uint8_t ccShift = Module::ccShift;
+//  m_PLLSAICFGR &= ~(0x07 <<28);
+//  m_PLLSAICFGR |= (factor & 0x0F) <<28;
+}
 
-  *reinterpret_cast<uint32_t volatile* const>(ccAddress) &= ~(0x0F <<ccShift);
-  *reinterpret_cast<uint32_t volatile* const>(ccAddress) |= static_cast<uint16_t const>(source) <<ccShift;
-
-  return reinterpret_cast<typename Module::RegType volatile*>(Module::regAddress);
+bool PLL::isReady() volatile
+{
+//  return ( *(&m_PLLSAICFGR - 1) ) & (0x1 <<29);
 }
 
 } //NS stm32f429
 
-#endif /* SYSCFG_CPP_ */
+#endif /* PLL_CPP_ */

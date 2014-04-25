@@ -175,6 +175,6 @@ constexpr Periph<module> volatile* const getPeriph();
 } //NS TIM
 } //NS stm32f429
 
-#include "impl/TIM.impl"
-
 #endif /* TIM_H_ */
+
+#include "impl/TIM.impl"

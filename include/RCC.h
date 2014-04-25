@@ -31,6 +31,7 @@
 
 #include <GPIO.h>
 #include <LCD.h>
+#include <PLL.h>
 #include <SYSCFG.h>
 #include <TIM.h>
 
@@ -48,10 +49,14 @@ private: //Internal Declarations
   using Module = util::Module<BaseAddress + offset, shift, T, regAddress>;
 
 public: //Declarations
-  using GPIOA = Module<0x30, 6, GPIO::Port, GPIO::PortA>;
-  using GPIOB = Module<0x30, 6, GPIO::Port, GPIO::PortB>;
-  using GPIOC = Module<0x30, 6, GPIO::Port, GPIO::PortC>;
+  using GPIOA = Module<0x30, 0, GPIO::Port, GPIO::PortA>;
+  using GPIOB = Module<0x30, 1, GPIO::Port, GPIO::PortB>;
+  using GPIOC = Module<0x30, 2, GPIO::Port, GPIO::PortC>;
+  using GPIOD = Module<0x30, 3, GPIO::Port, GPIO::PortG>;
+  using GPIOE = Module<0x30, 4, GPIO::Port, GPIO::PortG>;
+  using GPIOF = Module<0x30, 5, GPIO::Port, GPIO::PortG>;
   using GPIOG = Module<0x30, 6, GPIO::Port, GPIO::PortG>;
+  using GPIOH = Module<0x30, 7, GPIO::Port, GPIO::PortG>;
 
   using SYSCFG = Module<0x44, 14, stm32f429::SYSCFG, stm32f429::SYSCFG::BaseAddress>;
 
@@ -79,6 +84,42 @@ public: //Methods
 
   template<class Module>
   static typename Module::RegType volatile* enablePeriph();
+
+  bool isPLLSAIReady() volatile
+  {
+    return m_CR & (0x1 <<29);
+  }
+
+  void enablePLLSAI() volatile
+  {
+    m_CR |= 0x1 <<28;
+  }
+
+  void setPLLSAIMFactor(uint16_t const factor) volatile
+  {
+    m_PLLSAICFGR &= ~(0x01FF <<6);
+    m_PLLSAICFGR |= factor <<6;
+  }
+
+  void setPLLSAIDFactor(uint8_t const factor) volatile
+  {
+    m_PLLSAICFGR &= ~(0x07 <<28);
+    m_PLLSAICFGR |= (factor & 0x0F) <<28;
+  }
+
+  enum class PLLSAIDIVR : uint32_t
+  {
+    _2 = 0,
+    _4 = 1,
+    _8 = 2,
+    _16 = 3
+  };
+
+  void setPLLSAIDIVR(PLLSAIDIVR const divr) volatile
+  {
+    m_DCKCFGR &= ~(0x3 <<16);
+    m_DCKCFGR |= static_cast<uint32_t>(divr) <<16;
+  }
 
 public: //Registers
   uint32_t m_CR; //Clock Control
@@ -115,9 +156,11 @@ public: //Registers
   uint32_t m_reserved11;
   uint32_t m_SSCGR;
   uint32_t m_PLLI2SCFGR;
+  uint32_t m_PLLSAICFGR;
+  uint32_t m_DCKCFGR;
 };
 
-static_assert(sizeof(RCC) == 0x88, "RCC size is wrong. Spec says its 88 bytes long.");
+static_assert(sizeof(RCC) == 0x90, "RCC size is wrong. Spec says its 0x8C bytes long.");
 
 } //NS stm32f429
 

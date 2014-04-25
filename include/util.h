@@ -27,6 +27,8 @@
 #ifndef UTIL_H
 #define UTIL_H
 
+#include <functional>
+
 namespace stm32f429
 {
 
@@ -42,6 +44,8 @@ struct Module
   typedef T RegType;
   static constexpr std::size_t regAddress = regAddress_;
 };
+
+typedef std::function<bool()> ISR;
 
 }
 

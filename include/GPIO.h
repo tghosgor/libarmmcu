@@ -166,5 +166,3 @@ public: //Methods
 #include "impl/GPIO.impl"
 
 #endif /* GPIO_H_ */
-
-

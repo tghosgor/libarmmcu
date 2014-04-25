@@ -27,6 +27,7 @@
 #ifndef SYSCFG_H_
 #define SYSCFG_H_
 
+#include <cstddef>
 #include <cstdint>
 #include <type_traits>
 
@@ -34,7 +35,6 @@
 #include <NVIC.h>
 
 #include <util.h>
-
 
 namespace stm32f429
 {
@@ -46,10 +46,10 @@ public:
 
 private: //Internal Declarations
   template<uint8_t N>
-  using EXTIModule = util::Module<BaseAddress + 0x08 + (N / 4) * 4, (N * 4) % 16, stm32f429::EXTI<N>, stm32f429::EXTI<N>::BaseAddress>;
+  using EXTIModule = util::Module<BaseAddress + 0x08 + (N / 4) * 0x4, (N * 4) % 16, stm32f429::EXTI<N>, stm32f429::EXTI<N>::BaseAddress>;
 
-  template<std::size_t offset, uint8_t shift, class T>
-  using NVICEXTIModule = util::Module<NVIC::BaseAddress + offset, shift, T, BaseAddress>;
+  template<std::size_t bit, class T>
+  using NVICEXTIModule = util::Module<NVIC::BaseAddress + offsetof(NVIC, m_ISER) + bit / 32, bit % 32, T, BaseAddress>;
 
 public: //Declarations
   enum class EXTISource : uint32_t
@@ -65,11 +65,11 @@ public: //Declarations
     typename Module::RegType volatile* setSource(EXTISource const source) volatile;
   };
 
-  using EXTI0 = NVICEXTIModule<0, 6 , EXTI<EXTIModule<0>>>;
-  using EXTI1 = NVICEXTIModule<0, 7 , EXTI<EXTIModule<1>>>;
-  using EXTI2 = NVICEXTIModule<0, 8 , EXTI<EXTIModule<2>>>;
-  using EXTI3 = NVICEXTIModule<0, 9 , EXTI<EXTIModule<3>>>;
-  using EXTI4 = NVICEXTIModule<0, 10, EXTI<EXTIModule<4>>>;
+  using EXTI0 = NVICEXTIModule<6 , EXTI<EXTIModule<0>>>;
+  using EXTI1 = NVICEXTIModule<7 , EXTI<EXTIModule<1>>>;
+  using EXTI2 = NVICEXTIModule<8 , EXTI<EXTIModule<2>>>;
+  using EXTI3 = NVICEXTIModule<9 , EXTI<EXTIModule<3>>>;
+  using EXTI4 = NVICEXTIModule<10, EXTI<EXTIModule<4>>>;
 
 public:
   SYSCFG() = delete;
