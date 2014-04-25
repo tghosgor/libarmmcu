@@ -52,11 +52,12 @@ public: //Declarations
   using GPIOA = Module<0x30, 0, GPIO::Port, GPIO::PortA>;
   using GPIOB = Module<0x30, 1, GPIO::Port, GPIO::PortB>;
   using GPIOC = Module<0x30, 2, GPIO::Port, GPIO::PortC>;
-  using GPIOD = Module<0x30, 3, GPIO::Port, GPIO::PortG>;
-  using GPIOE = Module<0x30, 4, GPIO::Port, GPIO::PortG>;
-  using GPIOF = Module<0x30, 5, GPIO::Port, GPIO::PortG>;
+  using GPIOD = Module<0x30, 3, GPIO::Port, GPIO::PortD>;
+  using GPIOE = Module<0x30, 4, GPIO::Port, GPIO::PortE>;
+  using GPIOF = Module<0x30, 5, GPIO::Port, GPIO::PortF>;
   using GPIOG = Module<0x30, 6, GPIO::Port, GPIO::PortG>;
-  using GPIOH = Module<0x30, 7, GPIO::Port, GPIO::PortG>;
+  using GPIOH = Module<0x30, 7, GPIO::Port, GPIO::PortH>;
+  using GPIOI = Module<0x30, 8, GPIO::Port, GPIO::PortI>;
 
   using SYSCFG = Module<0x44, 14, stm32f429::SYSCFG, stm32f429::SYSCFG::BaseAddress>;
 

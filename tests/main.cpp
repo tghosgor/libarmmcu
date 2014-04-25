@@ -111,57 +111,38 @@ int main()
   exti2->enableInterrupt();
 
   SET_UP_LCD:
-  auto portApin11 = portA->createPin<11, GPIO::Port::PinMode::Alternate>();
-  portApin11->setAF(GPIO::Port::Pin<11, GPIO::Port::PinMode::Alternate>::AF::_14);
-  auto portApin12 = portA->createPin<12, GPIO::Port::PinMode::Alternate>();
-  portApin12->setAF(GPIO::Port::Pin<12, GPIO::Port::PinMode::Alternate>::AF::_14);
-  auto portApin6 = portA->createPin<6, GPIO::Port::PinMode::Alternate>();
-  portApin6->setAF(GPIO::Port::Pin<6, GPIO::Port::PinMode::Alternate>::AF::_14);
-  auto portApin3 = portA->createPin<3, GPIO::Port::PinMode::Alternate>();
-  portApin3->setAF(GPIO::Port::Pin<3, GPIO::Port::PinMode::Alternate>::AF::_14);
-  auto portApin4 = portA->createPin<4, GPIO::Port::PinMode::Alternate>();
-  portApin4->setAF(GPIO::Port::Pin<4, GPIO::Port::PinMode::Alternate>::AF::_14);
-
-  auto portBpin0 = portB->createPin<0, GPIO::Port::PinMode::Alternate>();
-  portBpin0->setAF(GPIO::Port::Pin<0, GPIO::Port::PinMode::Alternate>::AF::_9);
-  auto portBpin1 = portB->createPin<1, GPIO::Port::PinMode::Alternate>();
-  portBpin1->setAF(GPIO::Port::Pin<1, GPIO::Port::PinMode::Alternate>::AF::_9);
-  auto portBpin10 = portB->createPin<10, GPIO::Port::PinMode::Alternate>();
-  portBpin10->setAF(GPIO::Port::Pin<10, GPIO::Port::PinMode::Alternate>::AF::_14);
-  auto portBpin11 = portB->createPin<11, GPIO::Port::PinMode::Alternate>();
-  portBpin11->setAF(GPIO::Port::Pin<11, GPIO::Port::PinMode::Alternate>::AF::_14);
-  auto portBpin8 = portB->createPin<8, GPIO::Port::PinMode::Alternate>();
-  portBpin8->setAF(GPIO::Port::Pin<8, GPIO::Port::PinMode::Alternate>::AF::_14);
-  auto portBpin9 = portB->createPin<9, GPIO::Port::PinMode::Alternate>();
-  portBpin9->setAF(GPIO::Port::Pin<9, GPIO::Port::PinMode::Alternate>::AF::_14);
-
-  auto portCpin10 = portC->createPin<10, GPIO::Port::PinMode::Alternate>();
-  portCpin10->setAF(GPIO::Port::Pin<10, GPIO::Port::PinMode::Alternate>::AF::_14);
-  auto portCpin7 = portC->createPin<7, GPIO::Port::PinMode::Alternate>();
-  portCpin7->setAF(GPIO::Port::Pin<7, GPIO::Port::PinMode::Alternate>::AF::_14);
-  auto portCpin6 = portC->createPin<6, GPIO::Port::PinMode::Alternate>();
-  portCpin6->setAF(GPIO::Port::Pin<6, GPIO::Port::PinMode::Alternate>::AF::_14);
-
   auto portD = RCC::enablePeriph<RCC::GPIOD>();
-  auto portDpin3 = portG->createPin<3, GPIO::Port::PinMode::Alternate>();
-  portDpin3->setAF(GPIO::Port::Pin<3, GPIO::Port::PinMode::Alternate>::AF::_14);
-  auto portDpin6 = portG->createPin<6, GPIO::Port::PinMode::Alternate>();
-  portDpin6->setAF(GPIO::Port::Pin<6, GPIO::Port::PinMode::Alternate>::AF::_14);
-
+  auto portE = RCC::enablePeriph<RCC::GPIOE>();
   auto portF = RCC::enablePeriph<RCC::GPIOF>();
-  auto portFpin10 = portG->createPin<10, GPIO::Port::PinMode::Alternate>();
-  portFpin10->setAF(GPIO::Port::Pin<10, GPIO::Port::PinMode::Alternate>::AF::_14);
+  auto portH = RCC::enablePeriph<RCC::GPIOH>();
+  auto portI = RCC::enablePeriph<RCC::GPIOI>();
 
-  auto portGpin6 = portG->createPin<6, GPIO::Port::PinMode::Alternate>();
-  portGpin6->setAF(GPIO::Port::Pin<6, GPIO::Port::PinMode::Alternate>::AF::_14);
-  auto portGpin10 = portG->createPin<10, GPIO::Port::PinMode::Alternate>();
-  portGpin10->setAF(GPIO::Port::Pin<10, GPIO::Port::PinMode::Alternate>::AF::_9);
-  auto portGpin11 = portG->createPin<11, GPIO::Port::PinMode::Alternate>();
-  portGpin11->setAF(GPIO::Port::Pin<11, GPIO::Port::PinMode::Alternate>::AF::_14);
-  auto portGpin12 = portG->createPin<12, GPIO::Port::PinMode::Alternate>();
-  portGpin12->setAF(GPIO::Port::Pin<12, GPIO::Port::PinMode::Alternate>::AF::_9);
-  auto portGpin7 = portG->createPin<7, GPIO::Port::PinMode::Alternate>();
-  portGpin7->setAF(GPIO::Port::Pin<7, GPIO::Port::PinMode::Alternate>::AF::_14);
+  portC->createPin<6, GPIO::Port::PinMode::Alternate>()->setAF(GPIO::Port::Pin<6, GPIO::Port::PinMode::Alternate>::AF::_14);//HSYNC
+  portA->createPin<4, GPIO::Port::PinMode::Alternate>()->setAF(GPIO::Port::Pin<4, GPIO::Port::PinMode::Alternate>::AF::_14);//VSYNC
+
+  portG->createPin<7, GPIO::Port::PinMode::Alternate>()->setAF(GPIO::Port::Pin<7, GPIO::Port::PinMode::Alternate>::AF::_14);//CLK
+  portF->createPin<10, GPIO::Port::PinMode::Alternate>()->setAF(GPIO::Port::Pin<10, GPIO::Port::PinMode::Alternate>::AF::_14);//DE
+
+  portC->createPin<10, GPIO::Port::PinMode::Alternate>()->setAF(GPIO::Port::Pin<10, GPIO::Port::PinMode::Alternate>::AF::_14);//R2
+  portB->createPin<0, GPIO::Port::PinMode::Alternate>()->setAF(GPIO::Port::Pin<0, GPIO::Port::PinMode::Alternate>::AF::_14);//R3
+  portA->createPin<11, GPIO::Port::PinMode::Alternate>()->setAF(GPIO::Port::Pin<11, GPIO::Port::PinMode::Alternate>::AF::_14);//R4
+  portA->createPin<12, GPIO::Port::PinMode::Alternate>()->setAF(GPIO::Port::Pin<12, GPIO::Port::PinMode::Alternate>::AF::_14);//R5
+  portB->createPin<1, GPIO::Port::PinMode::Alternate>()->setAF(GPIO::Port::Pin<1, GPIO::Port::PinMode::Alternate>::AF::_14);//R6
+  portG->createPin<6, GPIO::Port::PinMode::Alternate>()->setAF(GPIO::Port::Pin<6, GPIO::Port::PinMode::Alternate>::AF::_14);//R7
+
+  portA->createPin<6, GPIO::Port::PinMode::Alternate>()->setAF(GPIO::Port::Pin<6, GPIO::Port::PinMode::Alternate>::AF::_14);//G2
+  portG->createPin<10, GPIO::Port::PinMode::Alternate>()->setAF(GPIO::Port::Pin<10, GPIO::Port::PinMode::Alternate>::AF::_14);//G3
+  portB->createPin<10, GPIO::Port::PinMode::Alternate>()->setAF(GPIO::Port::Pin<10, GPIO::Port::PinMode::Alternate>::AF::_14);//G4
+  portB->createPin<11, GPIO::Port::PinMode::Alternate>()->setAF(GPIO::Port::Pin<11, GPIO::Port::PinMode::Alternate>::AF::_14);//G5
+  portC->createPin<7, GPIO::Port::PinMode::Alternate>()->setAF(GPIO::Port::Pin<7, GPIO::Port::PinMode::Alternate>::AF::_14);//G6
+  portD->createPin<3, GPIO::Port::PinMode::Alternate>()->setAF(GPIO::Port::Pin<3, GPIO::Port::PinMode::Alternate>::AF::_14);//G7
+
+  portD->createPin<6, GPIO::Port::PinMode::Alternate>()->setAF(GPIO::Port::Pin<6, GPIO::Port::PinMode::Alternate>::AF::_14);//B2
+  portG->createPin<11, GPIO::Port::PinMode::Alternate>()->setAF(GPIO::Port::Pin<11, GPIO::Port::PinMode::Alternate>::AF::_14);//B3
+  portG->createPin<12, GPIO::Port::PinMode::Alternate>()->setAF(GPIO::Port::Pin<12, GPIO::Port::PinMode::Alternate>::AF::_14);//B4
+  portA->createPin<3, GPIO::Port::PinMode::Alternate>()->setAF(GPIO::Port::Pin<3, GPIO::Port::PinMode::Alternate>::AF::_14);//B5
+  portB->createPin<8, GPIO::Port::PinMode::Alternate>()->setAF(GPIO::Port::Pin<8, GPIO::Port::PinMode::Alternate>::AF::_14);//B6
+  portB->createPin<9, GPIO::Port::PinMode::Alternate>()->setAF(GPIO::Port::Pin<9, GPIO::Port::PinMode::Alternate>::AF::_14);//B7
 
   constexpr unsigned ActiveWidth = 294;
   constexpr unsigned ActiveHeight = 266;
@@ -175,7 +156,7 @@ int main()
   constexpr unsigned VFP = 4;
 
   {
-    RCC::instance()->m_CR |= 0x1 <<16; //HSEON
+    //RCC::instance()->m_CR |= 0x1 <<16; //HSEON
     //RCC::instance()->m_PLLCFGR |= 0x1 <<22; //PLL source is HSE
     RCC::instance()->m_PLLCFGR |= 8 <<0; //PLL division PLLM
     RCC::instance()->m_PLLCFGR |= 360 <<6; //PLL multiplication PLLN

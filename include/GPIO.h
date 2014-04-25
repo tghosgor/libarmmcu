@@ -40,7 +40,12 @@ enum : std::size_t
   PortA = 0x40020000,
   PortB = 0x40020400,
   PortC = 0x40020800,
-  PortG = 0x40021800
+  PortD = 0x40020C00,
+  PortE = 0x40021000,
+  PortF = 0x40021400,
+  PortG = 0x40021800,
+  PortH = 0x40021C00,
+  PortI = 0x40022000
 };
 
 class Port
