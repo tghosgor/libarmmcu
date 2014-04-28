@@ -30,15 +30,17 @@
 #include <cstdint>
 
 #include <GPIO.h>
-#include <LCD.h>
 #include <PLL.h>
 #include <SYSCFG.h>
+#include <SPI.h>
 #include <TIM.h>
 
+#include <fwd.h>
 #include <util.h>
 
 namespace stm32f429
 {
+
 class RCC
 {
 public:
@@ -76,7 +78,10 @@ public: //Declarations
   using TIM13 = Module<0x40, 7,  TIM::Periph<TIM::_13>, TIM::_13>;
   using TIM14 = Module<0x40, 8,  TIM::Periph<TIM::_14>, TIM::_14>;
 
-  using LCD0 = Module<0x44, 26, LCD::Periph, LCD::_0>;
+  using LCD0 = Module<0x44, 26, LCD, 0x40016800>;
+
+  using SPI1 = Module<0x44, 12, SPI, SPI::_1>;
+  using SPI5 = Module<0x44, 20, SPI, SPI::_5>;
 
 public: //Methods
   RCC() = delete;

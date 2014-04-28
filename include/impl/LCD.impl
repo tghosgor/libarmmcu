@@ -29,58 +29,78 @@
 
 #include <LCD.h>
 
+#include <SPI.h>
+
 namespace stm32f429
 {
-namespace LCD
-{
 
-void Periph::enable() volatile
+GPIO::Port::Pin<12, GPIO::Port::PinMode::Output> volatile* LCD::m_RDX;
+GPIO::Port::Pin<13, GPIO::Port::PinMode::Output> volatile* LCD::m_WRX;
+GPIO::Port::Pin<2, GPIO::Port::PinMode::Output> volatile* LCD::m_CSX;
+
+void LCD::enable() volatile
 {
+  auto portD = RCC::enablePeriph<RCC::GPIOD>();
+  auto portC = RCC::enablePeriph<RCC::GPIOC>();
+
+  m_RDX = portD->createPin<12, GPIO::Port::PinMode::Output>();
+  m_WRX = portD->createPin<13, GPIO::Port::PinMode::Output>();
+  m_CSX = portC->createPin<2, GPIO::Port::PinMode::Output>();
+
+  /* Set or Reset the control line */
+  m_CSX->reset();
+  m_CSX->set();
+
   m_GCR |= 0x1 <<0;
+
+  auto spi5 = RCC::enablePeriph<RCC::SPI5>();
+  spi5->setBaudPrescaler(SPI::BaudPSC::_16);
+  spi5->setUnidirectionalMode();
+  spi5->enableSoftwareSlave();
+  spi5->enable(SPI::DataFrame::_8Bit);
 }
 
-void Periph::setSync(uint16_t const hSync, uint16_t const vSync) volatile
+void LCD::setSync(uint16_t const hSync, uint16_t const vSync) volatile
 {
   m_SSCR &= ~(0x0FFF <<16 | 0x07FF);
   m_SSCR |= (hSync - 1) <<16 | (vSync - 1);
 }
 
-void Periph::setBackPorch(uint16_t const hBP, uint16_t vBP) volatile
+void LCD::setBackPorch(uint16_t const hBP, uint16_t vBP) volatile
 {
   m_BPCR &= ~(0x0FFF <<16 | 0x07FF);
   m_BPCR |= (hBP - 1) <<16 | (vBP - 1);
 }
 
-void Periph::setActiveWidth(uint16_t const width, uint16_t height) volatile
+void LCD::setActiveWidth(uint16_t const width, uint16_t height) volatile
 {
   m_AWCR &= ~(0x0FFF <<16 | 0x07FF);
   m_AWCR |= (width - 1) <<16 | (height - 1);
 }
 
-void Periph::setTotalWidth(uint16_t const width, uint16_t height) volatile
+void LCD::setTotalWidth(uint16_t const width, uint16_t height) volatile
 {
   m_TWCR &= ~(0x0FFF <<16 | 0x07FF);
   m_TWCR |= (width - 1) <<16 | (height - 1);
 }
 
 
-void Periph::immediateReload() volatile
+void LCD::immediateReload() volatile
 {
   m_SRCR |= 0x1 <<0;
 }
 
-void Periph::blankingReload() volatile
+void LCD::blankingReload() volatile
 {
   m_SRCR |= 0x1 <<1;
 }
 
-void Periph::setBgColor(uint8_t const r, uint8_t const g, uint8_t const b) volatile
+void LCD::setBgColor(uint8_t const r, uint8_t const g, uint8_t const b) volatile
 {
   m_BCCR &= 0xFF000000;
   m_BCCR |= static_cast<uint32_t const>(r) <<16 | static_cast<uint32_t const>(g) <<8 | static_cast<uint32_t const>(b) <<0;
 }
 
-} //NS LCD
 } //NS stm32f429
 
 #endif /* LCD_CPP_ */

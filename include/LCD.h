@@ -29,17 +29,12 @@
 
 #include <cstdint>
 
+#include <RCC.h>
+
 namespace stm32f429
 {
-namespace LCD
-{
 
-enum : std::size_t
-{
-   _0 = 0x40016800
-};
-
-class Periph
+class LCD
 {
 public:
   static constexpr std::size_t BaseAddress = 0x40016800;
@@ -66,14 +61,14 @@ public: //Declarations
 
   enum : std::size_t
   {
-    Layer1 = _0 + (19 * 4),           //LCD::Periph<_0>::BaseAddress + sizeof(LCD::Periph<_0>)
+    Layer1 = BaseAddress + (19 * 4),           //LCD::Periph<_0>::BaseAddress + sizeof(LCD::Periph<_0>)
     Layer2 = Layer1 + sizeof(Layer) + 15 * 4 //Layer1 + sizeof(Layer<Layer1>) + offset
   };
 
   static_assert(sizeof(Layer) == 17 * 4, "Layer size is wrong");
 
 public: //Methods
-  Periph() = delete;
+  LCD() = delete;
 
   void enable() volatile;
   void setSync(uint16_t const hSync, uint16_t const vSync) volatile;
@@ -83,6 +78,8 @@ public: //Methods
   void immediateReload() volatile;
   void blankingReload() volatile;
   void setBgColor(uint8_t const r, uint8_t const g, uint8_t const b) volatile;
+
+  void writeData() { }
 
 public: //Registers
   uint32_t PADDING1[2];
@@ -110,11 +107,15 @@ public: //Registers
   uint32_t PADDING8[15];
 
   Layer LAYER2;
-};
 
-static_assert(sizeof(Periph) == 0x148, "LCD size is not correct, spec says 0x148 bytes.");
+private:
+  static GPIO::Port::Pin<12, GPIO::Port::PinMode::Output> volatile* m_RDX; //GPIOD::12
+  static GPIO::Port::Pin<13, GPIO::Port::PinMode::Output> volatile* m_WRX; //GPIOD::13
+  static GPIO::Port::Pin<2 , GPIO::Port::PinMode::Output> volatile* m_CSX; //GPIOC::2
+}; //class LCD
 
-} //NS LED
+static_assert(sizeof(LCD) == 0x148, "LCD size is not correct, spec says 0x148 bytes.");
+
 } //NS stm32f429
 
 #include "impl/LCD.impl"
