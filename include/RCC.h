@@ -32,7 +32,6 @@
 #include <GPIO.h>
 #include <PLL.h>
 #include <SYSCFG.h>
-#include <SPI.h>
 #include <TIM.h>
 
 #include <fwd.h>
@@ -80,8 +79,8 @@ public: //Declarations
 
   using LCD0 = Module<0x44, 26, LCD, 0x40016800>;
 
-  using SPI1 = Module<0x44, 12, SPI, SPI::_1>;
-  using SPI5 = Module<0x44, 20, SPI, SPI::_5>;
+  using SPI1 = Module<0x44, 12, SPI, 0x40013000>;
+  using SPI5 = Module<0x44, 20, SPI, 0x40015000>;
 
 public: //Methods
   RCC() = delete;

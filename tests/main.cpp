@@ -68,17 +68,17 @@ extern "C" void SystemInit()
 }
 
 auto portA = RCC::enablePeriph<RCC::GPIOA>();
-auto portApin0 = portA->createPin<0, GPIO::Port::PinMode::Input>();
+auto portApin0 = portA->createPin(0, GPIO::Port::InputPin);
 
 auto portB = RCC::enablePeriph<RCC::GPIOB>();
-auto portBpin2 = portB->createPin<2, GPIO::Port::PinMode::Input>();
+auto portBpin2 = portB->createPin(2, GPIO::Port::InputPin);
 
 auto portC = RCC::enablePeriph<RCC::GPIOC>();
-auto portCpin2 = portC->createPin<2, GPIO::Port::PinMode::Input>();
+auto portCpin2 = portC->createPin(2, GPIO::Port::InputPin);
 
 auto portG = RCC::enablePeriph<RCC::GPIOG>();
-auto portGpin13 = portG->createPin<13, GPIO::Port::PinMode::Output>();
-auto portGpin14 = portG->createPin<14, GPIO::Port::PinMode::Output>();
+auto portGpin13 = portG->createPin(13, GPIO::Port::OutputPin);
+auto portGpin14 = portG->createPin(14, GPIO::Port::OutputPin);
 
 auto syscfg = RCC::enablePeriph<RCC::SYSCFG>();
 auto exti0syscfg = syscfg->enable<SYSCFG::EXTI0>();
@@ -89,7 +89,7 @@ auto exti2 = extis2yscfg->setSource(SYSCFG::EXTISource::PC);
 
 int main()
 {
-  portGpin13->set();
+  portGpin13.set();
 
   SET_UP_TIM:
   auto TIM1 = RCC::enablePeriph<RCC::TIM1>();
@@ -99,8 +99,8 @@ int main()
 
   SET_UP_EXTI0:
   //Configure EXTI0 to PA0 Rising Edge
-  portApin0->setPullMode(GPIO::Port::Pin<0, GPIO::Port::PinMode::Input>::PullMode::PullDown);
-  portCpin2->setPullMode(GPIO::Port::Pin<2, GPIO::Port::PinMode::Input>::PullMode::PullDown);
+  portApin0.setPullMode(GPIO::Port::IPin::PullMode::PullDown);
+  portCpin2.setPullMode(GPIO::Port::IPin::PullMode::PullDown);
   exti0->registerISR(&exti0Handler);
   exti0->clearPending();
   exti0->enableRisingTrigger();
@@ -117,7 +117,7 @@ int main()
   auto portH = RCC::enablePeriph<RCC::GPIOH>();
   auto portI = RCC::enablePeriph<RCC::GPIOI>();
 
-  portC->createPin<6, GPIO::Port::PinMode::Alternate>()->setAF(GPIO::Port::Pin<6, GPIO::Port::PinMode::Alternate>::AF::_14);//HSYNC
+ /* portC->createPin<6, GPIO::Port::PinMode::Alternate>()->setAF(GPIO::Port::Pin<6, GPIO::Port::PinMode::Alternate>::AF::_14);//HSYNC
   portA->createPin<4, GPIO::Port::PinMode::Alternate>()->setAF(GPIO::Port::Pin<4, GPIO::Port::PinMode::Alternate>::AF::_14);//VSYNC
 
   portG->createPin<7, GPIO::Port::PinMode::Alternate>()->setAF(GPIO::Port::Pin<7, GPIO::Port::PinMode::Alternate>::AF::_14);//CLK
@@ -142,7 +142,7 @@ int main()
   portG->createPin<12, GPIO::Port::PinMode::Alternate>()->setAF(GPIO::Port::Pin<12, GPIO::Port::PinMode::Alternate>::AF::_14);//B4
   portA->createPin<3, GPIO::Port::PinMode::Alternate>()->setAF(GPIO::Port::Pin<3, GPIO::Port::PinMode::Alternate>::AF::_14);//B5
   portB->createPin<8, GPIO::Port::PinMode::Alternate>()->setAF(GPIO::Port::Pin<8, GPIO::Port::PinMode::Alternate>::AF::_14);//B6
-  portB->createPin<9, GPIO::Port::PinMode::Alternate>()->setAF(GPIO::Port::Pin<9, GPIO::Port::PinMode::Alternate>::AF::_14);//B7
+  portB->createPin<9, GPIO::Port::PinMode::Alternate>()->setAF(GPIO::Port::Pin<9, GPIO::Port::PinMode::Alternate>::AF::_14);//B7*/
 
   constexpr unsigned ActiveWidth = 294;
   constexpr unsigned ActiveHeight = 266;
@@ -179,7 +179,7 @@ int main()
                          vSync + VBP + ActiveHeight);
     lcd0->setTotalWidth(hSync + HBP + ActiveWidth + HFP,
                         vSync + VBP + ActiveHeight + VFP);
-    lcd0->enable();
+    //lcd0->enable();
     lcd0->immediateReload();
   }
 
@@ -187,9 +187,9 @@ int main()
   {
     uint16_t cntVal = TIM1->getCounterValue();
     if(cntVal >= std::numeric_limits<uint16_t>::max() / 2)
-      portGpin13->set();
+      portGpin13.set();
     else
-      portGpin13->reset();
+      portGpin13.reset();
   }
 }
 
@@ -197,13 +197,13 @@ bool exti0Handler()
 {
   if(exti0->isPending())
   {
-    if(!portGpin14->getOutputState())
-     portGpin14->set();
+    if(!portGpin14.getOutputState())
+     portGpin14.set();
     else
-      portGpin14->reset();
+      portGpin14.reset();
 
-    exti0->clearPending();
   }
+  exti0->clearPending();
 }
 
 /*extern "C" void EXTI0_IRQHandler()
@@ -221,7 +221,7 @@ bool exti0Handler()
 
 bool exti3Handler()
 {
-  portGpin14->reset();
+  portGpin14.reset();
   exti2->clearPending();
 }
 

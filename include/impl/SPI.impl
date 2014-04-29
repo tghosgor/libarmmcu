@@ -27,6 +27,8 @@
 #ifndef SPI_CPP_
 #define SPI_CPP_
 
+#include <RCC.h>
+
 #include <SPI.h>
 
 namespace stm32f429
@@ -34,6 +36,24 @@ namespace stm32f429
 
 void SPI::enable(DataFrame const dataFrameFormat, bool const enableHardwareCRC) volatile
 {
+  auto gpioD = RCC::enablePeriph<RCC::GPIOD>();
+
+  auto port7 = gpioD->createPin(7, GPIO::Port::AlternatePin);
+  auto port8 = gpioD->createPin(8, GPIO::Port::AlternatePin);
+  auto port9 = gpioD->createPin(9, GPIO::Port::AlternatePin);
+
+  port7.setPullMode(GPIO::Port::APin::PullMode::PullDown);
+  port8.setPullMode(GPIO::Port::APin::PullMode::PullDown);
+  port9.setPullMode(GPIO::Port::APin::PullMode::PullDown);
+
+  port7.setOutputSpeed(GPIO::Port::APin::OutputSpeed::Medium);
+  port8.setOutputSpeed(GPIO::Port::APin::OutputSpeed::Medium);
+  port9.setOutputSpeed(GPIO::Port::APin::OutputSpeed::Medium);
+
+  port7.setAF(GPIO::Port::APin::AF::_5);
+  port8.setAF(GPIO::Port::APin::AF::_5);
+  port9.setAF(GPIO::Port::APin::AF::_5);
+
   m_CR1 |= 0x1 <<6 | static_cast<uint16_t>(dataFrameFormat) <<11 | static_cast<uint16_t>(enableHardwareCRC) <<13;
 }
 
@@ -53,12 +73,12 @@ void SPI::setBaudPrescaler(BaudPSC const psc) volatile
   m_CR1 |= static_cast<uint16_t>(psc) <<3;
 }
 
-void SPI::enableSoftwareSlave() volatile
+void SPI::enableSoftwareSlaveMode() volatile
 {
   m_CR1 |= static_cast<uint16_t>(0x1) <<9;
 }
 
-void SPI::disableSoftwareSlave() volatile
+void SPI::disableSoftwareSlaveMode() volatile
 {
   m_CR1 &= ~(static_cast<uint16_t>(0x1) <<9);
 }

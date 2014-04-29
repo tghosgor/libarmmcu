@@ -34,29 +34,21 @@
 namespace stm32f429
 {
 
-GPIO::Port::Pin<12, GPIO::Port::PinMode::Output> volatile* LCD::m_RDX;
-GPIO::Port::Pin<13, GPIO::Port::PinMode::Output> volatile* LCD::m_WRX;
-GPIO::Port::Pin<2, GPIO::Port::PinMode::Output> volatile* LCD::m_CSX;
-
 void LCD::enable() volatile
 {
   auto portD = RCC::enablePeriph<RCC::GPIOD>();
   auto portC = RCC::enablePeriph<RCC::GPIOC>();
 
-  m_RDX = portD->createPin<12, GPIO::Port::PinMode::Output>();
-  m_WRX = portD->createPin<13, GPIO::Port::PinMode::Output>();
-  m_CSX = portC->createPin<2, GPIO::Port::PinMode::Output>();
-
   /* Set or Reset the control line */
-  m_CSX->reset();
-  m_CSX->set();
+  m_CSX.reset();
+  m_CSX.set();
 
   m_GCR |= 0x1 <<0;
 
   auto spi5 = RCC::enablePeriph<RCC::SPI5>();
   spi5->setBaudPrescaler(SPI::BaudPSC::_16);
   spi5->setUnidirectionalMode();
-  spi5->enableSoftwareSlave();
+  spi5->enableSoftwareSlaveMode();
   spi5->enable(SPI::DataFrame::_8Bit);
 }
 

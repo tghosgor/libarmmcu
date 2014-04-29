@@ -68,7 +68,7 @@ public: //Declarations
   static_assert(sizeof(Layer) == 17 * 4, "Layer size is wrong");
 
 public: //Methods
-  LCD() = delete;
+  LCD();
 
   void enable() volatile;
   void setSync(uint16_t const hSync, uint16_t const vSync) volatile;
@@ -109,12 +109,15 @@ public: //Registers
   Layer LAYER2;
 
 private:
-  static GPIO::Port::Pin<12, GPIO::Port::PinMode::Output> volatile* m_RDX; //GPIOD::12
-  static GPIO::Port::Pin<13, GPIO::Port::PinMode::Output> volatile* m_WRX; //GPIOD::13
-  static GPIO::Port::Pin<2 , GPIO::Port::PinMode::Output> volatile* m_CSX; //GPIOC::2
+  GPIO::Port volatile* portD = RCC::enablePeriph<RCC::GPIOD>();
+  GPIO::Port volatile* portC = RCC::enablePeriph<RCC::GPIOC>();
+
+  GPIO::Port::OPin m_RDX = portD->createPin(12, GPIO::Port::OutputPin);
+  GPIO::Port::OPin m_WRX = portD->createPin(13, GPIO::Port::OutputPin);
+  GPIO::Port::OPin m_CSX = portC->createPin(2 , GPIO::Port::OutputPin);
 }; //class LCD
 
-static_assert(sizeof(LCD) == 0x148, "LCD size is not correct, spec says 0x148 bytes.");
+static_assert(sizeof(LCD) == 0x148 + sizeof(GPIO::Port volatile*) * 2 + sizeof(GPIO::Port::OPin) * 3, "LCD size is not correct, spec says 0x148 bytes.");
 
 } //NS stm32f429
 

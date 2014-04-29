@@ -31,6 +31,7 @@ namespace stm32f429
 {
 
 class LCD;
+class SPI;
 
 namespace GPIO
 {

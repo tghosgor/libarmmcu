@@ -50,24 +50,30 @@ enum : std::size_t
 
 class Port
 {
-public: //Declarations
-  enum class PinMode
+private: //Internal Declarations
+  template<uint8_t moder_, class typeName_>
+  struct PinType
   {
-    Input = 0x0,
-    Output = 0x1,
-    Alternate = 0x2,
-    Analog = 0x3,
-    Reserved = 0x4 //Used for common Pin interface
+    static constexpr uint8_t m_moder = moder_;
+    using type = typeName_;
   };
 
-  template<uint8_t nPin, PinMode mode>
+public: //Declarations
+  class OPin;
+  class IPin;
+  class APin;
+
   class Pin;
+
+  static constexpr PinType<0x0, IPin> InputPin{};
+  static constexpr PinType<0x1, OPin> OutputPin{};
+  static constexpr PinType<0x2, APin> AlternatePin{};
 
 public: //Methods
   Port() = delete;
 
-  template<uint8_t nPin, PinMode mode>
-  Pin<nPin, mode> volatile* createPin() volatile;
+  template<class PinType_>
+  typename PinType_::type createPin(uint8_t const nPin, PinType_ const) volatile;
 
 public: //Registers
   uint32_t m_MODER;
@@ -81,9 +87,6 @@ public: //Registers
   uint32_t m_AFR[2];
 }; //END Port
 
-Port volatile* const createPort(std::size_t port);
-
-template<uint8_t nPin, Port::PinMode mode>
 class Port::Pin //Common Pin interface
 {
 public:
@@ -94,14 +97,18 @@ public:
     PullDown = 0x2
   };
 
-public:
-  Pin() = delete;
-
+public: //Methods
   void setPullMode(PullMode const ppm) volatile;
+
+protected:
+  Pin(uint8_t const nPin, Port volatile& port);
+
+protected:
+  uint8_t const m_nPin;
+  Port volatile& m_port;
 }; //END Pin
 
-template<uint8_t nPin>
-class Port::Pin<nPin, Port::PinMode::Output> : public Pin<nPin, Port::PinMode::Reserved>
+class Port::OPin : public Pin
 {
 public: //Declarations
   enum class OutputSpeed : uint32_t
@@ -113,7 +120,7 @@ public: //Declarations
   };
 
 public: //Methods
-  Pin() = delete;
+  OPin(uint8_t const nPin, Port volatile& port);
 
   void setOutputSpeed(OutputSpeed const ospeed) volatile;
 
@@ -121,21 +128,27 @@ public: //Methods
   void reset() volatile;
 
   bool getOutputState() volatile;
+
+private:
+  static constexpr uint8_t m_moder = 0x1;
 }; //END OutputPin
 
-template<uint8_t nPin>
-class Port::Pin<nPin, Port::PinMode::Input> : public Pin<nPin, Port::PinMode::Reserved>
+class Port::IPin : public Pin
 {
   friend class Port;
 
 public: //Declarations
 
 public: //Methods
+  IPin(uint8_t const nPin, Port volatile& port);
+
   bool getInputState() volatile;
+
+private:
+  static constexpr uint8_t m_moder = 0x0;
 }; //END InputPin
 
-template<uint8_t nPin>
-class Port::Pin<nPin, Port::PinMode::Alternate> : public Pin<nPin, Port::PinMode::Reserved>
+class Port::APin : public Pin
 {
   friend class Port;
 
@@ -157,10 +170,13 @@ public: //Declarations
   };
 
 public: //Methods
-  Pin() = delete;
+  APin(uint8_t const nPin, Port volatile& port);
 
   void setAF(AF const af) volatile;
   void setOutputSpeed(OutputSpeed const ospeed) volatile;
+
+private:
+  static constexpr uint8_t m_moder = 0x2;
 };
 
 //END AFPin

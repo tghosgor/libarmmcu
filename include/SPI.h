@@ -68,8 +68,8 @@ public: //Methods
   void setBidirectionalMode() volatile;
   void setUnidirectionalMode() volatile;
   void setBaudPrescaler(BaudPSC const psc) volatile;
-  void enableSoftwareSlave() volatile;
-  void disableSoftwareSlave() volatile;
+  void enableSoftwareSlaveMode() volatile;
+  void disableSoftwareSlaveMode() volatile;
 
 private:
   uint32_t m_CR1;
