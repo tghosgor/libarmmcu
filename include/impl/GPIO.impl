@@ -43,7 +43,7 @@ typename PinType_::type Port::createPin(uint8_t const nPin, PinType_ const) vola
 {
   const uint32_t shiftBy { (nPin * 2u) };
   m_MODER &= ~(0x3 <<shiftBy);
-  m_MODER |= static_cast<uint32_t>(PinType_::m_moder) <<shiftBy;
+  m_MODER |= static_cast<uint32_t>(PinType_::moder) <<shiftBy;
 
   return typename PinType_::type(nPin, *this);
 }

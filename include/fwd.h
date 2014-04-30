@@ -30,6 +30,7 @@
 namespace stm32f429
 {
 
+class RCC;
 class LCD;
 class SPI;
 

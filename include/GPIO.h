@@ -30,6 +30,8 @@
 #include <cstdint>
 #include <type_traits>
 
+#include <fwd.h>
+
 namespace stm32f429
 {
 namespace GPIO
@@ -50,17 +52,19 @@ enum : std::size_t
 
 class Port
 {
+  friend RCC; //TODO: friend class does not work. Why?
+
 private: //Internal Declarations
   template<uint8_t moder_, class typeName_>
   struct PinType
   {
-    static constexpr uint8_t m_moder = moder_;
+    static constexpr uint8_t moder = moder_;
     using type = typeName_;
   };
 
 public: //Declarations
-  class OPin;
   class IPin;
+  class OPin;
   class APin;
 
   class Pin;
@@ -70,8 +74,6 @@ public: //Declarations
   static constexpr PinType<0x2, APin> AlternatePin{};
 
 public: //Methods
-  Port() = delete;
-
   template<class PinType_>
   typename PinType_::type createPin(uint8_t const nPin, PinType_ const) volatile;
 
@@ -85,6 +87,9 @@ public: //Registers
   uint32_t m_BSRR;
   uint32_t m_LCKR;
   uint32_t m_AFR[2];
+
+private:
+  Port() { }
 }; //END Port
 
 class Port::Pin //Common Pin interface
@@ -107,6 +112,21 @@ protected:
   uint8_t const m_nPin;
   Port volatile& m_port;
 }; //END Pin
+
+class Port::IPin : public Pin
+{
+  friend class Port;
+
+public: //Declarations
+
+public: //Methods
+  IPin(uint8_t const nPin, Port volatile& port);
+
+  bool getInputState() volatile;
+
+private:
+  static constexpr uint8_t m_moder = 0x0;
+}; //END InputPin
 
 class Port::OPin : public Pin
 {
@@ -132,21 +152,6 @@ public: //Methods
 private:
   static constexpr uint8_t m_moder = 0x1;
 }; //END OutputPin
-
-class Port::IPin : public Pin
-{
-  friend class Port;
-
-public: //Declarations
-
-public: //Methods
-  IPin(uint8_t const nPin, Port volatile& port);
-
-  bool getInputState() volatile;
-
-private:
-  static constexpr uint8_t m_moder = 0x0;
-}; //END InputPin
 
 class Port::APin : public Pin
 {

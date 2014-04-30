@@ -36,11 +36,11 @@ namespace stm32f429
 
 void SPI::enable(DataFrame const dataFrameFormat, bool const enableHardwareCRC) volatile
 {
-  auto gpioD = RCC::enablePeriph<RCC::GPIOD>();
+  auto portF = RCC::enablePeriph<RCC::GPIOF>();
 
-  auto port7 = gpioD->createPin(7, GPIO::Port::AlternatePin);
-  auto port8 = gpioD->createPin(8, GPIO::Port::AlternatePin);
-  auto port9 = gpioD->createPin(9, GPIO::Port::AlternatePin);
+  auto port7 = portF->createPin(7, GPIO::Port::AlternatePin);
+  auto port8 = portF->createPin(8, GPIO::Port::AlternatePin);
+  auto port9 = portF->createPin(9, GPIO::Port::AlternatePin);
 
   port7.setPullMode(GPIO::Port::APin::PullMode::PullDown);
   port8.setPullMode(GPIO::Port::APin::PullMode::PullDown);
@@ -54,7 +54,18 @@ void SPI::enable(DataFrame const dataFrameFormat, bool const enableHardwareCRC) 
   port8.setAF(GPIO::Port::APin::AF::_5);
   port9.setAF(GPIO::Port::APin::AF::_5);
 
-  m_CR1 |= 0x1 <<6 | static_cast<uint16_t>(dataFrameFormat) <<11 | static_cast<uint16_t>(enableHardwareCRC) <<13;
+  m_CR1 |= static_cast<uint16_t>(dataFrameFormat) <<11 | static_cast<uint16_t>(enableHardwareCRC) <<13;
+  m_CR1 |= 0x1 <<6;//TODO: üstteki satır ayarlanmadan SPI açmayın diyor ama bu şekil ayırmaya gerek var mı?
+}
+
+void SPI::setMasterMode() volatile
+{
+  m_CR1 |= 0x1 <<2;
+}
+
+void SPI::setSlaveMode() volatile
+{
+  m_CR1 &= ~(0x1 <<2);
 }
 
 void SPI::setBidirectionalMode() volatile
@@ -76,11 +87,26 @@ void SPI::setBaudPrescaler(BaudPSC const psc) volatile
 void SPI::enableSoftwareSlaveMode() volatile
 {
   m_CR1 |= static_cast<uint16_t>(0x1) <<9;
+  m_CR2 |= 0x1 <<2; //TODO: LCD burayı beraber kullanıyor (CMSIS'e göre) ancak burayı ayırmalı mı?
 }
 
 void SPI::disableSoftwareSlaveMode() volatile
 {
   m_CR1 &= ~(static_cast<uint16_t>(0x1) <<9);
+  m_CR2 &= ~(0x1 <<2);
+}
+
+void SPI::send(uint16_t data) volatile
+{
+  m_DR = data;
+
+  while(m_SR & (0x1 <<1)) //wait for tx buffer empty flag
+  { }
+}
+
+SPI::DataFrame SPI::getDataFrameFormat() volatile const
+{
+  return static_cast<DataFrame>(m_CR1 & (0x1 <<11));
 }
 
 } //NS stm32f429

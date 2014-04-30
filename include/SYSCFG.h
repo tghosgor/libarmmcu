@@ -41,6 +41,8 @@ namespace stm32f429
 
 class SYSCFG
 {
+  friend class RCC;
+
 public:
   static constexpr std::size_t BaseAddress{ 0x40013800 };
 
@@ -72,8 +74,6 @@ public: //Declarations
   using EXTI4 = NVICEXTIModule<10, EXTI<EXTIModule<4>>>;
 
 public:
-  SYSCFG() = delete;
-
   static constexpr SYSCFG volatile* const instance();
 
   template<class Module>
@@ -101,6 +101,9 @@ public:
   uint32_t m_PMC;       //Peripheral Mode Configuration
   uint32_t m_EXTICR[4]; //External Interrupt Configuration N
   uint32_t m_CMPCR;     //Compensation Cell Control
+
+private:
+  SYSCFG() { }
 };
 
 } //NS stm32f429

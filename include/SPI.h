@@ -29,6 +29,7 @@
 
 #include <cstdint>
 
+#include <fwd.h>
 #include <util.h>
 
 namespace stm32f429
@@ -36,6 +37,8 @@ namespace stm32f429
 
 class SPI
 {
+  friend RCC;
+
 public: //Declarations
   enum : uint32_t
   {
@@ -62,14 +65,17 @@ public: //Declarations
   };
 
 public: //Methods
-  SPI() = delete;
-
   void enable(DataFrame const dataFrameFormat = DataFrame::_8Bit, bool const enableHardwareCRC = false) volatile;
+  void setMasterMode() volatile;
+  void setSlaveMode() volatile;
   void setBidirectionalMode() volatile;
   void setUnidirectionalMode() volatile;
   void setBaudPrescaler(BaudPSC const psc) volatile;
   void enableSoftwareSlaveMode() volatile;
   void disableSoftwareSlaveMode() volatile;
+  void send(uint16_t data) volatile;
+
+  DataFrame getDataFrameFormat() volatile const;
 
 private:
   uint32_t m_CR1;
@@ -81,6 +87,9 @@ private:
   uint32_t m_TXCRCR;
   uint32_t m_I2SCFGR;
   uint32_t m_I2SPR;
+
+private:
+  SPI() { }
 };
 
 } //NS stm32f429
