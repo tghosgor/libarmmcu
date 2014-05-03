@@ -53,11 +53,8 @@ void LCD::enable() volatile
   auto portB = RCC::enablePeriph<RCC::GPIOB>();
   auto portC = RCC::enablePeriph<RCC::GPIOC>();
   auto portD = RCC::enablePeriph<RCC::GPIOD>();
-  auto portE = RCC::enablePeriph<RCC::GPIOE>();
   auto portF = RCC::enablePeriph<RCC::GPIOF>();
   auto portG = RCC::enablePeriph<RCC::GPIOG>();
-  auto portH = RCC::enablePeriph<RCC::GPIOH>();
-  auto portI = RCC::enablePeriph<RCC::GPIOI>();
 
   /*
    +------------------------+-----------------------+----------------------------+
@@ -131,7 +128,7 @@ void LCD::enable() volatile
   m_spi5->setBaudPrescaler(SPI::BaudPSC::_16);
   m_spi5->setUnidirectionalMode();
   m_spi5->enableSoftwareSlaveMode();
-  m_spi5->enableInternalSlaveSelect();
+  //m_spi5->enableInternalSlaveSelect();
   m_spi5->setMasterMode();
   m_spi5->enable(SPI::DataFrame::_8Bit);
 
@@ -259,8 +256,6 @@ void LCD::enable() volatile
   selectReg(LCD_GRAM);
 
   m_GCR |= 0x1 <<0;
-  m_layer1.m_CR |= 0x1;
-  m_layer2.m_CR |= 0x1;
 }
 
 void LCD::setSync(uint16_t const hSync, uint16_t const vSync) volatile
@@ -324,7 +319,7 @@ void LCD::selectReg(uint8_t const reg) volatile
   m_CSX.set();
 }
 
-void LCD::writeReg(uint16_t const value) volatile
+void LCD::writeReg(uint8_t const value) volatile
 {
   //set WRX to send data
   m_WRX.set();
@@ -333,12 +328,6 @@ void LCD::writeReg(uint16_t const value) volatile
   m_spi5->send(value);
   //set LCD control line - SPI deselect?
   m_CSX.set();
-}
-
-void LCD::writeReg(uint8_t const reg, uint16_t const value) volatile
-{
-  selectReg(reg);
-  writeReg(value);
 }
 
 } //NS stm32f429

@@ -29,7 +29,6 @@
 
 #include <cstdint>
 
-#include <GPIO.h>
 #include <PLL.h>
 #include <SYSCFG.h>
 #include <TIM.h>
@@ -50,15 +49,15 @@ private: //Internal Declarations
   using Module = util::Module<BaseAddress + offset, shift, T, regAddress>;
 
 public: //Declarations
-  using GPIOA = Module<0x30, 0, GPIO::Port, GPIO::PortA>;
-  using GPIOB = Module<0x30, 1, GPIO::Port, GPIO::PortB>;
-  using GPIOC = Module<0x30, 2, GPIO::Port, GPIO::PortC>;
-  using GPIOD = Module<0x30, 3, GPIO::Port, GPIO::PortD>;
-  using GPIOE = Module<0x30, 4, GPIO::Port, GPIO::PortE>;
-  using GPIOF = Module<0x30, 5, GPIO::Port, GPIO::PortF>;
-  using GPIOG = Module<0x30, 6, GPIO::Port, GPIO::PortG>;
-  using GPIOH = Module<0x30, 7, GPIO::Port, GPIO::PortH>;
-  using GPIOI = Module<0x30, 8, GPIO::Port, GPIO::PortI>;
+  using GPIOA = Module<0x30, 0, GPIO::Port, 0x40020000>;
+  using GPIOB = Module<0x30, 1, GPIO::Port, 0x40020400>;
+  using GPIOC = Module<0x30, 2, GPIO::Port, 0x40020800>;
+  using GPIOD = Module<0x30, 3, GPIO::Port, 0x40020C00>;
+  using GPIOE = Module<0x30, 4, GPIO::Port, 0x40021000>;
+  using GPIOF = Module<0x30, 5, GPIO::Port, 0x40021400>;
+  using GPIOG = Module<0x30, 6, GPIO::Port, 0x40021800>;
+  using GPIOH = Module<0x30, 7, GPIO::Port, 0x40021C00>;
+  using GPIOI = Module<0x30, 8, GPIO::Port, 0x40022000>;
 
   using SYSCFG = Module<0x44, 14, stm32f429::SYSCFG, stm32f429::SYSCFG::BaseAddress>;
 
@@ -77,7 +76,7 @@ public: //Declarations
   using TIM13 = Module<0x40, 7,  TIM::Periph<TIM::_13>, TIM::_13>;
   using TIM14 = Module<0x40, 8,  TIM::Periph<TIM::_14>, TIM::_14>;
 
-  using LCD0 = Module<0x44, 26, LCD, 0x40016800>;
+  using LTDC = Module<0x44, 26, LCD, 0x40016800>;
 
   using SPI1 = Module<0x44, 12, SPI, 0x40013000>;
   using SPI5 = Module<0x44, 20, SPI, 0x40015000>;
@@ -92,7 +91,7 @@ public: //Methods
 
   bool isPLLSAIReady() volatile
   {
-    return m_CR & (0x1 <<29);
+    return !(m_CR & (0x1 <<29));
   }
 
   void enablePLLSAI() volatile

@@ -84,10 +84,8 @@ public: //Methods
   void enableInterrupt(Interrupt const interrupt) volatile;
   void disableInterrupt(Interrupt const interrupt) volatile;
 
-  void writeReg(uint8_t offset, uint16_t value) volatile;
-
   void selectReg(uint8_t offset) volatile;
-  void writeReg(uint16_t value) volatile;
+  void writeReg(uint8_t value) volatile;
 
 public: //Registers
   uint32_t PADDING1[2];

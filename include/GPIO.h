@@ -52,7 +52,7 @@ enum : std::size_t
 
 class Port
 {
-  friend RCC; //TODO: friend class does not work. Why?
+  friend class stm32f429::RCC;
 
 private: //Internal Declarations
   template<uint8_t moder_, class typeName_>
@@ -168,10 +168,10 @@ public: //Declarations
 
   enum class OutputSpeed : uint32_t
   {
-    Low,
-    Medium,
-    Fast,
-    High
+    Low = 0,
+    Medium = 1,
+    Fast = 2,
+    High = 3
   };
 
 public: //Methods

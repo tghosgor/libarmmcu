@@ -67,36 +67,36 @@ extern "C" void SystemInit()
   SCB::instance()->m_VTOR = reinterpret_cast<uint32_t>(&ivTable);
 }
 
-auto portA = RCC::enablePeriph<RCC::GPIOA>();
+/*auto portA = RCC::enablePeriph<RCC::GPIOA>();
 auto portApin0 = portA->createPin(0, GPIO::Port::InputPin);
 
 auto portD = RCC::enablePeriph<RCC::GPIOD>();
-auto portDpin2 = portD->createPin(2, GPIO::Port::InputPin);
+auto portDpin2 = portD->createPin(2, GPIO::Port::InputPin);*/
 
 auto portG = RCC::enablePeriph<RCC::GPIOG>();
 auto portGpin13 = portG->createPin(13, GPIO::Port::OutputPin);
-auto portGpin14 = portG->createPin(14, GPIO::Port::OutputPin);
+/*auto portGpin14 = portG->createPin(14, GPIO::Port::OutputPin);
 
 auto syscfg = RCC::enablePeriph<RCC::SYSCFG>();
 auto exti0syscfg = syscfg->enable<SYSCFG::EXTI0>();
 auto exti0 = exti0syscfg->setSource(SYSCFG::EXTISource::PA);
 
 auto extis2yscfg = syscfg->enable<SYSCFG::EXTI2>();
-auto exti2 = extis2yscfg->setSource(SYSCFG::EXTISource::PD);
+auto exti2 = extis2yscfg->setSource(SYSCFG::EXTISource::PD);*/
 
 int main()
 {
   portGpin13.set();
 
-  SET_UP_TIM:
+SET_UP_TIM:
   auto TIM1 = RCC::enablePeriph<RCC::TIM1>();
   TIM1->setAutoReloadValue(std::numeric_limits<uint16_t>::max());
   TIM1->setPrescalerValue(1000);
   TIM1->enable();
 
-  SET_UP_EXTI0:
+SET_UP_EXTI0:
   //Configure EXTI0 to PA0 Rising Edge
-  portApin0.setPullMode(GPIO::Port::IPin::PullMode::PullDown);
+  /*portApin0.setPullMode(GPIO::Port::IPin::PullMode::PullDown);
   portDpin2.setPullMode(GPIO::Port::IPin::PullMode::PullDown);
   exti0->registerISR(&exti0Handler);
   exti0->clearPending();
@@ -105,8 +105,9 @@ int main()
   exti2->registerISR(&exti3Handler);
   exti2->clearPending();
   exti2->enableRisingTrigger();
-  exti2->enableInterrupt();
+  exti2->enableInterrupt();*/
 
+SET_UP_LCD:
   constexpr unsigned ActiveWidth = 240;
   constexpr unsigned ActiveHeight = 320;
 
@@ -118,19 +119,21 @@ int main()
   constexpr unsigned VBP = 2;
   constexpr unsigned VFP = 4;
 
-  RCC::instance()->m_APB1ENR |= 0x1 <<28; //PWR EN
-  RCC::instance()->m_CR |= 0x1 <<16; //HSEON
-  while (! RCC::instance()->m_CR & (0x1 <<17))
-  { }
-  RCC::instance()->m_PLLCFGR |= 0x1 <<22; //PLL source is HSE
   RCC::instance()->m_PLLCFGR &= ~(0x3F <<0);
   RCC::instance()->m_PLLCFGR |= 8 <<0; //PLL division PLLM
   RCC::instance()->m_PLLCFGR &= ~(0x1FF <<6);
   RCC::instance()->m_PLLCFGR |= 360 <<6; //PLL multiplication PLLN
   RCC::instance()->m_PLLCFGR &= ~(0x3 <<16); //PLL division for main system clock PLLP
-  RCC::instance()->m_PLLCFGR &=  ~(0xF <<24); //PLL main division for usb otg fs, sdio, rng PLLQ
+  RCC::instance()->m_PLLCFGR &= ~(0xF <<24);
   RCC::instance()->m_PLLCFGR |=  7 <<24; //PLL main division for usb otg fs, sdio, rng PLLQ
+  RCC::instance()->m_PLLCFGR |= 0x1 <<22; //PLL source is HSE
+
+  RCC::instance()->m_CR |= 0x1 <<16; //HSEON
+  while (! RCC::instance()->m_CR & (0x1 <<17))
+  { }
   RCC::instance()->m_CR |= 0x1 <<24; //PLLON
+  while (RCC::instance()->m_CR & (0x1 <<25))
+  { }
 
   *reinterpret_cast<uint8_t* const>(0x40023C00) = 5; //FLASH Latency 5
   RCC::instance()->m_CFGR |= 0x2 <<0; //PLL as SYSCLK
@@ -144,7 +147,8 @@ int main()
   RCC::instance()->enablePLLSAI();
   while(!RCC::instance()->isPLLSAIReady())
   { }
-  auto lcd0 = RCC::enablePeriph<RCC::LCD0>();
+
+  auto lcd0 = RCC::enablePeriph<RCC::LTDC>();
   lcd0->enableInterrupt(LCD::Interrupt::FIFOUnderrun);
   lcd0->enableInterrupt(LCD::Interrupt::TransferError);
   lcd0->enableInterrupt(LCD::Interrupt::RegisterReload);
@@ -169,7 +173,7 @@ int main()
 
 bool exti0Handler()
 {
-  if(exti0->isPending())
+  /*if(exti0->isPending())
   {
     if(!portGpin14.getOutputState())
      portGpin14.set();
@@ -177,7 +181,7 @@ bool exti0Handler()
       portGpin14.reset();
 
   }
-  exti0->clearPending();
+  exti0->clearPending();*/
 }
 
 /*extern "C" void EXTI0_IRQHandler()
@@ -195,8 +199,8 @@ bool exti0Handler()
 
 bool exti3Handler()
 {
-  portGpin14.reset();
-  exti2->clearPending();
+  /*portGpin14.reset();
+  exti2->clearPending();*/
 }
 
 extern "C" void _exit()

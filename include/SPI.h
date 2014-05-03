@@ -37,7 +37,7 @@ namespace stm32f429
 
 class SPI
 {
-  friend RCC;
+  friend class RCC;
 
 public: //Declarations
   enum : uint32_t
