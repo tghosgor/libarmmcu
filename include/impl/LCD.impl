@@ -45,94 +45,222 @@ LCD::LCD()
 
 void LCD::enable() volatile
 {
+  m_RDX.setOutputSpeed(GPIO::Port::OPin::OutputSpeed::Fast);
+  m_WRX.setOutputSpeed(GPIO::Port::OPin::OutputSpeed::Fast);
+  m_CSX.setOutputSpeed(GPIO::Port::OPin::OutputSpeed::Fast);
+
+  auto portA = RCC::enablePeriph<RCC::GPIOA>();
+  auto portB = RCC::enablePeriph<RCC::GPIOB>();
+  auto portC = RCC::enablePeriph<RCC::GPIOC>();
+  auto portD = RCC::enablePeriph<RCC::GPIOD>();
+  auto portE = RCC::enablePeriph<RCC::GPIOE>();
+  auto portF = RCC::enablePeriph<RCC::GPIOF>();
+  auto portG = RCC::enablePeriph<RCC::GPIOG>();
+  auto portH = RCC::enablePeriph<RCC::GPIOH>();
+  auto portI = RCC::enablePeriph<RCC::GPIOI>();
+
+  /*
+   +------------------------+-----------------------+----------------------------+
+   +                       LCD pins assignment                                   +
+   +------------------------+-----------------------+----------------------------+
+   |  LCD_TFT R2 <-> PC.10  |  LCD_TFT G2 <-> PA.06 |  LCD_TFT B2 <-> PD.06      |
+   |  LCD_TFT R3 <-> PB.00  |  LCD_TFT G3 <-> PG.10 |  LCD_TFT B3 <-> PG.11      |
+   |  LCD_TFT R4 <-> PA.11  |  LCD_TFT G4 <-> PB.10 |  LCD_TFT B4 <-> PG.12      |
+   |  LCD_TFT R5 <-> PA.12  |  LCD_TFT G5 <-> PB.11 |  LCD_TFT B5 <-> PA.03      |
+   |  LCD_TFT R6 <-> PB.01  |  LCD_TFT G6 <-> PC.07 |  LCD_TFT B6 <-> PB.08      |
+   |  LCD_TFT R7 <-> PG.06  |  LCD_TFT G7 <-> PD.03 |  LCD_TFT B7 <-> PB.09      |
+   -------------------------------------------------------------------------------
+            |  LCD_TFT HSYNC <-> PC.06  | LCDTFT VSYNC <->  PA.04 |
+            |  LCD_TFT CLK   <-> PG.07  | LCD_TFT DE   <->  PF.10 |
+             -----------------------------------------------------
+
+  */
+
+  portC->createPin(6, GPIO::Port::AlternatePin).setAF(GPIO::Port::APin::AF::_14)
+      .setOutputSpeed(GPIO::Port::APin::OutputSpeed::Fast).setPullMode(GPIO::Port::APin::PullMode::None);//HSYNC
+  portA->createPin(4, GPIO::Port::AlternatePin).setAF(GPIO::Port::APin::AF::_14)
+      .setOutputSpeed(GPIO::Port::APin::OutputSpeed::Fast).setPullMode(GPIO::Port::APin::PullMode::None);//VSYNC
+  portG->createPin(7, GPIO::Port::AlternatePin).setAF(GPIO::Port::APin::AF::_14)
+      .setOutputSpeed(GPIO::Port::APin::OutputSpeed::Fast).setPullMode(GPIO::Port::APin::PullMode::None);//CLK
+  portF->createPin(10, GPIO::Port::AlternatePin).setAF(GPIO::Port::APin::AF::_14)
+      .setOutputSpeed(GPIO::Port::APin::OutputSpeed::Fast).setPullMode(GPIO::Port::APin::PullMode::None);//DE
+
+  portC->createPin(10, GPIO::Port::AlternatePin).setAF(GPIO::Port::APin::AF::_14)
+      .setOutputSpeed(GPIO::Port::APin::OutputSpeed::Fast).setPullMode(GPIO::Port::APin::PullMode::None);//R2
+  portB->createPin(0, GPIO::Port::AlternatePin).setAF(GPIO::Port::APin::AF::_14)
+      .setOutputSpeed(GPIO::Port::APin::OutputSpeed::Fast).setPullMode(GPIO::Port::APin::PullMode::None);//R3
+  portA->createPin(11, GPIO::Port::AlternatePin).setAF(GPIO::Port::APin::AF::_14)
+      .setOutputSpeed(GPIO::Port::APin::OutputSpeed::Fast).setPullMode(GPIO::Port::APin::PullMode::None);//R4
+  portA->createPin(12, GPIO::Port::AlternatePin).setAF(GPIO::Port::APin::AF::_14)
+      .setOutputSpeed(GPIO::Port::APin::OutputSpeed::Fast).setPullMode(GPIO::Port::APin::PullMode::None);//R5
+  portB->createPin(1, GPIO::Port::AlternatePin).setAF(GPIO::Port::APin::AF::_14)
+      .setOutputSpeed(GPIO::Port::APin::OutputSpeed::Fast).setPullMode(GPIO::Port::APin::PullMode::None);//R6
+  portG->createPin(6, GPIO::Port::AlternatePin).setAF(GPIO::Port::APin::AF::_14)
+      .setOutputSpeed(GPIO::Port::APin::OutputSpeed::Fast).setPullMode(GPIO::Port::APin::PullMode::None);//R7
+
+  portA->createPin(6, GPIO::Port::AlternatePin).setAF(GPIO::Port::APin::AF::_14)
+      .setOutputSpeed(GPIO::Port::APin::OutputSpeed::Fast).setPullMode(GPIO::Port::APin::PullMode::None);//G2
+  portG->createPin(10, GPIO::Port::AlternatePin).setAF(GPIO::Port::APin::AF::_14)
+      .setOutputSpeed(GPIO::Port::APin::OutputSpeed::Fast).setPullMode(GPIO::Port::APin::PullMode::None);//G3
+  portB->createPin(10, GPIO::Port::AlternatePin).setAF(GPIO::Port::APin::AF::_14)
+      .setOutputSpeed(GPIO::Port::APin::OutputSpeed::Fast).setPullMode(GPIO::Port::APin::PullMode::None);//G4
+  portB->createPin(11, GPIO::Port::AlternatePin).setAF(GPIO::Port::APin::AF::_14)
+      .setOutputSpeed(GPIO::Port::APin::OutputSpeed::Fast).setPullMode(GPIO::Port::APin::PullMode::None);//G5
+  portC->createPin(7, GPIO::Port::AlternatePin).setAF(GPIO::Port::APin::AF::_14)
+      .setOutputSpeed(GPIO::Port::APin::OutputSpeed::Fast).setPullMode(GPIO::Port::APin::PullMode::None);//G6
+  portD->createPin(3, GPIO::Port::AlternatePin).setAF(GPIO::Port::APin::AF::_14)
+      .setOutputSpeed(GPIO::Port::APin::OutputSpeed::Fast).setPullMode(GPIO::Port::APin::PullMode::None);//G7
+
+  portD->createPin(6, GPIO::Port::AlternatePin).setAF(GPIO::Port::APin::AF::_14)
+      .setOutputSpeed(GPIO::Port::APin::OutputSpeed::Fast).setPullMode(GPIO::Port::APin::PullMode::None);//B2
+  portG->createPin(11, GPIO::Port::AlternatePin).setAF(GPIO::Port::APin::AF::_14)
+      .setOutputSpeed(GPIO::Port::APin::OutputSpeed::Fast).setPullMode(GPIO::Port::APin::PullMode::None);//B3
+  portG->createPin(12, GPIO::Port::AlternatePin).setAF(GPIO::Port::APin::AF::_14)
+      .setOutputSpeed(GPIO::Port::APin::OutputSpeed::Fast).setPullMode(GPIO::Port::APin::PullMode::None);//B4
+  portA->createPin(3, GPIO::Port::AlternatePin).setAF(GPIO::Port::APin::AF::_14)
+      .setOutputSpeed(GPIO::Port::APin::OutputSpeed::Fast).setPullMode(GPIO::Port::APin::PullMode::None);//B5
+  portB->createPin(8, GPIO::Port::AlternatePin).setAF(GPIO::Port::APin::AF::_14)
+      .setOutputSpeed(GPIO::Port::APin::OutputSpeed::Fast).setPullMode(GPIO::Port::APin::PullMode::None);//B6
+  portB->createPin(9, GPIO::Port::AlternatePin).setAF(GPIO::Port::APin::AF::_14)
+      .setOutputSpeed(GPIO::Port::APin::OutputSpeed::Fast).setPullMode(GPIO::Port::APin::PullMode::None);//B7
+
   /* Set or Reset the control line */
   m_CSX.reset();
   m_CSX.set();
 
-  m_GCR |= 0x1 <<0;
-
   m_spi5->setBaudPrescaler(SPI::BaudPSC::_16);
   m_spi5->setUnidirectionalMode();
   m_spi5->enableSoftwareSlaveMode();
+  m_spi5->enableInternalSlaveSelect();
   m_spi5->setMasterMode();
   m_spi5->enable(SPI::DataFrame::_8Bit);
 
-  writeReg(LCD_REG_0, 0x0001); /* Start internal OSC. */
-  writeReg(LCD_REG_1, 0x0100); /* Set SS and SM bit */
-  writeReg(LCD_REG_2, 0x0700); /* Set 1 line inversion */
-  writeReg(LCD_REG_3, 0x1018); /* Set GRAM write direction and BGR=1. */
-  writeReg(LCD_REG_4, 0x0000); /* Resize register */
-  writeReg(LCD_REG_8, 0x0202); /* Set the back porch and front porch */
-  writeReg(LCD_REG_9, 0x0000); /* Set non-display area refresh cycle ISC[3:0] */
-  writeReg(LCD_REG_10, 0x0000); /* FMARK function */
-  writeReg(LCD_REG_12, 0x0000); /* RGB interface setting */
-  writeReg(LCD_REG_13, 0x0000); /* Frame marker Position */
-  writeReg(LCD_REG_15, 0x0000); /* RGB interface polarity */
+  /*Configure LCD*/
+  selectReg(0xCA);
+  writeRegData(0xC3);
+  writeRegData(0x08);
+  writeRegData(0x50);
+  selectReg(LCD_POWERB);
+  writeRegData(0x00);
+  writeRegData(0xC1);
+  writeRegData(0x30);
+  selectReg(LCD_POWER_SEQ);
+  writeRegData(0x64);
+  writeRegData(0x03);
+  writeRegData(0x12);
+  writeRegData(0x81);
+  selectReg(LCD_DTCA);
+  writeRegData(0x85);
+  writeRegData(0x00);
+  writeRegData(0x78);
+  selectReg(LCD_POWERA);
+  writeRegData(0x39);
+  writeRegData(0x2C);
+  writeRegData(0x00);
+  writeRegData(0x34);
+  writeRegData(0x02);
+  selectReg(LCD_PRC);
+  writeRegData(0x20);
+  selectReg(LCD_DTCB);
+  writeRegData(0x00);
+  writeRegData(0x00);
+  selectReg(LCD_FRMCTR1);
+  writeRegData(0x00);
+  writeRegData(0x1B);
+  selectReg(LCD_DFC);
+  writeRegData(0x0A);
+  writeRegData(0xA2);
+  selectReg(LCD_POWER1);
+  writeRegData(0x10);
+  selectReg(LCD_POWER2);
+  writeRegData(0x10);
+  selectReg(LCD_VCOM1);
+  writeRegData(0x45);
+  writeRegData(0x15);
+  selectReg(LCD_VCOM2);
+  writeRegData(0x90);
+  selectReg(LCD_MAC);
+  writeRegData(0xC8);
+  selectReg(LCD_3GAMMA_EN);
+  writeRegData(0x00);
+  selectReg(LCD_RGB_INTERFACE);
+  writeRegData(0xC2);
+  selectReg(LCD_DFC);
+  writeRegData(0x0A);
+  writeRegData(0xA7);
+  writeRegData(0x27);
+  writeRegData(0x04);
 
-  /* Power On sequence -----------------------------------------------------*/
-  writeReg(LCD_REG_16, 0x0000); /* SAP, BT[3:0], AP, DSTB, SLP, STB */
-  writeReg(LCD_REG_17, 0x0000); /* DC1[2:0], DC0[2:0], VC[2:0] */
-  writeReg(LCD_REG_18, 0x0000); /* VREG1OUT voltage */
-  writeReg(LCD_REG_19, 0x0000); /* VDV[4:0] for VCOM amplitude */
+  /* colomn address set */
+  selectReg(LCD_COLUMN_ADDR);
+  writeRegData(0x00);
+  writeRegData(0x00);
+  writeRegData(0x00);
+  writeRegData(0xEF);
+  /* Page Address Set */
+  selectReg(LCD_PAGE_ADDR);
+  writeRegData(0x00);
+  writeRegData(0x00);
+  writeRegData(0x01);
+  writeRegData(0x3F);
+  selectReg(LCD_INTERFACE);
+  writeRegData(0x01);
+  writeRegData(0x00);
+  writeRegData(0x06);
 
-  writeReg(LCD_REG_16, 0x17B0); /* SAP, BT[3:0], AP, DSTB, SLP, STB */
-  writeReg(LCD_REG_17, 0x0137); /* DC1[2:0], DC0[2:0], VC[2:0] */
+  selectReg(LCD_GRAM);
+  //LCD_Delay(200);
+  uint32_t volatile i = 0;
+  while(++i < 19999999); //temporary enough?
 
-  writeReg(LCD_REG_18, 0x0139); /* VREG1OUT voltage */
+  selectReg(LCD_GAMMA);
+  writeRegData(0x01);
 
-  writeReg(LCD_REG_19, 0x1d00); /* VDV[4:0] for VCOM amplitude */
-  writeReg(LCD_REG_41, 0x0013); /* VCM[4:0] for VCOMH */
+  selectReg(LCD_PGAMMA);
+  writeRegData(0x0F);
+  writeRegData(0x29);
+  writeRegData(0x24);
+  writeRegData(0x0C);
+  writeRegData(0x0E);
+  writeRegData(0x09);
+  writeRegData(0x4E);
+  writeRegData(0x78);
+  writeRegData(0x3C);
+  writeRegData(0x09);
+  writeRegData(0x13);
+  writeRegData(0x05);
+  writeRegData(0x17);
+  writeRegData(0x11);
+  writeRegData(0x00);
+  selectReg(LCD_NGAMMA);
+  writeRegData(0x00);
+  writeRegData(0x16);
+  writeRegData(0x1B);
+  writeRegData(0x04);
+  writeRegData(0x11);
+  writeRegData(0x07);
+  writeRegData(0x31);
+  writeRegData(0x33);
+  writeRegData(0x42);
+  writeRegData(0x05);
+  writeRegData(0x0C);
+  writeRegData(0x0A);
+  writeRegData(0x28);
+  writeRegData(0x2F);
+  writeRegData(0x0F);
 
-  writeReg(LCD_REG_32, 0x0000); /* GRAM horizontal Address */
-  writeReg(LCD_REG_33, 0x0000); /* GRAM Vertical Address */
+  selectReg(LCD_SLEEP_OUT);
+  //LCD_Delay(200);
+  i = 0;
+  while(++i < 19999999); //temporary enough?
 
-  /* Adjust the Gamma Curve (ILI9325)---------------------------------------*/
-  writeReg(LCD_REG_48, 0x0007);
-  writeReg(LCD_REG_49, 0x0302);
-  writeReg(LCD_REG_50, 0x0105);
-  writeReg(LCD_REG_53, 0x0206);
-  writeReg(LCD_REG_54, 0x0808);
-  writeReg(LCD_REG_55, 0x0206);
-  writeReg(LCD_REG_56, 0x0504);
-  writeReg(LCD_REG_57, 0x0007);
-  writeReg(LCD_REG_60, 0x0105);
-  writeReg(LCD_REG_61, 0x0808);
+  selectReg(LCD_DISPLAY_ON);
+  /* GRAM start writing */
+  selectReg(LCD_GRAM);
 
-  /* Set GRAM area ---------------------------------------------------------*/
-  writeReg(LCD_REG_80, 0x0000); /* Horizontal GRAM Start Address */
-  writeReg(LCD_REG_81, 0x00EF); /* Horizontal GRAM End Address */
-  writeReg(LCD_REG_82, 0x0000); /* Vertical GRAM Start Address */
-  writeReg(LCD_REG_83, 0x013F); /* Vertical GRAM End Address */
-
-  writeReg(LCD_REG_96,  0xA700); /* Gate Scan Line(GS=1, scan direction is G320~G1) */
-  writeReg(LCD_REG_97,  0x0001); /* NDL,VLE, REV */
-  writeReg(LCD_REG_106, 0x0000); /* set scrolling line */
-
-  /* Partial Display Control -----------------------------------------------*/
-  writeReg(LCD_REG_128, 0x0000);
-  writeReg(LCD_REG_129, 0x0000);
-  writeReg(LCD_REG_130, 0x0000);
-  writeReg(LCD_REG_131, 0x0000);
-  writeReg(LCD_REG_132, 0x0000);
-  writeReg(LCD_REG_133, 0x0000);
-
-  /* Panel Control ---------------------------------------------------------*/
-  writeReg(LCD_REG_144, 0x0010);
-  writeReg(LCD_REG_146, 0x0000);
-  writeReg(LCD_REG_147, 0x0003);
-  writeReg(LCD_REG_149, 0x0110);
-  writeReg(LCD_REG_151, 0x0000);
-  writeReg(LCD_REG_152, 0x0000);
-
-  /* set GRAM write direction and BGR = 1 */
-  /* I/D=00 (Horizontal : increment, Vertical : decrement) */
-  /* AM=1 (address is updated in vertical writing direction) */
-  writeReg(LCD_REG_3, 0x1018);
-
-  /* 262K color and display ON */
-  writeReg(LCD_REG_7, 0x0173);
-
-  selectReg(LCD_REG_34);
+  m_GCR |= 0x1 <<0;
+  m_layer1.m_CR |= 0x1;
+  m_layer2.m_CR |= 0x1;
 }
 
 void LCD::setSync(uint16_t const hSync, uint16_t const vSync) volatile
@@ -173,6 +301,16 @@ void LCD::setBgColor(uint8_t const r, uint8_t const g, uint8_t const b) volatile
 {
   m_BCCR &= 0xFF000000;
   m_BCCR |= static_cast<uint32_t const>(r) <<16 | static_cast<uint32_t const>(g) <<8 | static_cast<uint32_t const>(b) <<0;
+}
+
+void LCD::enableInterrupt(Interrupt const interrupt) volatile
+{
+  m_IER |= static_cast<uint32_t>(interrupt);
+}
+
+void LCD::disableInterrupt(Interrupt const interrupt) volatile
+{
+  m_IER &= ~(static_cast<uint32_t>(interrupt));
 }
 
 void LCD::selectReg(uint8_t const reg) volatile

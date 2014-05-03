@@ -142,10 +142,10 @@ public: //Declarations
 public: //Methods
   OPin(uint8_t const nPin, Port volatile& port);
 
-  void setOutputSpeed(OutputSpeed const ospeed) volatile;
+  OPin volatile& setOutputSpeed(OutputSpeed const ospeed) volatile;
 
-  void set() volatile;
-  void reset() volatile;
+  OPin volatile& set() volatile;
+  OPin volatile& reset() volatile;
 
   bool getOutputState() volatile;
 
@@ -177,8 +177,8 @@ public: //Declarations
 public: //Methods
   APin(uint8_t const nPin, Port volatile& port);
 
-  void setAF(AF const af) volatile;
-  void setOutputSpeed(OutputSpeed const ospeed) volatile;
+  APin volatile& setAF(AF const af) volatile;
+  APin volatile& setOutputSpeed(OutputSpeed const ospeed) volatile;
 
 private:
   static constexpr uint8_t m_moder = 0x2;

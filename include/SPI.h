@@ -73,6 +73,8 @@ public: //Methods
   void setBaudPrescaler(BaudPSC const psc) volatile;
   void enableSoftwareSlaveMode() volatile;
   void disableSoftwareSlaveMode() volatile;
+  void enableInternalSlaveSelect() volatile;
+  void disableInternalSlaveSelect() volatile;
   void send(uint16_t data) volatile;
 
   DataFrame getDataFrameFormat() volatile const;

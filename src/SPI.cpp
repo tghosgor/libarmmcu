@@ -36,75 +36,84 @@ void SPI::enable(DataFrame const dataFrameFormat, bool const enableHardwareCRC) 
 {
   auto portF = RCC::enablePeriph<RCC::GPIOF>();
 
-  auto port7 = portF->createPin(7, GPIO::Port::AlternatePin);
-  auto port8 = portF->createPin(8, GPIO::Port::AlternatePin);
-  auto port9 = portF->createPin(9, GPIO::Port::AlternatePin);
+  auto pin7 = portF->createPin(7, GPIO::Port::AlternatePin);
+  auto pin8 = portF->createPin(8, GPIO::Port::AlternatePin);
+  auto pin9 = portF->createPin(9, GPIO::Port::AlternatePin);
 
-  port7.setPullMode(GPIO::Port::APin::PullMode::PullDown);
-  port8.setPullMode(GPIO::Port::APin::PullMode::PullDown);
-  port9.setPullMode(GPIO::Port::APin::PullMode::PullDown);
+  pin7.setPullMode(GPIO::Port::APin::PullMode::PullDown);
+  pin8.setPullMode(GPIO::Port::APin::PullMode::PullDown);
+  pin9.setPullMode(GPIO::Port::APin::PullMode::PullDown);
 
-  port7.setOutputSpeed(GPIO::Port::APin::OutputSpeed::Medium);
-  port8.setOutputSpeed(GPIO::Port::APin::OutputSpeed::Medium);
-  port9.setOutputSpeed(GPIO::Port::APin::OutputSpeed::Medium);
+  pin7.setOutputSpeed(GPIO::Port::APin::OutputSpeed::Medium);
+  pin8.setOutputSpeed(GPIO::Port::APin::OutputSpeed::Medium);
+  pin9.setOutputSpeed(GPIO::Port::APin::OutputSpeed::Medium);
 
-  port7.setAF(GPIO::Port::APin::AF::_5);
-  port8.setAF(GPIO::Port::APin::AF::_5);
-  port9.setAF(GPIO::Port::APin::AF::_5);
+  pin7.setAF(GPIO::Port::APin::AF::_5);
+  pin8.setAF(GPIO::Port::APin::AF::_5);
+  pin9.setAF(GPIO::Port::APin::AF::_5);
 
-  m_CR1 |= static_cast<uint16_t>(dataFrameFormat) <<11 | static_cast<uint16_t>(enableHardwareCRC) <<13;
-  m_CR1 |= 0x1 <<6;//TODO: üstteki satır ayarlanmadan SPI açmayın diyor ama bu şekil ayırmaya gerek var mı?
+  m_CR1 |= static_cast<uint32_t const>(dataFrameFormat) <<11 | static_cast<uint32_t const>(enableHardwareCRC) <<13;
+  m_CR1 |= 0x1u <<6;//TODO: üstteki satır ayarlanmadan SPI açmayın diyor ama bu şekil ayırmaya gerek var mı?
 }
 
 void SPI::setMasterMode() volatile
 {
-  m_CR1 |= 0x1 <<2;
+  m_CR1 |= 0x1u <<2;
 }
 
 void SPI::setSlaveMode() volatile
 {
-  m_CR1 &= ~(0x1 <<2);
+  m_CR1 &= ~(0x1u <<2);
 }
 
 void SPI::setBidirectionalMode() volatile
 {
-  m_CR1 |= static_cast<uint16_t>(0x1) <<15;
+  m_CR1 |= 0x1u <<15;
 }
 
 void SPI::setUnidirectionalMode() volatile
 {
-  m_CR1 &= ~(static_cast<uint16_t>(0x1) <<15);
+  m_CR1 &= ~(0x1u <<15);
 }
 
 void SPI::setBaudPrescaler(BaudPSC const psc) volatile
 {
-  m_CR1 &= ~(static_cast<uint16_t>(0x7) <<3);
-  m_CR1 |= static_cast<uint16_t>(psc) <<3;
+  m_CR1 &= ~(0x7u <<3);
+  m_CR1 |= static_cast<uint32_t const>(psc) <<3;
 }
 
 void SPI::enableSoftwareSlaveMode() volatile
 {
-  m_CR1 |= static_cast<uint16_t>(0x1) <<9;
-  m_CR2 |= 0x1 <<2; //TODO: LCD burayı beraber kullanıyor (CMSIS'e göre) ancak burayı ayırmalı mı?
+  m_CR1 |= 0x1u <<9;
+  //m_CR2 |= 0x1u <<2; //TODO: LCD burayı beraber kullanıyor (CMSIS'e göre) ancak burayı ayırmalı mı?
 }
 
 void SPI::disableSoftwareSlaveMode() volatile
 {
-  m_CR1 &= ~(static_cast<uint16_t>(0x1) <<9);
-  m_CR2 &= ~(0x1 <<2);
+  m_CR1 &= ~(0x1u <<9);
+  //m_CR2 &= ~(0x1u <<2);
+}
+
+void SPI::enableInternalSlaveSelect() volatile
+{
+  m_CR1 |= 0x1u <<8;
+}
+
+void SPI::disableInternalSlaveSelect() volatile
+{
+  m_CR1 &= ~(0x1u <<8);
 }
 
 void SPI::send(uint16_t data) volatile
 {
-  m_DR = data;
-
-  while(m_SR & (0x1 <<1)) //wait for tx buffer empty flag
+  while(m_SR & (0x1u <<7)) //wait for tx buffer empty flag
   { }
+  m_DR = data;
 }
 
 SPI::DataFrame SPI::getDataFrameFormat() volatile const
 {
-  return static_cast<DataFrame>(m_CR1 & (0x1 <<11));
+  return static_cast<DataFrame>(m_CR1 & (0x1u <<11));
 }
 
 } //NS stm32f429
