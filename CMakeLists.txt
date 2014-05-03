@@ -33,5 +33,5 @@ set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "") #-rdynamic suppression
 set(CMAKE_EXE_LINKER_FLAGS "-Xlinker --script ${libarmmcu_SOURCE_DIR}/misc/STM32F429ZI_FLASH.ld")
 set(CMAKE_EXE_LINKER_FLAGS_RELEASE "-s")
 
-add_executable(stm32f429i-disco tests/main.cpp misc/startup_stm32f429xx.S misc/STM32F429ZI_FLASH.ld include/util.h include/fwd.h include/IVTable.h include/RCC.h include/SCB.h include/NVIC.h include/GPIO.h include/TIM.h include/ADC.h include/SYSCFG.h include/EXTI.h include/LCD.h include/PLL.h include/SPI.h src/IVTable.cpp include/impl/GPIO.impl include/impl/TIM.impl include/impl/RCC.impl  include/impl/NVIC.impl include/impl/SYSCFG.impl include/impl/EXTI.impl include/impl/LCD.impl include/impl/PLL.impl include/impl/SPI.impl README.md)
+add_executable(stm32f429i-disco tests/main.cpp misc/startup_stm32f429xx.S misc/STM32F429ZI_FLASH.ld include/util.h include/fwd.h include/IVTable.h include/RCC.h include/SCB.h include/NVIC.h include/GPIO.h include/TIM.h include/ADC.h include/SYSCFG.h include/EXTI.h include/LCD.h include/PLL.h include/SPI.h src/IVTable.cpp src/GPIO.cpp include/impl/TIM.impl include/impl/RCC.impl  include/impl/NVIC.impl include/impl/SYSCFG.impl include/impl/EXTI.impl include/impl/LCD.impl src/PLL.cpp src/SPI.cpp README.md)
 

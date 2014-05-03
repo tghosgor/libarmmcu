@@ -44,6 +44,4 @@ public:
 
 } //NS stm32f429
 
-#include <impl/PLL.impl>
-
 #endif /* PLL_H_ */

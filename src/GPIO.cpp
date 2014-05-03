@@ -24,9 +24,6 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef GPIO_CPP_
-#define GPIO_CPP_
-
 #include <RCC.h>
 
 #include <GPIO.h>
@@ -47,6 +44,13 @@ typename PinType_::type Port::createPin(uint8_t const nPin, PinType_ const) vola
 
   return typename PinType_::type(nPin, *this);
 }
+
+template
+decltype(Port::InputPin)::type Port::createPin(uint8_t const nPin, decltype(Port::InputPin) const) volatile;
+template
+decltype(Port::OutputPin)::type Port::createPin(uint8_t const nPin, decltype(Port::OutputPin) const) volatile;
+template
+decltype(Port::AlternatePin)::type Port::createPin(uint8_t const nPin, decltype(Port::AlternatePin) const) volatile;
 
 Port::Pin::Pin(uint8_t const nPin, Port volatile& port)
   : m_nPin(nPin)
@@ -115,5 +119,3 @@ void Port::APin::setAF(Port::APin::AF const af) volatile
 
 } //NS GPIO
 } //NS stm32f429
-
-#endif /* GPIO_CPP_ */

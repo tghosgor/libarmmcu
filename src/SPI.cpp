@@ -24,9 +24,7 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SPI_CPP_
-#define SPI_CPP_
-
+#include <GPIO.h>
 #include <RCC.h>
 
 #include <SPI.h>
@@ -110,5 +108,3 @@ SPI::DataFrame SPI::getDataFrameFormat() volatile const
 }
 
 } //NS stm32f429
-
-#endif /* SPI_CPP_ */
