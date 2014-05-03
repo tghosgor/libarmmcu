@@ -69,12 +69,6 @@ public: //Declarations
     uint32_t m_CLUTWR;
   };
 
-  enum : std::size_t
-  {
-    Layer1 = BaseAddress + (19 * 4),           //LCD::Periph<_0>::BaseAddress + sizeof(LCD::Periph<_0>)
-    Layer2 = Layer1 + sizeof(Layer) + 15 * 4 //Layer1 + sizeof(Layer<Layer1>) + offset
-  };
-
   static_assert(sizeof(Layer) == 17 * 4, "Layer size is wrong");
 
 public: //Methods
@@ -93,7 +87,7 @@ public: //Methods
   void writeReg(uint8_t offset, uint16_t value) volatile;
 
   void selectReg(uint8_t offset) volatile;
-  void writeRegData(uint16_t value) volatile;
+  void writeReg(uint16_t value) volatile;
 
 public: //Registers
   uint32_t PADDING1[2];
