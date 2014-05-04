@@ -217,7 +217,7 @@ void LCD::enable(
   selectReg(LCD_GRAM);
   //LCD_Delay(200);
   uint32_t volatile i = 0;
-  while(++i < 9999999); //temporary enough?
+  while(++i < 999999); //temporary enough?
 
   selectReg(LCD_GAMMA);
   writeReg(0x01);
@@ -258,7 +258,7 @@ void LCD::enable(
   selectReg(LCD_SLEEP_OUT);
   //LCD_Delay(200);
   i = 0;
-  while(++i < 9999999); //temporary enough?
+  while(++i < 999999); //temporary enough?
 
   selectReg(LCD_DISPLAY_ON);
   /* GRAM start writing */

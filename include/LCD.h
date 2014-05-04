@@ -29,6 +29,7 @@
 
 #include <cstdint>
 
+#include <GPIO.h>
 #include <RCC.h>
 
 namespace stm32f429
@@ -263,7 +264,5 @@ static_assert(sizeof(LCD) == 0x148, "LCD size is not correct, spec says 0x148 by
 
 /* Size of read registers*/
 #define LCD_READ_ID4_SIZE        3      /* Size of Read ID4 */
-
-#include "impl/LCD.impl"
 
 #endif /* LCD_H_ */
