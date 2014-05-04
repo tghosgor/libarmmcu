@@ -91,7 +91,7 @@ public: //Methods
 
   bool isPLLSAIReady() volatile
   {
-    return !(m_CR & (0x1 <<29));
+    return m_CR & (0x1 <<29);
   }
 
   void enablePLLSAI() volatile
@@ -99,16 +99,21 @@ public: //Methods
     m_CR |= 0x1 <<28;
   }
 
+  void disablePLLSAI() volatile
+  {
+    m_CR &= ~(0x1 <<28);
+  }
+
   void setPLLSAIMFactor(uint16_t const factor) volatile
   {
     m_PLLSAICFGR &= ~(0x01FF <<6);
-    m_PLLSAICFGR |= factor <<6;
+    m_PLLSAICFGR |= (factor & 0x01FF) <<6;
   }
 
   void setPLLSAIDFactor(uint8_t const factor) volatile
   {
     m_PLLSAICFGR &= ~(0x07 <<28);
-    m_PLLSAICFGR |= (factor & 0x0F) <<28;
+    m_PLLSAICFGR |= (factor & 0x07) <<28;
   }
 
   enum class PLLSAIDIVR : uint32_t

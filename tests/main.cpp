@@ -119,11 +119,15 @@ SET_UP_LCD:
   constexpr unsigned VBP = 2;
   constexpr unsigned VFP = 4;
 
+  RCC::instance()->m_CR &= ~(0x1 <<24); //PLLON OFF
+  while (RCC::instance()->m_CR & (0x1 <<25))
+  { }
   RCC::instance()->m_PLLCFGR &= ~(0x3F <<0);
   RCC::instance()->m_PLLCFGR |= 8 <<0; //PLL division PLLM
   RCC::instance()->m_PLLCFGR &= ~(0x1FF <<6);
   RCC::instance()->m_PLLCFGR |= 360 <<6; //PLL multiplication PLLN
-  RCC::instance()->m_PLLCFGR &= ~(0x3 <<16); //PLL division for main system clock PLLP
+  RCC::instance()->m_PLLCFGR &= ~(0x3 <<16);
+  RCC::instance()->m_PLLCFGR |= 0x0 <<16; //PLL division for main system clock PLLP
   RCC::instance()->m_PLLCFGR &= ~(0xF <<24);
   RCC::instance()->m_PLLCFGR |=  7 <<24; //PLL main division for usb otg fs, sdio, rng PLLQ
   RCC::instance()->m_PLLCFGR |= 0x1 <<22; //PLL source is HSE
@@ -132,15 +136,18 @@ SET_UP_LCD:
   while (! RCC::instance()->m_CR & (0x1 <<17))
   { }
   RCC::instance()->m_CR |= 0x1 <<24; //PLLON
-  while (RCC::instance()->m_CR & (0x1 <<25))
+  while (!RCC::instance()->m_CR & (0x1 <<25))
   { }
 
-  *reinterpret_cast<uint8_t* const>(0x40023C00) = 5; //FLASH Latency 5
-  RCC::instance()->m_CFGR |= 0x2 <<0; //PLL as SYSCLK
-  RCC::instance()->m_CFGR |= 0x0 <<4; //AHB PSC 1
-  RCC::instance()->m_CFGR |= 0x5 <<10; //APB1 PSC 4
-  RCC::instance()->m_CFGR |= 0x4 <<13; //APB2 PSC 2
+  //*reinterpret_cast<uint8_t* const>(0x40023C00) = 5; //FLASH Latency 5
+  //RCC::instance()->m_CFGR |= 0x2 <<0; //PLL as SYSCLK
+  //RCC::instance()->m_CFGR |= 0x0 <<4; //AHB PSC 1
+  //RCC::instance()->m_CFGR |= 0x5 <<10; //APB1 PSC 4
+  //RCC::instance()->m_CFGR |= 0x4 <<13; //APB2 PSC 2
 
+  RCC::instance()->disablePLLSAI();
+  while(RCC::instance()->isPLLSAIReady())
+  { }
   RCC::instance()->setPLLSAIMFactor(192);
   RCC::instance()->setPLLSAIDFactor(4);
   RCC::instance()->setPLLSAIDIVR(RCC::PLLSAIDIVR::_8);
@@ -149,25 +156,26 @@ SET_UP_LCD:
   { }
 
   auto lcd0 = RCC::enablePeriph<RCC::LTDC>();
-  lcd0->enableInterrupt(LCD::Interrupt::FIFOUnderrun);
-  lcd0->enableInterrupt(LCD::Interrupt::TransferError);
-  lcd0->enableInterrupt(LCD::Interrupt::RegisterReload);
-  lcd0->setBgColor(255, 0, 0);
-  lcd0->setSync(hSync, vSync);;
-  lcd0->setBackPorch(hSync + HBP, vSync + VBP);
-  lcd0->setActiveWidth(270,
-                       324);
-  lcd0->setTotalWidth(280,
-                      328);
-  lcd0->enable();
+  lcd0->enable(ActiveWidth, hSync, HBP, HFP, ActiveHeight, vSync, VBP, VFP);
+  lcd0->setBgColor({255, 0, 0});
 
   while(true)
   {
     uint16_t cntVal = TIM1->getCounterValue();
     if(cntVal >= std::numeric_limits<uint16_t>::max() / 2)
+    {
+      LCD::Color const green{0, 255, 0};
+      if(lcd0->getBgColor() != green)
+        lcd0->setBgColor(green);
       portGpin13.set();
+    }
     else
+    {
+      LCD::Color const red{255, 0, 0};
+      if(lcd0->getBgColor() != red)
+        lcd0->setBgColor(red);
       portGpin13.reset();
+    }
   }
 }
 

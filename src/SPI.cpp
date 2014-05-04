@@ -85,13 +85,11 @@ void SPI::setBaudPrescaler(BaudPSC const psc) volatile
 void SPI::enableSoftwareSlaveMode() volatile
 {
   m_CR1 |= 0x1u <<9;
-  //m_CR2 |= 0x1u <<2; //TODO: LCD burayı beraber kullanıyor (CMSIS'e göre) ancak burayı ayırmalı mı?
 }
 
 void SPI::disableSoftwareSlaveMode() volatile
 {
   m_CR1 &= ~(0x1u <<9);
-  //m_CR2 &= ~(0x1u <<2);
 }
 
 void SPI::enableInternalSlaveSelect() volatile
@@ -106,9 +104,13 @@ void SPI::disableInternalSlaveSelect() volatile
 
 void SPI::send(uint16_t data) volatile
 {
-  while(m_SR & (0x1u <<7)) //wait for tx buffer empty flag
-  { }
   m_DR = data;
+  while(! (m_SR & (0x1u <<1))) //wait until txe is set to send data
+  { }
+  while(m_SR & (0x1u <<7)) //wait for tx bsy is reset
+  { }
+  if(! (m_CR1 & 0x1u <<15)) //2lines unidirectional mode
+    m_SR &= ~(0x1u <<6); //clear OVR
 }
 
 SPI::DataFrame SPI::getDataFrameFormat() volatile const

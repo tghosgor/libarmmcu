@@ -42,6 +42,18 @@ public:
   static constexpr std::size_t BaseAddress = 0x40016800;
 
 public: //Declarations
+  struct Color
+  {
+    uint8_t m_blue;
+    uint8_t m_green;
+    uint8_t m_red;
+  private:
+    uint8_t m_reserved;
+
+  public:
+    Color(uint8_t const red, uint8_t const green, uint8_t const blue);
+  };
+
   enum class Interrupt : uint32_t
   {
     Line = 0x1,
@@ -72,14 +84,16 @@ public: //Declarations
   static_assert(sizeof(Layer) == 17 * 4, "Layer size is wrong");
 
 public: //Methods
-  void enable() volatile;
+  void enable(uint16_t const activeWidth, uint16_t const hSync, uint16_t const hBackPorch, uint16_t const HFP,
+              uint16_t const activeHeight, uint16_t const vSync, uint16_t const vBackPorch, uint16_t const VFP) volatile;
   void setSync(uint16_t const hSync, uint16_t const vSync) volatile;
   void setBackPorch(uint16_t const hBP, uint16_t const vBP) volatile;
   void setActiveWidth(uint16_t const width, uint16_t const height) volatile;
   void setTotalWidth(uint16_t const width, uint16_t const height) volatile;
   void immediateReload() volatile;
   void blankingReload() volatile;
-  void setBgColor(uint8_t const r, uint8_t const g, uint8_t const b) volatile;
+  Color volatile const& getBgColor() volatile;
+  void setBgColor(Color const color) volatile;
 
   void enableInterrupt(Interrupt const interrupt) volatile;
   void disableInterrupt(Interrupt const interrupt) volatile;
@@ -126,6 +140,9 @@ private: //TODO: this structure is placed on top of LCD-TFT register so the ones
 private:
   LCD();
 }; //class LCD
+
+bool operator==(LCD::Color volatile const& lhs, LCD::Color volatile const& rhs);
+bool operator!=(LCD::Color volatile const& lhs, LCD::Color volatile const& rhs);
 
 static_assert(sizeof(LCD) == 0x148, "LCD size is not correct, spec says 0x148 bytes.");
 

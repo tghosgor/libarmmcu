@@ -40,10 +40,19 @@ GPIO::Port::OPin LCD::m_CSX = RCC::enablePeriph<RCC::GPIOC>()->createPin(2 , GPI
 
 SPI volatile* LCD::m_spi5 = RCC::enablePeriph<RCC::SPI5>();
 
+LCD::Color::Color(uint8_t const red, uint8_t const green, uint8_t const blue)
+  : m_reserved(0u)
+  , m_red(red)
+  , m_green(green)
+  , m_blue(blue)
+{ }
+
 LCD::LCD()
 { }
 
-void LCD::enable() volatile
+void LCD::enable(
+    uint16_t const activeWidth, uint16_t const hSync, uint16_t const hBackPorch, uint16_t const HFP,
+    uint16_t const activeHeight, uint16_t const vSync, uint16_t const vBackPorch, uint16_t const VFP) volatile
 {
   m_RDX.setOutputSpeed(GPIO::Port::OPin::OutputSpeed::Fast);
   m_WRX.setOutputSpeed(GPIO::Port::OPin::OutputSpeed::Fast);
@@ -125,12 +134,12 @@ void LCD::enable() volatile
   m_CSX.reset();
   m_CSX.set();
 
+  m_spi5->enable(SPI::DataFrame::_8Bit);
   m_spi5->setBaudPrescaler(SPI::BaudPSC::_16);
   m_spi5->setUnidirectionalMode();
   m_spi5->enableSoftwareSlaveMode();
-  //m_spi5->enableInternalSlaveSelect();
+  m_spi5->enableInternalSlaveSelect();
   m_spi5->setMasterMode();
-  m_spi5->enable(SPI::DataFrame::_8Bit);
 
   /*Configure LCD*/
   selectReg(0xCA);
@@ -208,7 +217,7 @@ void LCD::enable() volatile
   selectReg(LCD_GRAM);
   //LCD_Delay(200);
   uint32_t volatile i = 0;
-  while(++i < 19999999); //temporary enough?
+  while(++i < 9999999); //temporary enough?
 
   selectReg(LCD_GAMMA);
   writeReg(0x01);
@@ -249,12 +258,16 @@ void LCD::enable() volatile
   selectReg(LCD_SLEEP_OUT);
   //LCD_Delay(200);
   i = 0;
-  while(++i < 19999999); //temporary enough?
+  while(++i < 9999999); //temporary enough?
 
   selectReg(LCD_DISPLAY_ON);
   /* GRAM start writing */
   selectReg(LCD_GRAM);
 
+  setSync(hSync, vSync);;
+  setBackPorch(hSync + hBackPorch, vSync + vBackPorch);
+  setActiveWidth(activeWidth + hSync + hBackPorch, activeHeight + vSync + vBackPorch);
+  setTotalWidth(activeWidth + hSync + hBackPorch + HFP, activeHeight + vSync + vBackPorch + VFP);
   m_GCR |= 0x1 <<0;
 }
 
@@ -292,10 +305,15 @@ void LCD::blankingReload() volatile
   m_SRCR |= 0x1 <<1;
 }
 
-void LCD::setBgColor(uint8_t const r, uint8_t const g, uint8_t const b) volatile
+LCD::Color const volatile& LCD::getBgColor() volatile
+{
+  return reinterpret_cast<Color const volatile&>(m_BCCR);
+}
+
+void LCD::setBgColor(Color const color) volatile
 {
   m_BCCR &= 0xFF000000;
-  m_BCCR |= static_cast<uint32_t const>(r) <<16 | static_cast<uint32_t const>(g) <<8 | static_cast<uint32_t const>(b) <<0;
+  m_BCCR |= *reinterpret_cast<uint32_t const* const>(&color);
 }
 
 void LCD::enableInterrupt(Interrupt const interrupt) volatile
@@ -328,6 +346,16 @@ void LCD::writeReg(uint8_t const value) volatile
   m_spi5->send(value);
   //set LCD control line - SPI deselect?
   m_CSX.set();
+}
+
+bool operator==(LCD::Color volatile const& lhs, LCD::Color volatile const& rhs)
+{
+  return (reinterpret_cast<uint32_t volatile const&>(lhs) & 0x00FFFFFF) == (reinterpret_cast<uint32_t volatile const&>(rhs) & 0x00FFFFFF);
+}
+
+bool operator!=(LCD::Color volatile const& lhs, LCD::Color volatile const& rhs)
+{
+  return !operator==(lhs, rhs);
 }
 
 } //NS stm32f429
