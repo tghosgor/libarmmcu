@@ -54,6 +54,42 @@ void LCD::enable(
     uint16_t const activeWidth, uint16_t const hSync, uint16_t const hBackPorch, uint16_t const HFP,
     uint16_t const activeHeight, uint16_t const vSync, uint16_t const vBackPorch, uint16_t const VFP) volatile
 {
+  RCC::instance()->m_CR &= ~(0x1 <<24); //PLLON OFF
+  while (RCC::instance()->m_CR & (0x1 <<25))
+  { }
+  RCC::instance()->m_PLLCFGR &= ~(0x3F <<0);
+  RCC::instance()->m_PLLCFGR |= 8 <<0; //PLL division PLLM
+  RCC::instance()->m_PLLCFGR &= ~(0x1FF <<6);
+  RCC::instance()->m_PLLCFGR |= 360 <<6; //PLL multiplication PLLN
+  RCC::instance()->m_PLLCFGR &= ~(0x3 <<16);
+  RCC::instance()->m_PLLCFGR |= 0x0 <<16; //PLL division for main system clock PLLP
+  RCC::instance()->m_PLLCFGR &= ~(0xF <<24);
+  RCC::instance()->m_PLLCFGR |=  7 <<24; //PLL main division for usb otg fs, sdio, rng PLLQ
+  RCC::instance()->m_PLLCFGR |= 0x1 <<22; //PLL source is HSE
+
+  RCC::instance()->m_CR |= 0x1 <<16; //HSEON
+  while (! RCC::instance()->m_CR & (0x1 <<17))
+  { }
+  RCC::instance()->m_CR |= 0x1 <<24; //PLLON
+  while (!RCC::instance()->m_CR & (0x1 <<25))
+  { }
+
+  //*reinterpret_cast<uint8_t* const>(0x40023C00) = 5; //FLASH Latency 5
+  //RCC::instance()->m_CFGR |= 0x2 <<0; //PLL as SYSCLK
+  //RCC::instance()->m_CFGR |= 0x0 <<4; //AHB PSC 1
+  //RCC::instance()->m_CFGR |= 0x5 <<10; //APB1 PSC 4
+  //RCC::instance()->m_CFGR |= 0x4 <<13; //APB2 PSC 2
+
+  RCC::instance()->disablePLLSAI();
+  while(RCC::instance()->isPLLSAIReady())
+  { }
+  RCC::instance()->setPLLSAIMFactor(192);
+  RCC::instance()->setPLLSAIDFactor(4);
+  RCC::instance()->setPLLSAIDIVR(RCC::PLLSAIDIVR::_8);
+  RCC::instance()->enablePLLSAI();
+  while(!RCC::instance()->isPLLSAIReady())
+  { }
+
   m_RDX.setOutputSpeed(GPIO::Port::OPin::OutputSpeed::Fast);
   m_WRX.setOutputSpeed(GPIO::Port::OPin::OutputSpeed::Fast);
   m_CSX.setOutputSpeed(GPIO::Port::OPin::OutputSpeed::Fast);

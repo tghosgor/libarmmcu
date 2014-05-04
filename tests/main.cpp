@@ -43,30 +43,6 @@ using namespace stm32f429;
 bool exti0Handler();
 bool exti3Handler();
 
-extern "C" void SystemInit()
-{
-  /* Reset the RCC clock configuration to the default reset state ------------*/
-  /* Set HSION bit */
-  RCC::instance()->m_CR |= (uint32_t)0x00000001;
-
-  /* Reset CFGR register */
-  RCC::instance()->m_CFGR = 0x00000000;
-
-  /* Reset HSEON, CSSON and PLLON bits */
-  RCC::instance()->m_CR &= (uint32_t)0xFEF6FFFF;
-
-  /* Reset PLLCFGR register */
-  RCC::instance()->m_PLLCFGR = 0x24003010;
-
-  /* Reset HSEBYP bit */
-  RCC::instance()->m_CR &= (uint32_t)0xFFFBFFFF;
-
-  /* Disable all interrupts */
-  RCC::instance()->m_CIR = 0x00000000;
-
-  SCB::instance()->m_VTOR = reinterpret_cast<uint32_t>(&ivTable);
-}
-
 /*auto portA = RCC::enablePeriph<RCC::GPIOA>();
 auto portApin0 = portA->createPin(0, GPIO::Port::InputPin);
 
@@ -88,11 +64,21 @@ int main()
 {
   portGpin13.set();
 
-SET_UP_TIM:
-  auto TIM1 = RCC::enablePeriph<RCC::TIM1>();
-  TIM1->setAutoReloadValue(std::numeric_limits<uint16_t>::max());
-  TIM1->setPrescalerValue(1000);
-  TIM1->enable();
+SET_UP_LCD:
+  constexpr unsigned ActiveWidth = 240;
+  constexpr unsigned ActiveHeight = 320;
+
+  constexpr unsigned hSync = 10;
+  constexpr unsigned HBP = 20;
+  constexpr unsigned HFP = 10;
+
+  constexpr unsigned vSync = 2;
+  constexpr unsigned VBP = 2;
+  constexpr unsigned VFP = 4;
+
+  auto lcd0 = RCC::enablePeriph<RCC::LTDC>();
+  lcd0->enable(ActiveWidth, hSync, HBP, HFP, ActiveHeight, vSync, VBP, VFP);
+  lcd0->setBgColor({255, 0, 0});
 
 SET_UP_EXTI0:
   //Configure EXTI0 to PA0 Rising Edge
@@ -107,57 +93,12 @@ SET_UP_EXTI0:
   exti2->enableRisingTrigger();
   exti2->enableInterrupt();*/
 
-SET_UP_LCD:
-  constexpr unsigned ActiveWidth = 240;
-  constexpr unsigned ActiveHeight = 320;
-
-  constexpr unsigned hSync = 10;
-  constexpr unsigned HBP = 20;
-  constexpr unsigned HFP = 10;
-
-  constexpr unsigned vSync = 2;
-  constexpr unsigned VBP = 2;
-  constexpr unsigned VFP = 4;
-
-  RCC::instance()->m_CR &= ~(0x1 <<24); //PLLON OFF
-  while (RCC::instance()->m_CR & (0x1 <<25))
-  { }
-  RCC::instance()->m_PLLCFGR &= ~(0x3F <<0);
-  RCC::instance()->m_PLLCFGR |= 8 <<0; //PLL division PLLM
-  RCC::instance()->m_PLLCFGR &= ~(0x1FF <<6);
-  RCC::instance()->m_PLLCFGR |= 360 <<6; //PLL multiplication PLLN
-  RCC::instance()->m_PLLCFGR &= ~(0x3 <<16);
-  RCC::instance()->m_PLLCFGR |= 0x0 <<16; //PLL division for main system clock PLLP
-  RCC::instance()->m_PLLCFGR &= ~(0xF <<24);
-  RCC::instance()->m_PLLCFGR |=  7 <<24; //PLL main division for usb otg fs, sdio, rng PLLQ
-  RCC::instance()->m_PLLCFGR |= 0x1 <<22; //PLL source is HSE
-
-  RCC::instance()->m_CR |= 0x1 <<16; //HSEON
-  while (! RCC::instance()->m_CR & (0x1 <<17))
-  { }
-  RCC::instance()->m_CR |= 0x1 <<24; //PLLON
-  while (!RCC::instance()->m_CR & (0x1 <<25))
-  { }
-
-  //*reinterpret_cast<uint8_t* const>(0x40023C00) = 5; //FLASH Latency 5
-  //RCC::instance()->m_CFGR |= 0x2 <<0; //PLL as SYSCLK
-  //RCC::instance()->m_CFGR |= 0x0 <<4; //AHB PSC 1
-  //RCC::instance()->m_CFGR |= 0x5 <<10; //APB1 PSC 4
-  //RCC::instance()->m_CFGR |= 0x4 <<13; //APB2 PSC 2
-
-  RCC::instance()->disablePLLSAI();
-  while(RCC::instance()->isPLLSAIReady())
-  { }
-  RCC::instance()->setPLLSAIMFactor(192);
-  RCC::instance()->setPLLSAIDFactor(4);
-  RCC::instance()->setPLLSAIDIVR(RCC::PLLSAIDIVR::_8);
-  RCC::instance()->enablePLLSAI();
-  while(!RCC::instance()->isPLLSAIReady())
-  { }
-
-  auto lcd0 = RCC::enablePeriph<RCC::LTDC>();
-  lcd0->enable(ActiveWidth, hSync, HBP, HFP, ActiveHeight, vSync, VBP, VFP);
-  lcd0->setBgColor({255, 0, 0});
+//Temporary Test Loop
+SET_UP_TIM:
+  auto TIM1 = RCC::enablePeriph<RCC::TIM1>();
+  TIM1->setAutoReloadValue(std::numeric_limits<uint16_t>::max());
+  TIM1->setPrescalerValue(1000);
+  TIM1->enable();
 
   while(true)
   {
