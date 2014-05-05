@@ -81,6 +81,14 @@ public: //Declarations
   using SPI1 = Module<0x44, 12, SPI, 0x40013000>;
   using SPI5 = Module<0x44, 20, SPI, 0x40015000>;
 
+  enum class PLLSAIDiv : uint32_t
+  {
+    _2 = 0,
+    _4 = 1,
+    _8 = 2,
+    _16 = 3
+  };
+
 public: //Methods
   RCC() = delete;
 
@@ -89,45 +97,23 @@ public: //Methods
   template<class Module>
   static typename Module::RegType volatile* enablePeriph();
 
-  bool isPLLSAIReady() volatile
+  bool isPLLSAILocked() volatile
   {
     return m_CR & (0x1 <<29);
   }
 
-  void enablePLLSAI() volatile
+  void enablePLLSAI(uint8_t const LCDDivision, uint8_t const SAI1Division, uint16_t const VCODivision, PLLSAIDiv const LCDClkDivision) volatile
   {
+    m_PLLSAICFGR &= ~(0x01FF <<6 | 0x0F <<24 | 0x07 <<28);
+    m_PLLSAICFGR |= (VCODivision & 0x01FF <<6) <<6 | (SAI1Division & 0x0F) <<24 | (LCDDivision & 0x07) <<28;
+    m_DCKCFGR &= ~(0x3 <<16);
+    m_DCKCFGR |= static_cast<uint32_t>(LCDClkDivision) <<16;
     m_CR |= 0x1 <<28;
   }
 
   void disablePLLSAI() volatile
   {
     m_CR &= ~(0x1 <<28);
-  }
-
-  void setPLLSAIMFactor(uint16_t const factor) volatile
-  {
-    m_PLLSAICFGR &= ~(0x01FF <<6);
-    m_PLLSAICFGR |= (factor & 0x01FF) <<6;
-  }
-
-  void setPLLSAIDFactor(uint8_t const factor) volatile
-  {
-    m_PLLSAICFGR &= ~(0x07 <<28);
-    m_PLLSAICFGR |= (factor & 0x07) <<28;
-  }
-
-  enum class PLLSAIDIVR : uint32_t
-  {
-    _2 = 0,
-    _4 = 1,
-    _8 = 2,
-    _16 = 3
-  };
-
-  void setPLLSAIDIVR(PLLSAIDIVR const divr) volatile
-  {
-    m_DCKCFGR &= ~(0x3 <<16);
-    m_DCKCFGR |= static_cast<uint32_t>(divr) <<16;
   }
 
 public: //Registers

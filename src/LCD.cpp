@@ -57,13 +57,10 @@ void LCD::enable(
   RCC::instance()->m_CR &= ~(0x1 <<24); //PLLON OFF
   while (RCC::instance()->m_CR & (0x1 <<25))
   { }
-  RCC::instance()->m_PLLCFGR &= ~(0x3F <<0);
+  RCC::instance()->m_PLLCFGR &= ~(0x3F <<0 | 0x1FF <<6 | 0x3 <<16 | 0xF <<24);
   RCC::instance()->m_PLLCFGR |= 8 <<0; //PLL division PLLM
-  RCC::instance()->m_PLLCFGR &= ~(0x1FF <<6);
   RCC::instance()->m_PLLCFGR |= 360 <<6; //PLL multiplication PLLN
-  RCC::instance()->m_PLLCFGR &= ~(0x3 <<16);
   RCC::instance()->m_PLLCFGR |= 0x0 <<16; //PLL division for main system clock PLLP
-  RCC::instance()->m_PLLCFGR &= ~(0xF <<24);
   RCC::instance()->m_PLLCFGR |=  7 <<24; //PLL main division for usb otg fs, sdio, rng PLLQ
   RCC::instance()->m_PLLCFGR |= 0x1 <<22; //PLL source is HSE
 
@@ -81,13 +78,10 @@ void LCD::enable(
   //RCC::instance()->m_CFGR |= 0x4 <<13; //APB2 PSC 2
 
   RCC::instance()->disablePLLSAI();
-  while(RCC::instance()->isPLLSAIReady())
+  while(RCC::instance()->isPLLSAILocked())
   { }
-  RCC::instance()->setPLLSAIMFactor(192);
-  RCC::instance()->setPLLSAIDFactor(4);
-  RCC::instance()->setPLLSAIDIVR(RCC::PLLSAIDIVR::_8);
-  RCC::instance()->enablePLLSAI();
-  while(!RCC::instance()->isPLLSAIReady())
+  RCC::instance()->enablePLLSAI(4, 4, 192, RCC::PLLSAIDiv::_8);
+  while(!RCC::instance()->isPLLSAILocked())
   { }
 
   m_RDX.setOutputSpeed(GPIO::Port::OPin::OutputSpeed::Fast);
