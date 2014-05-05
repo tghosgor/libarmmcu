@@ -45,14 +45,11 @@ public:
 public: //Declarations
   struct Color
   {
-    uint8_t m_blue;
-    uint8_t m_green;
-    uint8_t m_red;
-  private:
-    uint8_t m_reserved;
-
   public:
     Color(uint8_t const red, uint8_t const green, uint8_t const blue);
+
+  private:
+    uint32_t m_color;
   };
 
   enum class Interrupt : uint32_t

@@ -31,6 +31,8 @@
 
 #include <SPI.h>
 
+#include <st_logo1.h>
+
 namespace stm32f429
 {
 
@@ -41,10 +43,7 @@ GPIO::Port::OPin LCD::m_CSX = RCC::enablePeriph<RCC::GPIOC>()->createPin(2 , GPI
 SPI volatile* LCD::m_spi5 = RCC::enablePeriph<RCC::SPI5>();
 
 LCD::Color::Color(uint8_t const red, uint8_t const green, uint8_t const blue)
-  : m_reserved(0u)
-  , m_red(red)
-  , m_green(green)
-  , m_blue(blue)
+  : m_color(static_cast<uint32_t>(red) <<16 | static_cast<uint32_t>(green) <<8 | static_cast<uint32_t>(blue) <<0)
 { }
 
 LCD::LCD()
@@ -298,7 +297,24 @@ void LCD::enable(
   setBackPorch(hSync + hBackPorch, vSync + vBackPorch);
   setActiveWidth(activeWidth + hSync + hBackPorch, activeHeight + vSync + vBackPorch);
   setTotalWidth(activeWidth + hSync + hBackPorch + HFP, activeHeight + vSync + vBackPorch + VFP);
+
   m_GCR |= 0x1 <<0;
+
+  m_layer1.m_CR |= 0x1;
+  m_layer1.m_WHPCR |= ((0 + ((m_BPCR & 0x0FFF0000) >> 16) + 1) | ((240 + ((m_BPCR & 0x0FFF0000) >> 16)) << 16));
+  m_layer1.m_WVPCR |= ((0 + (m_BPCR & 0x000007FF) + 1) | ((160 + (m_BPCR & 0x000007FF)) << 16));
+  //m_layer1.m_WHPCR = 240 <<16;
+  //m_layer1.m_WVPCR = 160 <<16;
+  m_layer1.m_PFCR |= 0x2; //LTDC_PIXEL_FORMAT_RGB565+
+  m_layer1.m_DCCR = 0;//default color
+  m_layer1.m_CACR |= 255;
+  m_layer1.m_BFCR |= 0x6 <<6 | 0x7; //LTDC_BLENDING_FACTOR2_PAxCA
+  m_layer1.m_CFBAR = reinterpret_cast<uint32_t>(&ST_LOGO_1);
+  m_layer1.m_CFBLR |= ((240 * 2) <<16) | (240 * 2 + 3); //pitch increment from one line of pixels to another <<16 | Active high width x number of bytes per pixel + 3
+  m_layer1.m_CFBLNR |= 160;
+  m_layer1.m_CR |= 0x1;
+
+  immediateReload();
 }
 
 void LCD::setSync(uint16_t const hSync, uint16_t const vSync) volatile
