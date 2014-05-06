@@ -1,7 +1,7 @@
 
 namespace stm32f429
 {
-namespace fonts
+namespace font
 {
 
 unsigned char constexpr basic[95][13] = {

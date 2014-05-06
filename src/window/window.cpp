@@ -52,4 +52,6 @@ std::size_t const& Window::getWidth() const { return m_area.m_width; }
 
 std::size_t const& Window::getHeight() const { return m_area.m_height; }
 
+void* Window::getBuffer() { return m_frameBuffer.buffer; }
+
 }//NS stm32f429

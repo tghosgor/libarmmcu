@@ -27,9 +27,9 @@
 #ifndef TEXT_WINDOW_H_
 #define TEXT_WINDOW_H_
 
-#include <string>
-
 #include <window/window.h>
+
+#include <string>
 
 namespace stm32f429
 {

@@ -24,29 +24,34 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <font/ubuntu_bold.h>
-#include <window/text_window.h>
-
 #include <font/utft.h>
 
-#include <algorithm>
+#include <window/window.h>
+
 #include <cstring>
 
 namespace stm32f429
 {
+namespace font
+{
 
-TextWindow::TextWindow(Window& parent, Area const area)
-  : Window(parent, area)
+UTFT::UTFT(uint8_t const* const utftFont, Window &desktop)
+  : m_utftFont(utftFont)
+  , m_desktop(desktop)
 { }
 
-TextWindow& TextWindow::operator<<(const char* const text)
+void UTFT::writeCharacter(char const c, std::size_t offset)
 {
-  memset(m_frameBuffer.buffer, 0xFF, std::min(m_frameBuffer.size, 240u*2u));
+  uint8_t const offsetInArr = 4 + (c - 32) * m_utftFont[3];
+  //std::size_t const leftPadding = reinterpret_cast<std::size_t>(position) % m_desktop.getWidth();
+  uint8_t height = m_utftFont[1];
 
-  m_frameBuffer.buffer += std::min(m_frameBuffer.size, 240u*2u);
-
-  font::UTFT utft(font::ubuntuBold, *this);
-  utft.writeCharacter('c', 2000);
+  for(;height > 0; --height)
+  {
+    memcpy(m_desktop.getBuffer() + offset * m_utftFont[1], m_utftFont + offsetInArr, m_utftFont[0]);
+    offset += m_desktop.getWidth() * 2u;
+  }
 }
 
+}//NS font
 }//NS stm32f429

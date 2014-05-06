@@ -42,6 +42,11 @@ file(GLOB window_SRC
     "src/window/*.cpp"
 )
 
+file(GLOB font_SRC
+    "include/font/*.h"
+    "src/font/*.cpp"
+)
+
 include_directories(
   "include"
   "ext/freetype2/include"
@@ -50,6 +55,6 @@ include_directories(
 #add_library(driver ${driver_SRC})
 #add_library(window ${window_SRC})
 
-add_executable(stm32f429i-disco tests/main.cpp src/System.cpp misc/startup_stm32f429xx.S misc/STM32F429ZI_FLASH.ld ${driver_SRC} ${window_SRC} README.md)
+add_executable(stm32f429i-disco tests/main.cpp src/System.cpp misc/startup_stm32f429xx.S misc/STM32F429ZI_FLASH.ld ${driver_SRC} ${window_SRC} ${font_SRC} README.md)
 #target_link_libraries(stm32f429i-disco driver_OBJ window_OBJ)
 

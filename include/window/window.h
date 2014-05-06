@@ -59,6 +59,8 @@ public:
   std::size_t const& getWidth() const;
   std::size_t const& getHeight() const;
 
+  void* getBuffer();
+
 protected:
   FrameBuffer m_frameBuffer;
   Window& m_parent;

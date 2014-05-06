@@ -24,29 +24,31 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <font/ubuntu_bold.h>
-#include <window/text_window.h>
+#ifndef UTFT_H_
+#define UTFT_H_
 
-#include <font/utft.h>
+#include <font/fwd.h>
 
-#include <algorithm>
-#include <cstring>
+#include <cstdint>
 
 namespace stm32f429
 {
-
-TextWindow::TextWindow(Window& parent, Area const area)
-  : Window(parent, area)
-{ }
-
-TextWindow& TextWindow::operator<<(const char* const text)
+namespace font
 {
-  memset(m_frameBuffer.buffer, 0xFF, std::min(m_frameBuffer.size, 240u*2u));
 
-  m_frameBuffer.buffer += std::min(m_frameBuffer.size, 240u*2u);
+class UTFT
+{
+public:
+  UTFT(uint8_t const* const utftFont, Window& desktop);
 
-  font::UTFT utft(font::ubuntuBold, *this);
-  utft.writeCharacter('c', 2000);
-}
+  void writeCharacter(char const c, std::size_t offset);
 
+private:
+  Window& m_desktop;
+  uint8_t const* const m_utftFont;
+};
+
+}//NS font
 }//NS stm32f429
+
+#endif
