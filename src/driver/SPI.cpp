@@ -24,10 +24,10 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <GPIO.h>
-#include <RCC.h>
+#include <driver/GPIO.h>
+#include <driver/RCC.h>
 
-#include <SPI.h>
+#include <driver/SPI.h>
 
 namespace stm32f429
 {

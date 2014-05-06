@@ -24,15 +24,15 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <EXTI.h>
-#include <IVTable.h>
-#include <GPIO.h>
-#include <LCD.h>
-#include <RCC.h>
-#include <NVIC.h>
-#include <SCB.h>
-#include <SYSCFG.h>
-#include <TIM.h>
+#include <driver/EXTI.h>
+#include <driver/IVTable.h>
+#include <driver/GPIO.h>
+#include <driver/LCD.h>
+#include <driver/RCC.h>
+#include <driver/NVIC.h>
+#include <driver/SCB.h>
+#include <driver/SYSCFG.h>
+#include <driver/TIM.h>
 
 #include <cstring>
 #include <cstdint>
@@ -163,6 +163,9 @@ extern "C" void _getpid()
 {
 }
 extern "C" void _sbrk()
+{
+}
+extern "C" void _open()
 {
 }
 extern "C" void _write()

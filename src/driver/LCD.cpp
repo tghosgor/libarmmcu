@@ -27,11 +27,16 @@
 #ifndef LCD_CPP_
 #define LCD_CPP_
 
-#include <LCD.h>
+#include <driver/LCD.h>
 
-#include <SPI.h>
+#include <driver/SPI.h>
+#include <window/desktop.h>
+#include <window/text_window.h>
 
-#include <st_logo1.h>
+
+//#include <st_logo1.h>
+//#include <fonts/basic.h>
+//#include <img/smiley.h>
 
 namespace stm32f429
 {
@@ -300,19 +305,40 @@ void LCD::enable(
 
   m_GCR |= 0x1 <<0;
 
-  m_layer1.m_CR |= 0x1;
-  m_layer1.m_WHPCR |= ((0 + ((m_BPCR & 0x0FFF0000) >> 16) + 1) | ((240 + ((m_BPCR & 0x0FFF0000) >> 16)) << 16));
-  m_layer1.m_WVPCR |= ((0 + (m_BPCR & 0x000007FF) + 1) | ((160 + (m_BPCR & 0x000007FF)) << 16));
+  /*uint32_t const imageWidth = smiley.width;
+  uint32_t const imageHeight = smiley.height;
+  uint32_t volatile const fbData = reinterpret_cast<uint32_t const volatile>(smiley.pixel_data);
+  uint8_t const bytesPerPixel = smiley.bytes_per_pixel;*/
+
+  extern uint8_t*  FrameBuffer;
+
+  uint32_t const windowWidth = 240;
+  uint32_t const windowHeight = 300;
+  uint32_t volatile const fbData = reinterpret_cast<uint32_t const volatile>(&FrameBuffer);
+  uint8_t const bytesPerPixel = 2;
+
+  m_layer1.m_WHPCR &= ~(0xF000F000);
+  m_layer1.m_WHPCR |= ((0 + ((m_BPCR & 0x0FFF0000) >> 16) + 1) | ((windowWidth + ((m_BPCR & 0x0FFF0000) >> 16)) << 16));
+  m_layer1.m_WVPCR &= ~(0xF800F800);
+  m_layer1.m_WVPCR |= ((0 + (m_BPCR & 0x000007FF) + 1) | ((windowHeight + (m_BPCR & 0x000007FF)) << 16));
   //m_layer1.m_WHPCR = 240 <<16;
   //m_layer1.m_WVPCR = 160 <<16;
+
   m_layer1.m_PFCR |= 0x2; //LTDC_PIXEL_FORMAT_RGB565+
   m_layer1.m_DCCR = 0;//default color
   m_layer1.m_CACR |= 255;
   m_layer1.m_BFCR |= 0x6 <<6 | 0x7; //LTDC_BLENDING_FACTOR2_PAxCA
-  m_layer1.m_CFBAR = reinterpret_cast<uint32_t>(&ST_LOGO_1);
-  m_layer1.m_CFBLR |= ((240 * 2) <<16) | (240 * 2 + 3); //pitch increment from one line of pixels to another <<16 | Active high width x number of bytes per pixel + 3
-  m_layer1.m_CFBLNR |= 160;
+  //m_layer1.m_CFBAR = reinterpret_cast<uint32_t>(&ST_LOGO_1);
+  m_layer1.m_CFBAR = fbData;
+  m_layer1.m_CFBLR &= ~(0xE000E000);
+  m_layer1.m_CFBLR |= ((windowWidth * bytesPerPixel) <<16) | (windowWidth * bytesPerPixel + 3); //pitch increment from one line of pixels to another <<16 | Active high width x number of bytes per pixel + 3
+  m_layer1.m_CFBLNR &= ~(0x3FF);
+  m_layer1.m_CFBLNR |= windowHeight;
   m_layer1.m_CR |= 0x1;
+
+  Desktop desktop;
+  TextWindow textWindow(desktop);
+  textWindow << "asd";
 
   immediateReload();
 }

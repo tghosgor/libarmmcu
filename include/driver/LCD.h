@@ -29,8 +29,8 @@
 
 #include <cstdint>
 
-#include <GPIO.h>
-#include <RCC.h>
+#include <driver/GPIO.h>
+#include <driver/RCC.h>
 
 namespace stm32f429
 {

@@ -27,7 +27,7 @@
 #ifndef NVIC_CPP_
 #define NVIC_CPP_
 
-#include <NVIC.h>
+#include <driver/NVIC.h>
 
 namespace stm32f429
 {

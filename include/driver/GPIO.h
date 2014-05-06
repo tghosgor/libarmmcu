@@ -30,7 +30,7 @@
 #include <cstdint>
 #include <type_traits>
 
-#include <fwd.h>
+#include <driver/fwd.h>
 
 namespace stm32f429
 {

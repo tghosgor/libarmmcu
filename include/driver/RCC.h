@@ -29,11 +29,11 @@
 
 #include <cstdint>
 
-#include <PLL.h>
-#include <SYSCFG.h>
-#include <TIM.h>
+#include <driver/PLL.h>
+#include <driver/SYSCFG.h>
+#include <driver/TIM.h>
 
-#include <fwd.h>
+#include <driver/fwd.h>
 #include <util.h>
 
 namespace stm32f429

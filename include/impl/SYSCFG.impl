@@ -27,7 +27,7 @@
 #ifndef SYSCFG_CPP_
 #define SYSCFG_CPP_
 
-#include <SYSCFG.h>
+#include <driver/SYSCFG.h>
 
 namespace stm32f429
 {

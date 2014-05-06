@@ -24,11 +24,31 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <IVTable.h>
+#ifndef PLL_CPP_
+#define PLL_CPP_
+
+#include <driver/PLL.h>
 
 namespace stm32f429
 {
 
-IVTable ivTable alignas(64 * 4);
+void PLL::setMultiplicationFactor(uint16_t const factor) volatile
+{
+//  m_PLLSAICFGR &= ~(0x01FF <<6);
+//  m_PLLSAICFGR |= factor <<6;
+}
+
+void PLL::setDivisionFactor(uint8_t const factor) volatile
+{
+//  m_PLLSAICFGR &= ~(0x07 <<28);
+//  m_PLLSAICFGR |= (factor & 0x0F) <<28;
+}
+
+bool PLL::isReady() volatile
+{
+//  return ( *(&m_PLLSAICFGR - 1) ) & (0x1 <<29);
+}
 
 } //NS stm32f429
+
+#endif /* PLL_CPP_ */

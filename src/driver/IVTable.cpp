@@ -24,76 +24,11 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SPI_H_
-#define SPI_H_
-
-#include <cstdint>
-
-#include <fwd.h>
-#include <util.h>
+#include <driver/IVTable.h>
 
 namespace stm32f429
 {
 
-class SPI
-{
-  friend class RCC;
-
-public: //Declarations
-  enum : uint32_t
-  {
-    _1 = 0x40013000,
-    _5 = 0x40015000
-  };
-
-  enum class DataFrame : bool
-  {
-    _8Bit = false,
-    _16Bit = true
-  };
-
-  enum class BaudPSC : uint8_t
-  {
-    _0 = 0,
-    _4 = 1,
-    _8 = 2,
-    _16 = 3,
-    _32 = 4,
-    _64 = 5,
-    _128 = 6,
-    _256 = 7
-  };
-
-public: //Methods
-  void enable(DataFrame const dataFrameFormat = DataFrame::_8Bit, bool const enableHardwareCRC = false) volatile;
-  void setMasterMode() volatile;
-  void setSlaveMode() volatile;
-  void setBidirectionalMode() volatile;
-  void setUnidirectionalMode() volatile;
-  void setBaudPrescaler(BaudPSC const psc) volatile;
-  void enableSoftwareSlaveMode() volatile;
-  void disableSoftwareSlaveMode() volatile;
-  void enableInternalSlaveSelect() volatile;
-  void disableInternalSlaveSelect() volatile;
-  void send(uint16_t data) volatile;
-
-  DataFrame getDataFrameFormat() volatile const;
-
-private:
-  uint32_t m_CR1;
-  uint32_t m_CR2;
-  uint32_t m_SR;
-  uint32_t m_DR;
-  uint32_t m_CRCPR;
-  uint32_t m_RXCRCR;
-  uint32_t m_TXCRCR;
-  uint32_t m_I2SCFGR;
-  uint32_t m_I2SPR;
-
-private:
-  SPI() { }
-};
+IVTable ivTable alignas(64 * 4);
 
 } //NS stm32f429
-
-#endif /* SPI_H_ */

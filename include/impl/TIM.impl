@@ -27,7 +27,7 @@
 #ifndef TIM_CPP_
 #define TIM_CPP_
 
-#include <TIM.h>
+#include <driver/TIM.h>
 
 namespace stm32f429
 {
