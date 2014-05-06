@@ -337,8 +337,8 @@ void LCD::enable(
   m_layer1.m_CR |= 0x1;
 
   Desktop desktop({reinterpret_cast<void*>(fbData), windowWidth * windowHeight * 4}, windowWidth, windowHeight);
-  TextWindow textWindow(desktop, {0, 0, 100, 200});
-  textWindow << "asd";
+  TextWindow textWindow(desktop, {0, 0, 240, 300});
+  textWindow << "NABER LAN?";
 
   immediateReload();
 }

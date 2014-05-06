@@ -41,11 +41,11 @@ class UTFT
 public:
   UTFT(uint8_t const* const utftFont, Window& desktop);
 
-  void writeCharacter(char const c, std::size_t offset);
+  uint8_t const writeCharacter(char const c, std::size_t const offset);
 
 private:
   Window& m_desktop;
-  uint8_t const* const m_utftFont;
+  uint8_t const* const m_UTFTFont;
 };
 
 }//NS font

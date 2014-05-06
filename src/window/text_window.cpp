@@ -24,10 +24,11 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <font/ubuntu_bold.h>
 #include <window/text_window.h>
 
 #include <font/utft.h>
+#include <font/arial_normal.h>
+#include <font/ubuntu_bold.h>
 
 #include <algorithm>
 #include <cstring>
@@ -39,14 +40,17 @@ TextWindow::TextWindow(Window& parent, Area const area)
   : Window(parent, area)
 { }
 
-TextWindow& TextWindow::operator<<(const char* const text)
+TextWindow& TextWindow::operator<<(const char* text)
 {
-  memset(m_frameBuffer.buffer, 0xFF, std::min(m_frameBuffer.size, 240u*2u));
+  memset(m_frameBuffer.buffer, 0xFF, std::min(m_frameBuffer.size, 120u*2u));
 
-  m_frameBuffer.buffer += std::min(m_frameBuffer.size, 240u*2u);
-
-  font::UTFT utft(font::ubuntuBold, *this);
-  utft.writeCharacter('c', 2000);
+  font::UTFT utft(font::arialNormal, *this);
+  std::size_t offset = 0;
+  while(*text)
+  {
+    offset += utft.writeCharacter(*text, 240 * 100 + 240 * 32 + offset * 2);
+    ++text;
+  }
 }
 
 }//NS stm32f429

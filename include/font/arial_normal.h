@@ -3,8 +3,8 @@
 // Font size    : 24x32 pixels
 // Memory usage : 9124 bytes
 
-#ifndef UBUNTU_BOLD_H_
-#define UBUNTU_BOLD_H_
+#ifndef ARIAL_NORMAL_H_
+#define ARIAL_NORMAL_H_
 
 #include <cstdint>
 
@@ -13,7 +13,7 @@ namespace stm32f429
 namespace font
 {
 
-extern uint8_t const ubuntuBold[9124];
+extern uint8_t const arialNormal[3044];
   
 }//NS font
 }//NS stm32f429

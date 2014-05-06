@@ -36,21 +36,32 @@ namespace font
 {
 
 UTFT::UTFT(uint8_t const* const utftFont, Window &desktop)
-  : m_utftFont(utftFont)
+  : m_UTFTFont(utftFont)
   , m_desktop(desktop)
 { }
 
-void UTFT::writeCharacter(char const c, std::size_t offset)
+uint8_t const UTFT::writeCharacter(char const c, std::size_t const offset)
 {
-  uint8_t const offsetInArr = 4 + (c - 32) * m_utftFont[3];
-  //std::size_t const leftPadding = reinterpret_cast<std::size_t>(position) % m_desktop.getWidth();
-  uint8_t height = m_utftFont[1];
+  uint8_t const& charWidth = m_UTFTFont[0];
+  uint8_t const& charHeight = m_UTFTFont[1];
+  uint16_t const bitsPerChar = charWidth * charHeight;
+  uint8_t const* character = m_UTFTFont + 4 + (c - 32) * (bitsPerChar / 8);
 
-  for(;height > 0; --height)
+  for(uint8_t height = 0; height < charHeight; ++height)
   {
-    memcpy(m_desktop.getBuffer() + offset * m_utftFont[1], m_utftFont + offsetInArr, m_utftFont[0]);
-    offset += m_desktop.getWidth() * 2u;
+    std::size_t const horizontalOffset = m_desktop.getWidth() * 2u * height;
+
+    for(uint8_t width = 0; width < charWidth; ++width)
+    {
+      bool const pixelState = character[(height * charWidth) / 8 + (width / 8)] & (0x80 >>(width % 8));
+
+      std::size_t const verticalOffset = width * 2u;
+
+      *reinterpret_cast<uint16_t*>(m_desktop.getBuffer() + offset + verticalOffset + horizontalOffset) = pixelState * 0xFFFF;
+    }
   }
+
+  return charWidth;
 }
 
 }//NS font
