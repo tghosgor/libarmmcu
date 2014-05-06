@@ -47,7 +47,7 @@ public:
   };
 
 public:
-  Window(Window& parent, Area const area = {0, 0, 0, 0});
+  Window(Window& parent, Area const area = {0, 0, 0, 0}); //TODO: any way to do , FrameBuffer const fb = parent.m_frameBuffer); ?
 
   void setX(std::size_t const x);
   void setY(std::size_t const y);
