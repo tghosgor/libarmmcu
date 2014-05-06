@@ -336,8 +336,8 @@ void LCD::enable(
   m_layer1.m_CFBLNR |= windowHeight;
   m_layer1.m_CR |= 0x1;
 
-  Desktop desktop;
-  TextWindow textWindow(desktop);
+  Desktop desktop({reinterpret_cast<void*>(fbData), windowWidth * windowHeight * 4}, windowWidth, windowHeight);
+  TextWindow textWindow(desktop, {0, 0, 100, 200});
   textWindow << "asd";
 
   immediateReload();
