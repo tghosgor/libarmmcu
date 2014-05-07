@@ -24,16 +24,17 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <window/desktop.h>
+#include <window/compositor.h>
 
 namespace stm32f429
 {
 
 uint8_t FrameBuffer[240 * 320 * sizeof(uint16_t)];
 
-Desktop::Desktop(FrameBuffer const& fb, std::size_t const width, std::size_t const height)
+Compositor::Compositor(FrameBuffer const& fb, std::size_t const width, std::size_t const height)
   : Window(*this, *this, {0, 0, width, height})
 {
+  char* lost = new char[512];
   m_frameBuffer = fb;
 }
 

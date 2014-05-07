@@ -24,19 +24,19 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef DESKTOP_H_
-#define DESKTOP_H_
+#ifndef COMPOSITOR_H_
+#define COMPOSITOR_H_
 
 #include <window/window.h>
 
 namespace stm32f429
 {
 
-class Desktop
+class Compositor
   : public Window
 {
 public:
-  Desktop(FrameBuffer const& fb, std::size_t const width, std::size_t const height);
+  Compositor(FrameBuffer const& fb, std::size_t const width, std::size_t const height);
 };
 
 }//NS stm32f429
