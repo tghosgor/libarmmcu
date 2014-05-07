@@ -26,31 +26,56 @@
 
 #include <window/text_window.h>
 
-#include <font/utft.h>
-#include <font/arial_normal.h>
-#include <font/ubuntu_bold.h>
-
 #include <algorithm>
 #include <cstring>
 
 namespace stm32f429
 {
 
-TextWindow::TextWindow(Window& parent, Area const area)
-  : Window(parent, area)
+TextWindow::TextWindow(Window& parent, Window& desktop, const uint8_t* const font, Area const area)
+  : Window(parent, desktop, area)
+  , m_font(font)
 { }
 
-TextWindow& TextWindow::operator<<(const char* text)
+TextWindow& TextWindow::operator<<(char const* text)
 {
-  memset(m_frameBuffer.buffer, 0xFF, std::min(m_frameBuffer.size, 120u*2u));
-
-  font::UTFT utft(font::arialNormal, *this);
-  std::size_t offset = 0;
   while(*text)
   {
-    offset += utft.writeCharacter(*text, 240 * 100 + 240 * 32 + offset * 2);
+    *this << *text;
     ++text;
   }
+}
+
+TextWindow& TextWindow::operator<<(char const c)
+{
+  uint8_t const& charWidth = m_font[0];
+  uint8_t const& charHeight = m_font[1];
+  uint8_t const& lineHeight = charHeight;
+
+  uint16_t const bitsPerChar = charWidth * charHeight;
+  uint8_t const* character = m_font + 4 + (c - 32) * (bitsPerChar / 8);
+
+  std::size_t const maxCharPerLine = getWidth() / charWidth;
+  std::size_t const charFbOffset = getY() * m_desktop.getWidth() //offset from top of screen
+      + getX() //offset from left of screen
+      + (m_cursor / maxCharPerLine) * m_desktop.getWidth() * lineHeight * 2 //offset of Nth line
+      + ((m_cursor % maxCharPerLine) * charWidth * 2); //offset of Nth letter in line
+
+  for(uint8_t height = 0; height < charHeight; ++height)
+  {
+    std::size_t const horizontalOffset = m_desktop.getWidth() * 2u * height;
+
+    for(uint8_t width = 0; width < charWidth; ++width)
+    {
+      bool const pixelState = character[(height * charWidth) / 8 + (width / 8)] & (0x80 >>(width % 8));
+
+      std::size_t const verticalOffset = width * 2u;
+
+      *reinterpret_cast<uint16_t*>(m_desktop.getBuffer() + charFbOffset + verticalOffset + horizontalOffset) = pixelState * 0xFFFF;
+    }
+  }
+
+  ++m_cursor;
 }
 
 }//NS stm32f429

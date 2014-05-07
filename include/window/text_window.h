@@ -38,9 +38,14 @@ class TextWindow
   : public Window
 {
 public:
-  TextWindow(Window& window, Area const area = {0, 0, 0, 0});
+  TextWindow(Window& window, Window& desktop, uint8_t const* const font, Area const area = {0, 0, 0, 0});
 
-  TextWindow& operator<<(const char* const text);
+  TextWindow& operator<<(char const* text);
+  TextWindow& operator<<(char const c);
+
+private:
+  uint8_t const* m_font;
+  uint8_t m_cursor = 0;
 };
 
 }//NS stm32f429

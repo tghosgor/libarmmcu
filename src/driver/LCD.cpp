@@ -32,7 +32,7 @@
 #include <driver/SPI.h>
 #include <window/desktop.h>
 #include <window/text_window.h>
-
+#include <font/arial_normal.h>
 
 //#include <st_logo1.h>
 //#include <fonts/basic.h>
@@ -337,8 +337,8 @@ void LCD::enable(
   m_layer1.m_CR |= 0x1;
 
   Desktop desktop({reinterpret_cast<void*>(fbData), windowWidth * windowHeight * 4}, windowWidth, windowHeight);
-  TextWindow textWindow(desktop, {0, 0, 240, 300});
-  textWindow << "NABER LAN?";
+  TextWindow textWindow(desktop, desktop, font::arialNormal, {50, 100, 120, 300});
+  textWindow << "Naber lan? test";
 
   immediateReload();
 }

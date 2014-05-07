@@ -29,9 +29,9 @@
 namespace stm32f429
 {
 
-Window::Window(Window& parent,
-               const Area area)
+Window::Window(Window& parent, Window& desktop, Area const area)
   : m_parent(parent)
+  , m_desktop(desktop)
   , m_area(area)
   , m_frameBuffer({parent.m_frameBuffer.buffer, area.m_width * area.m_height})
 { }
