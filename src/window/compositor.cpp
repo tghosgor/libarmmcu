@@ -24,34 +24,18 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <window/window.h>
+#include <window/compositor.h>
 
 namespace stm32f429
 {
 
-Window::Window(Window& parent, Window& desktop, Area const area)
-  : m_parent(parent)
-  , m_desktop(desktop)
-  , m_area(area)
-  , m_frameBuffer({parent.m_frameBuffer.buffer, area.m_width * area.m_height})
-{ }
+uint8_t FrameBuffer[240 * 320 * sizeof(uint16_t)];
 
-void Window::setX(std::size_t const x) { m_area.m_x = x; }
-
-void Window::setY(std::size_t const y) { m_area.m_y = y; }
-
-void Window::setWidth(std::size_t const width) { m_area.m_width = width; }
-
-void Window::setHeight(std::size_t const height) { m_area.m_height = height; }
-
-std::size_t const& Window::getX() const { return m_area.m_x; }
-
-std::size_t const& Window::getY() const { return m_area.m_y; }
-
-std::size_t const& Window::getWidth() const { return m_area.m_width; }
-
-std::size_t const& Window::getHeight() const { return m_area.m_height; }
-
-void* Window::getBuffer() { return m_frameBuffer.buffer; }
+Compositor::Compositor(FrameBuffer const& fb, std::size_t const width, std::size_t const height)
+  : Window(*this, *this, {0, 0, width, height})
+{
+  char* lost = new char[512];
+  m_frameBuffer = fb;
+}
 
 }//NS stm32f429

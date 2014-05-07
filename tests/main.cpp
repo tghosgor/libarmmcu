@@ -151,38 +151,3 @@ bool exti3Handler()
   /*portGpin14.reset();
   exti2->clearPending();*/
 }
-
-extern "C" void _exit()
-{
-  while(true);
-}
-extern "C" void _kill()
-{
-}
-extern "C" void _getpid()
-{
-}
-extern "C" void _sbrk()
-{
-}
-extern "C" void _open()
-{
-}
-extern "C" void _write()
-{
-}
-extern "C" void _close()
-{
-}
-extern "C" void _fstat()
-{
-}
-extern "C" void _isatty()
-{
-}
-extern "C" void _lseek()
-{
-}
-extern "C" void _read()
-{
-}

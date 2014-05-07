@@ -28,6 +28,7 @@
 #define WINDOW_H_
 
 #include <cstdint>
+#include <tuple>
 
 namespace stm32f429
 {
@@ -59,7 +60,8 @@ public:
   std::size_t const& getWidth() const;
   std::size_t const& getHeight() const;
 
-  void* getBuffer();
+  virtual const std::pair<uint16_t, bool> getPixel(std::size_t const x, std::size_t const y) const = 0;
+  virtual void update() { }
 
 protected:
   FrameBuffer m_frameBuffer;

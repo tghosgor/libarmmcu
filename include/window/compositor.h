@@ -37,6 +37,8 @@ class Compositor
 {
 public:
   Compositor(FrameBuffer const& fb, std::size_t const width, std::size_t const height);
+
+  virtual const std::pair<uint16_t, bool> getPixel(const std::size_t x, const std::size_t y) const override { }
 };
 
 }//NS stm32f429

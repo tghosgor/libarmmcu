@@ -19,7 +19,7 @@ if (NOT CMAKE_BUILD_TYPE)
 endif()
 
 set(CMAKE_C_FLAGS "-std=c11 -mcpu=cortex-m4 -mthumb")
-set(CMAKE_CXX_FLAGS "-std=c++11 -mcpu=cortex-m4 -mthumb")
+set(CMAKE_CXX_FLAGS "-std=c++11 -mcpu=cortex-m4 -mthumb -fno-exceptions")
 set(CMAKE_CXX_FLAGS_DEBUG "-g1")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -g1 -fno-inline")
 set(CMAKE_ASM_FLAGS "-mcpu=cortex-m4 -mthumb")
@@ -31,6 +31,11 @@ set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "") #-rdynamic suppression
 
 set(CMAKE_EXE_LINKER_FLAGS "-Xlinker --script ${libarmmcu_SOURCE_DIR}/misc/STM32F429ZI_FLASH.ld")
 set(CMAKE_EXE_LINKER_FLAGS_RELEASE "-s")
+
+file(GLOB global_SRC
+    "include/*.h"
+    "src/*.cpp"
+)
 
 file(GLOB driver_SRC
     "include/driver/*.h"
@@ -55,6 +60,6 @@ include_directories(
 #add_library(driver ${driver_SRC})
 #add_library(window ${window_SRC})
 
-add_executable(stm32f429i-disco tests/main.cpp src/System.cpp misc/startup_stm32f429xx.S misc/STM32F429ZI_FLASH.ld ${driver_SRC} ${window_SRC} ${font_SRC} README.md)
+add_executable(stm32f429i-disco tests/main.cpp misc/startup_stm32f429xx.S misc/STM32F429ZI_FLASH.ld ${driver_SRC} ${window_SRC} ${font_SRC} ${global_SRC} README.md)
 #target_link_libraries(stm32f429i-disco driver_OBJ window_OBJ)
 

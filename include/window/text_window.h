@@ -40,12 +40,15 @@ class TextWindow
 public:
   TextWindow(Window& window, Window& desktop, uint8_t const* const font, Area const area = {0, 0, 0, 0});
 
-  TextWindow& operator<<(char const* text);
+  TextWindow& operator<<(std::string const& text);
   TextWindow& operator<<(char const c);
+
+  virtual const std::pair<uint16_t, bool> getPixel(std::size_t const x, std::size_t const y) const override;
+  virtual void update() override { }
 
 private:
   uint8_t const* m_font;
-  uint8_t m_cursor = 0;
+  std::string m_str;
 };
 
 }//NS stm32f429

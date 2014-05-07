@@ -338,6 +338,8 @@ void LCD::enable(
 
   Compositor desktop({reinterpret_cast<void*>(fbData), windowWidth * windowHeight * 4}, windowWidth, windowHeight);
   TextWindow textWindow(desktop, desktop, font::arialNormal, {50, 100, 140, 300});
+  desktop.update();
+
   textWindow << "Naber lan? test";
 
   immediateReload();

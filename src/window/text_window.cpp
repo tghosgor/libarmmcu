@@ -37,31 +37,50 @@ TextWindow::TextWindow(Window& parent, Window& desktop, const uint8_t* const fon
   , m_font(font)
 { }
 
-TextWindow& TextWindow::operator<<(char const* text)
+TextWindow& TextWindow::operator<<(std::string const& text)
 {
-  while(*text)
+  auto iterator = text.cbegin();
+  while(iterator != text.cend())
   {
-    *this << *text;
-    ++text;
+    *this << *iterator;
+    ++iterator;
   }
+
+  return *this;
 }
 
 TextWindow& TextWindow::operator<<(char const c)
+{
+  m_str.push_back(c);
+
+  return *this;
+}
+
+std::pair<uint16_t, bool> const TextWindow::getPixel(std::size_t const x, std::size_t const y) const
 {
   uint8_t const& charWidth = m_font[0];
   uint8_t const& charHeight = m_font[1];
   uint8_t const& lineHeight = charHeight;
 
+  if(getWidth() < x || getHeight() < y)
+    return {0, false};
+
   uint16_t const bitsPerChar = charWidth * charHeight;
-  uint8_t const* character = m_font + 4 + (c - 32) * (bitsPerChar / 8);
 
   std::size_t const maxCharPerLine = getWidth() / charWidth;
-  std::size_t const charFbOffset = getY() * m_desktop.getWidth() //offset from top of screen
-      + getX() //offset from left of screen
-      + (m_cursor / maxCharPerLine) * m_desktop.getWidth() * lineHeight * 2 //offset of Nth line
-      + ((m_cursor % maxCharPerLine) * charWidth * 2); //offset of Nth letter in line
 
-  for(uint8_t height = 0; height < charHeight; ++height)
+  std::size_t const verticalSkippedChars = (y / lineHeight) * maxCharPerLine;
+  std::size_t const horizontalSkippedChars = x / charWidth;
+
+  uint8_t const& c = m_str[verticalSkippedChars + horizontalSkippedChars];
+
+  uint8_t const* character = m_font + 4 + (c - 32) * (bitsPerChar / 8);
+
+  bool const pixelState = character[((y % charHeight) * charWidth) / 8 + ((x % charWidth) / 8)] & (0x80 >>((x % charWidth) % 8));
+
+  return {pixelState * 0xFF, true};
+
+  /*for(uint8_t height = 0; height < charHeight; ++height)
   {
     std::size_t const horizontalOffset = m_desktop.getWidth() * 2u * height;
 
@@ -73,9 +92,7 @@ TextWindow& TextWindow::operator<<(char const c)
 
       *reinterpret_cast<uint16_t*>(m_desktop.getBuffer() + charFbOffset + verticalOffset + horizontalOffset) = pixelState * 0xFFFF;
     }
-  }
-
-  ++m_cursor;
+  }*/
 }
 
 }//NS stm32f429
