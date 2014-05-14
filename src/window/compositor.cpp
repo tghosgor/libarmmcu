@@ -29,13 +29,36 @@
 namespace stm32f429
 {
 
-uint8_t FrameBuffer[240 * 320 * sizeof(uint16_t)];
+uint8_t layerFrameBuffer[240 * 320 * sizeof(uint16_t)];
 
 Compositor::Compositor(FrameBuffer const& fb, std::size_t const width, std::size_t const height)
   : Window(*this, *this, {0, 0, width, height})
+  , m_frameBuffer(fb)
+{ }
+
+void Compositor::update()
 {
-  char* lost = new char[512];
-  m_frameBuffer = fb;
+  for(std::size_t y = 0; y < m_area.m_y2; ++y)
+  {
+    for(std::size_t x = 0; x < m_area.m_x2; ++x)
+    {
+      for(uint8_t i = 0; i < m_nSubWin; ++i)
+      {
+        bool isWindowValid = m_subWin[i]->getX() <= x && m_subWin[i]->getX2() >= x
+            && m_subWin[i]->getY() <= y && m_subWin[i]->getY2() >= y;
+
+        if(!isWindowValid)
+          continue;
+
+        auto pixel = m_subWin[i]->getPixel(x - m_subWin[i]->getX(), y - m_subWin[i]->getY());
+
+        if(pixel.second == false)
+          continue;
+
+        *reinterpret_cast<uint16_t*>(m_frameBuffer.buffer + (y * getWidth() + x) * sizeof(uint16_t)) = pixel.first;
+      }
+    }
+  }
 }
 
 }//NS stm32f429

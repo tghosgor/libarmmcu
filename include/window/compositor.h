@@ -36,9 +36,20 @@ class Compositor
   : public Window
 {
 public:
+  struct FrameBuffer
+  {
+    void* buffer;
+    std::size_t size;
+  };
+
+public:
   Compositor(FrameBuffer const& fb, std::size_t const width, std::size_t const height);
 
-  virtual const std::pair<uint16_t, bool> getPixel(const std::size_t x, const std::size_t y) const override { }
+  std::pair<uint16_t, bool> const virtual getPixel(const std::size_t x, const std::size_t y) const override { }
+  void virtual update() override;
+
+private:
+  FrameBuffer const m_frameBuffer;
 };
 
 }//NS stm32f429

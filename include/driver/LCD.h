@@ -40,7 +40,7 @@ class LCD
   friend class RCC;
 
 public:
-  static constexpr std::size_t BaseAddress = 0x40016800;
+  static std::size_t constexpr BaseAddress = 0x40016800;
 
 public: //Declarations
   struct Color

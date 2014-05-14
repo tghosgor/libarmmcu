@@ -37,23 +37,10 @@ TextWindow::TextWindow(Window& parent, Window& desktop, const uint8_t* const fon
   , m_font(font)
 { }
 
-TextWindow& TextWindow::operator<<(std::string const& text)
+void TextWindow::setText(char const* const cstr)
 {
-  auto iterator = text.cbegin();
-  while(iterator != text.cend())
-  {
-    *this << *iterator;
-    ++iterator;
-  }
-
-  return *this;
-}
-
-TextWindow& TextWindow::operator<<(char const c)
-{
-  m_str.push_back(c);
-
-  return *this;
+  m_cstr = cstr;
+  m_cstrLen = strlen(cstr);
 }
 
 std::pair<uint16_t, bool> const TextWindow::getPixel(std::size_t const x, std::size_t const y) const
@@ -62,9 +49,6 @@ std::pair<uint16_t, bool> const TextWindow::getPixel(std::size_t const x, std::s
   uint8_t const& charHeight = m_font[1];
   uint8_t const& lineHeight = charHeight;
 
-  if(getWidth() < x || getHeight() < y)
-    return {0, false};
-
   uint16_t const bitsPerChar = charWidth * charHeight;
 
   std::size_t const maxCharPerLine = getWidth() / charWidth;
@@ -72,13 +56,16 @@ std::pair<uint16_t, bool> const TextWindow::getPixel(std::size_t const x, std::s
   std::size_t const verticalSkippedChars = (y / lineHeight) * maxCharPerLine;
   std::size_t const horizontalSkippedChars = x / charWidth;
 
-  uint8_t const& c = m_str[verticalSkippedChars + horizontalSkippedChars];
+  if(verticalSkippedChars + horizontalSkippedChars >= m_cstrLen || horizontalSkippedChars >= maxCharPerLine)
+    return {0, false};
+
+  uint8_t const& c = m_cstr[verticalSkippedChars + horizontalSkippedChars];
 
   uint8_t const* character = m_font + 4 + (c - 32) * (bitsPerChar / 8);
 
-  bool const pixelState = character[((y % charHeight) * charWidth) / 8 + ((x % charWidth) / 8)] & (0x80 >>((x % charWidth) % 8));
+  bool const pixelState = character[(x % charWidth) / 8 + (y % charHeight) * (charWidth / 8)] & (0x80 >>(x % 8));
 
-  return {pixelState * 0xFF, true};
+  return {pixelState * 0xFFFF, true};
 
   /*for(uint8_t height = 0; height < charHeight; ++height)
   {

@@ -36,38 +36,40 @@ namespace stm32f429
 class Window
 {
 public:
-  struct FrameBuffer
-  {
-    void* buffer;
-    std::size_t size;
-  };
-
   struct Area
   {
-    std::size_t m_x, m_y, m_width, m_height;
+    std::size_t m_x, m_y, m_x2, m_y2;
   };
 
 public:
   Window(Window& parent, Window& desktop, Area const area = {0, 0, 0, 0}); //TODO: any way to do , FrameBuffer const fb = parent.m_frameBuffer); ?
 
   void setX(std::size_t const x);
+  void setX2(std::size_t const x2);
+
   void setY(std::size_t const y);
-  void setWidth(std::size_t const width);
-  void setHeight(std::size_t const height);
+  void setY2(std::size_t const y2);
 
   std::size_t const& getX() const;
-  std::size_t const& getY() const;
-  std::size_t const& getWidth() const;
-  std::size_t const& getHeight() const;
+  std::size_t const& getX2() const;
 
-  virtual const std::pair<uint16_t, bool> getPixel(std::size_t const x, std::size_t const y) const = 0;
-  virtual void update() { }
+  std::size_t const& getY() const;
+  std::size_t const& getY2() const;
+
+  const std::size_t getWidth() const;
+  const std::size_t getHeight() const;
+
+  std::pair<uint16_t, bool> const virtual getPixel(std::size_t const x, std::size_t const y) const = 0;
+  void virtual update() = 0;
+
+  void attach(Window& other);
 
 protected:
-  FrameBuffer m_frameBuffer;
   Window& m_parent;
-  Window& m_desktop;
+  Window& m_compositor;
   Area m_area;
+  std::array<Window*, 16> m_subWin;
+  uint8_t m_nSubWin;
 };
 
 

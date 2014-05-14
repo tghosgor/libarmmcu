@@ -310,11 +310,11 @@ void LCD::enable(
   uint32_t volatile const fbData = reinterpret_cast<uint32_t const volatile>(smiley.pixel_data);
   uint8_t const bytesPerPixel = smiley.bytes_per_pixel;*/
 
-  extern uint8_t*  FrameBuffer;
+  extern uint8_t* layerFrameBuffer;
 
   uint32_t const windowWidth = 240;
   uint32_t const windowHeight = 300;
-  uint32_t volatile const fbData = reinterpret_cast<uint32_t const volatile>(&FrameBuffer);
+  uint32_t volatile const fbData = reinterpret_cast<uint32_t const volatile>(&layerFrameBuffer);
   uint8_t const bytesPerPixel = 2;
 
   m_layer1.m_WHPCR &= ~(0xF000F000);
@@ -336,11 +336,12 @@ void LCD::enable(
   m_layer1.m_CFBLNR |= windowHeight;
   m_layer1.m_CR |= 0x1;
 
-  Compositor desktop({reinterpret_cast<void*>(fbData), windowWidth * windowHeight * 4}, windowWidth, windowHeight);
-  TextWindow textWindow(desktop, desktop, font::arialNormal, {50, 100, 140, 300});
+  Compositor desktop({reinterpret_cast<void*>(fbData), windowWidth * windowHeight * sizeof(uint16_t)}, windowWidth, windowHeight);
+  TextWindow textWindow(desktop, desktop, font::arialNormal, {30, 20, 30 + 140, 20 + (16 * 3 - 8)}); //3.5 lines
+  desktop.attach(textWindow);
   desktop.update();
 
-  textWindow << "Naber lan? test";
+  textWindow.setText("Naber? test test2");
 
   immediateReload();
 }

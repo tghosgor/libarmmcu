@@ -29,8 +29,6 @@
 
 #include <window/window.h>
 
-#include <string>
-
 namespace stm32f429
 {
 
@@ -40,15 +38,15 @@ class TextWindow
 public:
   TextWindow(Window& window, Window& desktop, uint8_t const* const font, Area const area = {0, 0, 0, 0});
 
-  TextWindow& operator<<(std::string const& text);
-  TextWindow& operator<<(char const c);
+  void setText(char const* const cstr);
 
-  virtual const std::pair<uint16_t, bool> getPixel(std::size_t const x, std::size_t const y) const override;
-  virtual void update() override { }
+  std::pair<uint16_t, bool> const virtual getPixel(std::size_t const x, std::size_t const y) const override;
+  void virtual update() override { }
 
 private:
   uint8_t const* m_font;
-  std::string m_str;
+  char const* m_cstr;
+  std::size_t m_cstrLen;
 };
 
 }//NS stm32f429
