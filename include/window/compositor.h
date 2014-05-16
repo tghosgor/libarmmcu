@@ -45,7 +45,6 @@ public:
 public:
   Compositor(FrameBuffer const& fb, std::size_t const width, std::size_t const height);
 
-  std::pair<uint16_t, bool> const virtual getPixel(const std::size_t x, const std::size_t y) const override { }
   void virtual update() override;
 
 private:

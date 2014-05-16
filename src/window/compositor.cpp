@@ -42,7 +42,14 @@ void Compositor::update()
   {
     for(std::size_t x = 0; x < m_area.m_x2; ++x)
     {
-      for(uint8_t i = 0; i < m_nSubWin; ++i)
+      auto pixel = getPixel(x, y);
+
+      if(pixel.second == false)
+        continue;
+
+      *reinterpret_cast<uint16_t*>(m_frameBuffer.buffer + (y * getWidth() + x) * sizeof(uint16_t)) = pixel.first;
+
+      /*for(uint8_t i = 0; i < m_nSubWin; ++i)
       {
         bool isWindowValid = m_subWin[i]->getX() <= x && m_subWin[i]->getX2() >= x
             && m_subWin[i]->getY() <= y && m_subWin[i]->getY2() >= y;
@@ -56,7 +63,7 @@ void Compositor::update()
           continue;
 
         *reinterpret_cast<uint16_t*>(m_frameBuffer.buffer + (y * getWidth() + x) * sizeof(uint16_t)) = pixel.first;
-      }
+      }*/
     }
   }
 }

@@ -75,11 +75,13 @@ void LCD::enable(
   while (!RCC::instance()->m_CR & (0x1 <<25))
   { }
 
-  //*reinterpret_cast<uint8_t* const>(0x40023C00) = 5; //FLASH Latency 5
-  //RCC::instance()->m_CFGR |= 0x2 <<0; //PLL as SYSCLK
-  //RCC::instance()->m_CFGR |= 0x0 <<4; //AHB PSC 1
-  //RCC::instance()->m_CFGR |= 0x5 <<10; //APB1 PSC 4
-  //RCC::instance()->m_CFGR |= 0x4 <<13; //APB2 PSC 2
+  /*
+  *reinterpret_cast<uint8_t* const>(0x40023C00) = 5; //FLASH Latency 5
+  RCC::instance()->m_CFGR |= 0x2 <<0; //PLL as SYSCLK
+  RCC::instance()->m_CFGR |= 0x0 <<4; //AHB PSC 1
+  RCC::instance()->m_CFGR |= 0x5 <<10; //APB1 PSC 4
+  RCC::instance()->m_CFGR |= 0x4 <<13; //APB2 PSC 2
+  */
 
   RCC::instance()->disablePLLSAI();
   while(RCC::instance()->isPLLSAILocked())
@@ -337,11 +339,15 @@ void LCD::enable(
   m_layer1.m_CR |= 0x1;
 
   Compositor desktop({reinterpret_cast<void*>(fbData), windowWidth * windowHeight * sizeof(uint16_t)}, windowWidth, windowHeight);
+
   TextWindow textWindow(desktop, desktop, font::arialNormal, {30, 20, 30 + 140, 20 + (16 * 3 - 8)}); //3.5 lines
-  desktop.attach(textWindow);
+  textWindow.setText("Naber? test test2");
   desktop.update();
 
-  textWindow.setText("Naber? test test2");
+  TextWindow textWindow2(desktop, desktop, font::arialNormal, {30, 20, 30 + 140, 20 + (16 * 3 - 8)}); //3.5 lines
+  textWindow2.setText("Win2");
+  textWindow2.bringToFront();
+  desktop.update();
 
   immediateReload();
 }

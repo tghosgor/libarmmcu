@@ -54,7 +54,6 @@ file(GLOB font_SRC
 
 include_directories(
   "include"
-  "ext/freetype2/include"
 )
 
 #add_library(driver ${driver_SRC})

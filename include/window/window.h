@@ -56,19 +56,20 @@ public:
   std::size_t const& getY() const;
   std::size_t const& getY2() const;
 
-  const std::size_t getWidth() const;
-  const std::size_t getHeight() const;
+  std::size_t const getWidth() const;
+  std::size_t const getHeight() const;
 
-  std::pair<uint16_t, bool> const virtual getPixel(std::size_t const x, std::size_t const y) const = 0;
+  void bringToFront() const;
+  void sendToBack() const;
+
+  std::pair<uint16_t, bool> const virtual getPixel(std::size_t const x, std::size_t const y) const;
   void virtual update() = 0;
-
-  void attach(Window& other);
 
 protected:
   Window& m_parent;
   Window& m_compositor;
   Area m_area;
-  std::array<Window*, 16> m_subWin;
+  std::array<Window const*, 16> m_subWin;
   uint8_t m_nSubWin;
 };
 
