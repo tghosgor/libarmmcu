@@ -78,6 +78,10 @@ public: //Declarations
 
   using LTDC = Module<0x44, 26, LCD, 0x40016800>;
 
+  using PWR = Module<0x40, 28, stm32f429::PWR, 0x40007000>;
+
+  using RTC = Module<0x70, 15, stm32f429::RTC, 0x40002800>;
+
   using SPI1 = Module<0x44, 12, SPI, 0x40013000>;
   using SPI5 = Module<0x44, 20, SPI, 0x40015000>;
 

@@ -25,6 +25,7 @@ set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -g2 -fno-inline")
 set(CMAKE_ASM_FLAGS "-mcpu=cortex-m4 -mthumb")
 set(CMAKE_ASM_FLAGS_RELEASE "")
 set(CMAKE_ASM_FLAGS_RELWITHDEBINFO "")
+set(CMAKE_ASM_FLAGS_MINSIZEREL "")
 
 set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "") #-rdynamic suppression
 set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "") #-rdynamic suppression

@@ -28,15 +28,27 @@
 #include <driver/IVTable.h>
 #include <driver/GPIO.h>
 #include <driver/LCD.h>
-#include <driver/RCC.h>
 #include <driver/NVIC.h>
+#include <driver/RCC.h>
+#include <driver/RTC.h>
 #include <driver/SCB.h>
 #include <driver/SYSCFG.h>
 #include <driver/TIM.h>
 
+#include <window/compositor.h>
+#include <window/text_window.h>
+#include <font/arial_normal.h>
+#include <font/arial_bold.h>
+
 #include <cstring>
 #include <cstdint>
+#include <cstdio>
 #include <limits>
+
+namespace stm32f429
+{
+extern uint8_t* layerFrameBuffer;
+}
 
 using namespace stm32f429;
 
@@ -101,8 +113,36 @@ SET_UP_TIM:
   TIM1->setPrescalerValue(1000);
   TIM1->enable();
 
+  uint32_t volatile const fbData = reinterpret_cast<uint32_t const volatile>(&layerFrameBuffer);
+  uint32_t const windowWidth = 240;
+  uint32_t const windowHeight = 300;
+
+  Compositor desktop({reinterpret_cast<void*>(fbData), windowWidth * windowHeight * sizeof(uint16_t)}, windowWidth, windowHeight);
+  desktop.update();
+
+  TextWindow textWindow(desktop, font::arialBold, {30, 20, 30 + 140, 20 + (16 * 3 - 8)}); //3.5 lines
+  textWindow.setText("Naber? test test2");
+  textWindow.update();
+
+  TextWindow textWindow2(desktop, font::arialBold, {0, 0, 16*8, 16});
+
+  TextWindow textWindow3(desktop, font::arialBold, {240 - 48, 0, 240, 16});
+
+  auto rtc = RCC::enablePeriph<RCC::RTC>();
+
   while(true)
   {
+    static uint8_t i = 0;
+    static char str[4];
+    sprintf(str, "%d", i++);
+    textWindow3.setText(str);
+    textWindow3.update();
+
+    static char time[9];
+    sprintf(time, "%d%d:%d%d:%d%d", rtc->getHourTens(),rtc->getHourUnits(), rtc->getMinTens(),rtc->getMinUnits(), rtc->getSecTens(),rtc->getSecUnits());
+    textWindow2.setText(time);
+    textWindow2.update();
+
     uint16_t cntVal = TIM1->getCounterValue();
     if(cntVal >= std::numeric_limits<uint16_t>::max() / 2)
     {

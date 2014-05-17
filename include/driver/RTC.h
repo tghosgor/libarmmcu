@@ -24,23 +24,30 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FWD_H_
-#define FWD_H_
+#ifndef RTC_H_
+#define RTC_H_
+
+#include <cstdint>
 
 namespace stm32f429
 {
 
-class RCC;
-class LCD;
-class SPI;
-class RTC;
-class PWR;
-
-namespace GPIO
+class RTC
 {
-class Port;
+public:
+  RTC();
+
+  uint8_t const getHourTens() const volatile { return (m_TR & 0x300000) >>20; }
+  uint8_t const getHourUnits() const volatile { return (m_TR & 0x0F0000) >>16; }
+  uint8_t const getMinTens() const volatile { return (m_TR & 0x7000) >>12; }
+  uint8_t const getMinUnits() const volatile { return (m_TR & 0x0F00) >>8; }
+  uint8_t const getSecTens() const volatile { return (m_TR & 0x70) >>4; }
+  uint8_t const getSecUnits() const volatile { return m_TR & 0x0F; }
+
+public: //Registers
+  uint32_t m_TR; //Time register
+};
+
 }
 
-} //NS stm32f429
-
-#endif /* FWD_H_ */
+#endif /* RTC_H_ */

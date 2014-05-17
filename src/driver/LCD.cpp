@@ -30,10 +30,6 @@
 #include <driver/LCD.h>
 
 #include <driver/SPI.h>
-#include <window/compositor.h>
-#include <window/text_window.h>
-#include <font/arial_normal.h>
-#include <font/arial_bold.h>
 
 #include <cstring>
 
@@ -208,9 +204,9 @@ void LCD::enable(
   selectReg(LCD_FRMCTR1);
   writeReg(0x00);
   writeReg(0x1B);
-  selectReg(LCD_DFC);
-  writeReg(0x0A);
-  writeReg(0xA2);
+  //selectReg(LCD_DFC);
+  //writeReg(0x0A);
+  //writeReg(0xA2);
   selectReg(LCD_POWER1);
   writeReg(0x10);
   selectReg(LCD_POWER2);
@@ -347,17 +343,6 @@ void LCD::enable(
   m_layer2.m_CR = 0;
 
   immediateReload();
-
-  Compositor desktop({reinterpret_cast<void*>(fbData), windowWidth * windowHeight * sizeof(uint16_t)}, windowWidth, windowHeight);
-
-  TextWindow textWindow(desktop, desktop, font::arialBold, {30, 20, 30 + 140, 20 + (16 * 3 - 8)}); //3.5 lines
-  textWindow.setText("Naber? test test2");
-  desktop.update();
-
-  /*TextWindow textWindow2(desktop, desktop, font::arialBold, {30, 20, 30 + 140, 20 + (16 * 3 - 8)}); //3.5 lines
-  textWindow2.setText("Win2");
-  textWindow2.bringToFront();
-  desktop.update();*/
 }
 
 void LCD::setSync(uint16_t const hSync, uint16_t const vSync) volatile

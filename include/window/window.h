@@ -33,6 +33,7 @@
 namespace stm32f429
 {
 
+class Compositor;
 class Window
 {
 public:
@@ -42,7 +43,14 @@ public:
   };
 
 public:
-  Window(Window& parent, Window& desktop, Area const area = {0, 0, 0, 0}); //TODO: any way to do , FrameBuffer const fb = parent.m_frameBuffer); ?
+  Window(Window& parent, Area const area = {0, 0, 0, 0}); //TODO: any way to do , FrameBuffer const fb = parent.m_frameBuffer); ?
+  Window(Window& parent, Compositor& compositor, Area const area = {0, 0, 0, 0});
+
+  void bringToFront() const;
+  void sendToBack() const;
+
+  std::pair<uint16_t, bool> const virtual getPixel(std::size_t const x, std::size_t const y) const;
+  void virtual update();
 
   void setX(std::size_t const x);
   void setX2(std::size_t const x2);
@@ -59,15 +67,11 @@ public:
   std::size_t const getWidth() const;
   std::size_t const getHeight() const;
 
-  void bringToFront() const;
-  void sendToBack() const;
-
-  std::pair<uint16_t, bool> const virtual getPixel(std::size_t const x, std::size_t const y) const;
-  void virtual update() = 0;
+  Compositor& getCompositor();
 
 protected:
   Window& m_parent;
-  Window& m_compositor;
+  Compositor& m_compositor;
   Area m_area;
   std::array<Window const*, 16> m_subWin;
   uint8_t m_nSubWin;

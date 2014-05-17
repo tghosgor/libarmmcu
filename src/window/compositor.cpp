@@ -36,18 +36,20 @@ Compositor::Compositor(FrameBuffer const& fb, std::size_t const width, std::size
   , m_frameBuffer(fb)
 { }
 
-void Compositor::update()
+void Compositor::render(Area const& area)
 {
-  for(std::size_t y = 0; y < m_area.m_y2; ++y)
+  for(std::size_t y = area.m_y; y < area.m_y2; ++y)
   {
-    for(std::size_t x = 0; x < m_area.m_x2; ++x)
+    for(std::size_t x = area.m_x; x < area.m_x2; ++x)
     {
       auto pixel = getPixel(x, y);
 
+      uint16_t* const fbPixel = reinterpret_cast<uint16_t*>(m_frameBuffer.buffer + (y * getWidth() + x) * sizeof(uint16_t));
+
       if(pixel.second == false)
-        *reinterpret_cast<uint16_t*>(m_frameBuffer.buffer + (y * getWidth() + x) * sizeof(uint16_t)) = m_defaultPixelColor;
+        *fbPixel = m_defaultPixelColor;
       else
-        *reinterpret_cast<uint16_t*>(m_frameBuffer.buffer + (y * getWidth() + x) * sizeof(uint16_t)) = pixel.first;
+        *fbPixel = pixel.first;
 
       /*for(uint8_t i = 0; i < m_nSubWin; ++i)
       {

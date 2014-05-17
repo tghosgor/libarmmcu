@@ -26,36 +26,28 @@
 
 #include <window/window.h>
 
+#include <window/compositor.h>
+
 #include <algorithm>
 
 namespace stm32f429
 {
 
-Window::Window(Window& parent, Window& desktop, Area const area)
+Window::Window(Window& parent, Area const area)
+  : Window(parent, parent.getCompositor(), area)
+{ }
+
+Window::Window(Window& parent, Compositor& compositor, Area const area)
   : m_parent(parent)
-  , m_compositor(desktop)
+  , m_compositor(compositor)
   , m_area(area)
   , m_nSubWin(0)
 {
   if(&parent != this)
     parent.m_subWin[parent.m_nSubWin++] = this;
-  //parent.attach(*this);
 }
 
-void Window::setX(std::size_t const x) { m_area.m_x = x; }
-void Window::setX2(std::size_t const x2) { m_area.m_x2 = x2; }
-
-void Window::setY(std::size_t const y) { m_area.m_y = y; }
-void Window::setY2(std::size_t const y2) { m_area.m_y2 = y2; }
-
-std::size_t const& Window::getX() const { return m_area.m_x; }
-std::size_t const& Window::getX2() const { return m_area.m_x2; }
-
-std::size_t const& Window::getY() const { return m_area.m_y; }
-std::size_t const& Window::getY2() const { return m_area.m_y2; }
-
-std::size_t const Window::getWidth() const { return getX2() - getX(); }
-std::size_t const Window::getHeight() const { return getY2() - getY(); }
+Compositor&Window::getCompositor() { return m_compositor; }
 
 void Window::bringToFront() const
 {
@@ -97,5 +89,25 @@ std::pair<uint16_t, bool> const Window::getPixel(std::size_t const x, std::size_
 
   return {0, false};
 }
+
+void Window::update()
+{
+  m_compositor.render({getX(), getY(), getX2(), getY2()});
+}
+
+void Window::setX(std::size_t const x) { m_area.m_x = x; }
+void Window::setX2(std::size_t const x2) { m_area.m_x2 = x2; }
+
+void Window::setY(std::size_t const y) { m_area.m_y = y; }
+void Window::setY2(std::size_t const y2) { m_area.m_y2 = y2; }
+
+std::size_t const& Window::getX() const { return m_area.m_x; }
+std::size_t const& Window::getX2() const { return m_area.m_x2; }
+
+std::size_t const& Window::getY() const { return m_area.m_y; }
+std::size_t const& Window::getY2() const { return m_area.m_y2; }
+
+std::size_t const Window::getWidth() const { return getX2() - getX(); }
+std::size_t const Window::getHeight() const { return getY2() - getY(); }
 
 }//NS stm32f429

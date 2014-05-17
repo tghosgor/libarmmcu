@@ -24,9 +24,6 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef PLL_CPP_
-#define PLL_CPP_
-
 #include <driver/PLL.h>
 
 namespace stm32f429
@@ -50,5 +47,3 @@ bool PLL::isReady() volatile
 }
 
 } //NS stm32f429
-
-#endif /* PLL_CPP_ */

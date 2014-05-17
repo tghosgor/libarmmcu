@@ -36,12 +36,11 @@ class TextWindow
   : public Window
 {
 public:
-  TextWindow(Window& window, Window& desktop, uint8_t const* const font, Area const area = {0, 0, 0, 0});
+  TextWindow(Window& window, uint8_t const* const font, Area const area = {0, 0, 0, 0});
 
   void setText(char const* const cstr);
 
   std::pair<uint16_t, bool> const virtual getPixel(std::size_t const x, std::size_t const y) const override;
-  void virtual update() override { }
 
 private:
   uint8_t const* m_font;

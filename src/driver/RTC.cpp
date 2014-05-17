@@ -24,23 +24,33 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FWD_H_
-#define FWD_H_
+#include <driver/RTC.h>
+
+#include <driver/PWR.h>
+#include <driver/RCC.h>
 
 namespace stm32f429
 {
 
-class RCC;
-class LCD;
-class SPI;
-class RTC;
-class PWR;
-
-namespace GPIO
+RTC::RTC()
 {
-class Port;
+  RCC::instance()->m_CSR |= 0x1 <<0; //LSI ON
+  while(!RCC::instance()->m_CSR & (0x1 <<1)) //LSI Ready
+  { }
+
+  auto pwr = RCC::enablePeriph<RCC::PWR>();
+
+  RCC::instance()->m_BDCR |= 0x1 <<16; //Backup Domain Reset
+  RCC::instance()->m_BDCR &= ~(0x1 <<16); //Backup Domain Reset
+
+  pwr->disableBDWriteProtection();
+
+  RCC::instance()->m_BDCR &= ~(0x3 <<8);
+  RCC::instance()->m_BDCR |= 0x2 <<8; //RTC Clock is LSI
+
+  RCC::instance()->m_BDCR = 0x1 <<15;
+
+  pwr->enableBDWriteProtection();
 }
 
 } //NS stm32f429
-
-#endif /* FWD_H_ */

@@ -45,7 +45,7 @@ public:
 public:
   Compositor(FrameBuffer const& fb, std::size_t const width, std::size_t const height);
 
-  void virtual update() override;
+  void render(Area const& area);
 
 private:
   FrameBuffer const m_frameBuffer;

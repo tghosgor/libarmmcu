@@ -26,14 +26,16 @@
 
 #include <window/text_window.h>
 
+#include <window/compositor.h>
+
 #include <algorithm>
 #include <cstring>
 
 namespace stm32f429
 {
 
-TextWindow::TextWindow(Window& parent, Window& desktop, const uint8_t* const font, Area const area)
-  : Window(parent, desktop, area)
+TextWindow::TextWindow(Window& parent, const uint8_t* const font, Area const area)
+  : Window(parent, area)
   , m_font(font)
 { }
 
