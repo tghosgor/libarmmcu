@@ -24,34 +24,44 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef COMPOSITOR_H_
-#define COMPOSITOR_H_
+#include <sys/types.h>
 
-#include <window/window.h>
-
-namespace stm32f429
+extern "C"
 {
 
-class Compositor
-  : public Window
+caddr_t _sbrk ( int incr )
+{ }
+
+void _exit()
 {
-public:
-  struct FrameBuffer
-  {
-    void* buffer;
-    std::size_t size;
-  };
+  while(true);
+}
+void _kill()
+{
+}
+void _getpid()
+{
+}
+void _open()
+{
+}
+void _write()
+{
+}
+void _close()
+{
+}
+void _fstat()
+{
+}
+void _isatty()
+{
+}
+void _lseek()
+{
+}
+void _read()
+{
+}
 
-public:
-  Compositor(FrameBuffer const& fb, std::size_t const width, std::size_t const height);
-
-  void virtual update() override;
-
-private:
-  FrameBuffer const m_frameBuffer;
-  uint16_t static constexpr m_defaultPixelColor = 0xFFFF;
-};
-
-}//NS stm32f429
-
-#endif
+}

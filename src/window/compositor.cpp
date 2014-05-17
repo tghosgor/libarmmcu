@@ -45,9 +45,9 @@ void Compositor::update()
       auto pixel = getPixel(x, y);
 
       if(pixel.second == false)
-        continue;
-
-      *reinterpret_cast<uint16_t*>(m_frameBuffer.buffer + (y * getWidth() + x) * sizeof(uint16_t)) = pixel.first;
+        *reinterpret_cast<uint16_t*>(m_frameBuffer.buffer + (y * getWidth() + x) * sizeof(uint16_t)) = m_defaultPixelColor;
+      else
+        *reinterpret_cast<uint16_t*>(m_frameBuffer.buffer + (y * getWidth() + x) * sizeof(uint16_t)) = pixel.first;
 
       /*for(uint8_t i = 0; i < m_nSubWin; ++i)
       {

@@ -65,7 +65,10 @@ std::pair<uint16_t, bool> const TextWindow::getPixel(std::size_t const x, std::s
 
   bool const pixelState = character[(x % charWidth) / 8 + (y % charHeight) * (charWidth / 8)] & (0x80 >>(x % 8));
 
-  return {pixelState * 0xFFFF, true};
+  if(pixelState == true)
+    return {0, true};
+  else
+    return {0, false};
 
   /*for(uint8_t height = 0; height < charHeight; ++height)
   {

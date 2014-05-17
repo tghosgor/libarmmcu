@@ -4,7 +4,9 @@
 // Memory usage : 3044 bytes
 // Submitted by : MBWK
 
-#include <font/ubuntu_bold.h>
+//http://www.henningkarlsen.com/electronics/r_fonts.php
+
+#include <font/arial_normal.h>
 
 namespace stm32f429
 {

@@ -33,10 +33,9 @@
 #include <window/compositor.h>
 #include <window/text_window.h>
 #include <font/arial_normal.h>
+#include <font/arial_bold.h>
 
-//#include <st_logo1.h>
-//#include <fonts/basic.h>
-//#include <img/smiley.h>
+#include <cstring>
 
 namespace stm32f429
 {
@@ -177,7 +176,7 @@ void LCD::enable(
   m_spi5->enableInternalSlaveSelect();
   m_spi5->setMasterMode();
 
-  /*Configure LCD*/
+  //Configure LCD
   selectReg(0xCA);
   writeReg(0xC3);
   writeReg(0x08);
@@ -233,13 +232,16 @@ void LCD::enable(
   writeReg(0x27);
   writeReg(0x04);
 
-  /* colomn address set */
+  selectReg(LCD_PIXEL_FORMAT);
+  writeReg(0x05 <<4);
+
+  //colomn address set
   selectReg(LCD_COLUMN_ADDR);
   writeReg(0x00);
   writeReg(0x00);
   writeReg(0x00);
   writeReg(0xEF);
-  /* Page Address Set */
+  //Page Address Set
   selectReg(LCD_PAGE_ADDR);
   writeReg(0x00);
   writeReg(0x00);
@@ -294,10 +296,10 @@ void LCD::enable(
   selectReg(LCD_SLEEP_OUT);
   //LCD_Delay(200);
   i = 0;
-  while(++i < 999999); //temporary enough?
+  while(++i < 99999); //temporary enough?
 
   selectReg(LCD_DISPLAY_ON);
-  /* GRAM start writing */
+  //GRAM start writing
   selectReg(LCD_GRAM);
 
   setSync(hSync, vSync);;
@@ -326,7 +328,11 @@ void LCD::enable(
   //m_layer1.m_WHPCR = 240 <<16;
   //m_layer1.m_WVPCR = 160 <<16;
 
-  m_layer1.m_PFCR |= 0x2; //LTDC_PIXEL_FORMAT_RGB565+
+  m_layer1.m_PFCR &= ~0x7;
+  m_layer1.m_PFCR |= 0x2; //LTDC_PIXEL_FORMAT_RGB565
+  //m_layer1.m_PFCR |= 0x4; //ARGB4444
+  //m_layer1.m_PFCR |= 0; //ARGB8888
+  //m_layer1.m_PFCR |= 0x7; //AL88
   m_layer1.m_DCCR = 0;//default color
   m_layer1.m_CACR |= 255;
   m_layer1.m_BFCR |= 0x6 <<6 | 0x7; //LTDC_BLENDING_FACTOR2_PAxCA
@@ -338,18 +344,20 @@ void LCD::enable(
   m_layer1.m_CFBLNR |= windowHeight;
   m_layer1.m_CR |= 0x1;
 
+  m_layer2.m_CR = 0;
+
+  immediateReload();
+
   Compositor desktop({reinterpret_cast<void*>(fbData), windowWidth * windowHeight * sizeof(uint16_t)}, windowWidth, windowHeight);
 
-  TextWindow textWindow(desktop, desktop, font::arialNormal, {30, 20, 30 + 140, 20 + (16 * 3 - 8)}); //3.5 lines
+  TextWindow textWindow(desktop, desktop, font::arialBold, {30, 20, 30 + 140, 20 + (16 * 3 - 8)}); //3.5 lines
   textWindow.setText("Naber? test test2");
   desktop.update();
 
-  TextWindow textWindow2(desktop, desktop, font::arialNormal, {30, 20, 30 + 140, 20 + (16 * 3 - 8)}); //3.5 lines
+  /*TextWindow textWindow2(desktop, desktop, font::arialBold, {30, 20, 30 + 140, 20 + (16 * 3 - 8)}); //3.5 lines
   textWindow2.setText("Win2");
   textWindow2.bringToFront();
-  desktop.update();
-
-  immediateReload();
+  desktop.update();*/
 }
 
 void LCD::setSync(uint16_t const hSync, uint16_t const vSync) volatile

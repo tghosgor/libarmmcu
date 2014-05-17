@@ -3,6 +3,8 @@
 // Font size    : 24x32 pixels
 // Memory usage : 9124 bytes
 
+//http://www.henningkarlsen.com/electronics/r_fonts.php
+
 #include <font/ubuntu_bold.h>
 
 namespace stm32f429

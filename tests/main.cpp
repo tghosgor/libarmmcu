@@ -78,7 +78,8 @@ SET_UP_LCD:
 
   auto lcd0 = RCC::enablePeriph<RCC::LTDC>();
   lcd0->enable(ActiveWidth, hSync, HBP, HFP, ActiveHeight, vSync, VBP, VFP);
-  lcd0->setBgColor({255, 0, 0});
+  //lcd0->setBgColor({255, 0, 0});
+  lcd0->setBgColor({255, 255, 255});
 
 SET_UP_EXTI0:
   //Configure EXTI0 to PA0 Rising Edge
@@ -106,15 +107,15 @@ SET_UP_TIM:
     if(cntVal >= std::numeric_limits<uint16_t>::max() / 2)
     {
       LCD::Color const green{0, 255, 0};
-      if(lcd0->getBgColor() != green)
-        lcd0->setBgColor(green);
+      //if(lcd0->getBgColor() != green)
+      //  lcd0->setBgColor(green);
       portGpin13.set();
     }
     else
     {
       LCD::Color const red{255, 0, 0};
-      if(lcd0->getBgColor() != red)
-        lcd0->setBgColor(red);
+      //if(lcd0->getBgColor() != red)
+      //  lcd0->setBgColor(red);
       portGpin13.reset();
     }
   }
