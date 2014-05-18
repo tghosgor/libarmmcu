@@ -128,7 +128,8 @@ SET_UP_TIM:
 
   TextWindow textWindow3(desktop, font::arialBold, {240 - 48, 0, 240, 16});
 
-  auto rtc = RCC::enablePeriph<RCC::RTC>();
+  //auto rtc = RCC::enablePeriph<RCC::RTC>();
+  volatile RTC* rtc = RTC::open(RTC::ClockSource::LSI);
 
   while(true)
   {

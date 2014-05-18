@@ -24,57 +24,22 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <driver/RTC.h>
+#ifndef OS_H_
+#define OS_H_
 
-#include <OS.h>
-#include <driver/PWR.h>
-#include <driver/RCC.h>
+#include <driver/fwd.h>
+#include <util.h>
+
+#include <cstdint>
 
 namespace stm32f429
 {
-
-volatile RTC* RTC::open(const RTC::ClockSource source)
+namespace OS
 {
-  return new (reinterpret_cast<RTC*>(RTC::BaseAddress)) RTC(source);
-}
 
-RTC::RTC(RTC::ClockSource const source)
-{
-  auto currentClockSource = RCC::instance()->m_BDCR & (0x3 <<8);
-
-  auto pwr = RCC::enablePeriph<RCC::PWR>();
-
-  pwr->disableBDWriteProtection();
-
-  switch(source)
-  {
-    case ClockSource::LSI:
-      RCC::instance()->m_CSR |= 0x1 <<0; //LSI ON
-      while(RCC::instance()->m_CSR & (0x1 <<1) == 0) //LSI Ready
-      { }
-      RCC::instance()->m_BDCR |= 0x2 <<8; //RTC Clock is LSI
-      break;
-    case ClockSource::LSE:
-      RCC::instance()->m_BDCR |= 0x1 <<0; //LSE ON
-      while(! (RCC::instance()->m_BDCR & (0x1 <<1)) ) //LSE Ready
-      { }
-      RCC::instance()->m_BDCR |= 0x1 <<8; //RTC Clock is LSE
-      break;
-    default:
-      OS::halt("Uninimpelented RCC source selected.");
-  }
-
-  if(currentClockSource != static_cast<uint32_t>(source)) //if clock source is same, no-op
-  {
-    RCC::instance()->m_BDCR |= 0x1 <<16; //Backup Domain Reset
-    RCC::instance()->m_BDCR &= ~(0x3 <<8);
-    RCC::instance()->m_BDCR &= ~(0x1 <<16); //Disable Backup Domain Reset
-  }//if
-
-  RCC::instance()->m_BDCR = 0x1 <<15;
-
-  pwr->enableBDWriteProtection();
+void halt(const char* errorMsg);
 
 }
-
 } //NS stm32f429
+
+#endif /* OS_H_ */

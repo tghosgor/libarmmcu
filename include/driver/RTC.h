@@ -27,6 +27,8 @@
 #ifndef RTC_H_
 #define RTC_H_
 
+#include <util.h>
+
 #include <cstdint>
 
 namespace stm32f429
@@ -35,7 +37,19 @@ namespace stm32f429
 class RTC
 {
 public:
-  RTC();
+  uint32_t static constexpr BaseAddress = 0x40002800;
+
+public:
+  enum class ClockSource : uint32_t
+  {
+    NoClock = 0x0,
+    LSE = 0x1 <<8,
+    LSI = 0x2 <<8,
+    HSE = 0x3 <<8
+  };
+
+public: //Methods
+  static volatile RTC* open(ClockSource const source = ClockSource::LSI);
 
   uint8_t const getHourTens() const volatile { return (m_TR & 0x300000) >>20; }
   uint8_t const getHourUnits() const volatile { return (m_TR & 0x0F0000) >>16; }
@@ -44,8 +58,12 @@ public:
   uint8_t const getSecTens() const volatile { return (m_TR & 0x70) >>4; }
   uint8_t const getSecUnits() const volatile { return m_TR & 0x0F; }
 
+private:
+  RTC(ClockSource const source = ClockSource::LSI);
+
 public: //Registers
   uint32_t m_TR; //Time register
+
 };
 
 }

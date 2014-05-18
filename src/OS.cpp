@@ -24,7 +24,24 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <OS.h>
+
+#include <driver/IVTable.h>
+
 #include <sys/types.h>
+
+namespace stm32f429
+{
+namespace OS
+{
+
+static const char* haltErrorMsg;
+
+void halt(const char* errorMsg)
+{
+  haltErrorMsg = errorMsg;
+  Default_Handler();
+}
 
 extern "C"
 {
@@ -34,8 +51,8 @@ caddr_t _sbrk ( int incr )
 
 void _exit()
 {
-  while(true);
 }
+
 void _kill()
 {
 }
@@ -65,3 +82,6 @@ void _read()
 }
 
 }
+
+}//NS OS
+}//NS stm32f429

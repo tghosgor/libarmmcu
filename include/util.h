@@ -35,6 +35,19 @@ namespace stm32f429
 namespace util
 {
 
+template<uint32_t ...values>
+struct EnableSequence
+{
+  constexpr EnableSequence() { }
+
+  template<uint32_t addr, uint32_t val, uint32_t ...restValues>
+  void static run()
+  {
+    *reinterpret_cast<uint32_t volatile*>(addr) = val;
+    run<restValues...>();
+  };
+};
+
 template<std::size_t ccAddress_, uint8_t ccShift_, class T = void, std::size_t regAddress_ = 0>
 struct Module
 {
