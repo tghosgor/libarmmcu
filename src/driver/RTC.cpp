@@ -33,13 +33,20 @@
 namespace stm32f429
 {
 
-volatile RTC* RTC::open(const RTC::ClockSource source)
+/*volatile RTC* RTC::open(const RTC::ClockSource source)
 {
   return new (reinterpret_cast<RTC*>(RTC::BaseAddress)) RTC(source);
-}
+}*/
+
+/*void RTC::close(volatile RTC* rtc)
+{
+  rtc->~RTC();
+}*/
 
 RTC::RTC(RTC::ClockSource const source)
 {
+  m_registers = reinterpret_cast<Registers*>(BaseAddress);
+
   auto currentClockSource = RCC::instance()->m_BDCR & (0x3 <<8);
 
   auto pwr = RCC::enablePeriph<RCC::PWR>();
@@ -71,10 +78,23 @@ RTC::RTC(RTC::ClockSource const source)
     RCC::instance()->m_BDCR &= ~(0x1 <<16); //Disable Backup Domain Reset
   }//if
 
-  RCC::instance()->m_BDCR = 0x1 <<15;
+  RCC::instance()->m_BDCR = 0x1 <<15; //RTC ON
+
+  pwr->enableBDWriteProtection();
+}
+
+RTC::~RTC()
+{
+  auto pwr = RCC::enablePeriph<RCC::PWR>();
 
   pwr->enableBDWriteProtection();
 
+  RCC::instance()->m_CSR &= ~(0x1 <<0); //LSI OFF
+  RCC::instance()->m_BDCR &= ~(0x1 <<0); //LSE OFF
+
+  RCC::instance()->m_BDCR &= ~(0x1 <<15); //RTC OFF
+
+  pwr->disableBDWriteProtection();
 }
 
 } //NS stm32f429

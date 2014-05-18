@@ -49,21 +49,29 @@ public:
   };
 
 public: //Methods
-  static volatile RTC* open(ClockSource const source = ClockSource::LSI);
+  RTC(ClockSource const source = ClockSource::LSI);
+  ~RTC();
 
-  uint8_t const getHourTens() const volatile { return (m_TR & 0x300000) >>20; }
-  uint8_t const getHourUnits() const volatile { return (m_TR & 0x0F0000) >>16; }
-  uint8_t const getMinTens() const volatile { return (m_TR & 0x7000) >>12; }
-  uint8_t const getMinUnits() const volatile { return (m_TR & 0x0F00) >>8; }
-  uint8_t const getSecTens() const volatile { return (m_TR & 0x70) >>4; }
-  uint8_t const getSecUnits() const volatile { return m_TR & 0x0F; }
+  //static volatile RTC* open(ClockSource const source = ClockSource::LSI);
+  //static void close(volatile RTC*);
+
+  uint8_t const getHourTens() const volatile { return (m_registers->m_TR & 0x300000) >>20; }
+  uint8_t const getHourUnits() const volatile { return (m_registers->m_TR & 0x0F0000) >>16; }
+  uint8_t const getMinTens() const volatile { return (m_registers->m_TR & 0x7000) >>12; }
+  uint8_t const getMinUnits() const volatile { return (m_registers->m_TR & 0x0F00) >>8; }
+  uint8_t const getSecTens() const volatile { return (m_registers->m_TR & 0x70) >>4; }
+  uint8_t const getSecUnits() const volatile { return m_registers->m_TR & 0x0F; }
 
 private:
-  RTC(ClockSource const source = ClockSource::LSI);
 
-public: //Registers
-  uint32_t m_TR; //Time register
+private: //Registers
+  struct Registers
+  {
+    uint32_t m_TR; //Time register
+  };
 
+public:
+  Registers* m_registers;
 };
 
 }

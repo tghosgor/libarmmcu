@@ -128,8 +128,8 @@ SET_UP_TIM:
 
   TextWindow textWindow3(desktop, font::arialBold, {240 - 48, 0, 240, 16});
 
-  //auto rtc = RCC::enablePeriph<RCC::RTC>();
-  volatile RTC* rtc = RTC::open(RTC::ClockSource::LSI);
+  //volatile RTC* rtc = RTC::open(RTC::ClockSource::LSI);
+  RTC rtc(RTC::ClockSource::LSI);
 
   while(true)
   {
@@ -140,7 +140,7 @@ SET_UP_TIM:
     textWindow3.update();
 
     static char time[9];
-    sprintf(time, "%d%d:%d%d:%d%d", rtc->getHourTens(),rtc->getHourUnits(), rtc->getMinTens(),rtc->getMinUnits(), rtc->getSecTens(),rtc->getSecUnits());
+    sprintf(time, "%d%d:%d%d:%d%d", rtc.getHourTens(),rtc.getHourUnits(), rtc.getMinTens(),rtc.getMinUnits(), rtc.getSecTens(),rtc.getSecUnits());
     textWindow2.setText(time);
     textWindow2.update();
 
