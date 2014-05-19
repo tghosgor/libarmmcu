@@ -47,12 +47,11 @@ RTC::RTC(RTC::ClockSource const source)
 {
   m_registers = reinterpret_cast<Registers*>(BaseAddress);
 
-  auto currentClockSource = RCC::instance()->m_BDCR & (0x3 <<8);
-
   auto pwr = RCC::enablePeriph<RCC::PWR>();
 
   pwr->disableBDWriteProtection();
 
+  //enable selected clock in case it is not enabled
   switch(source)
   {
     case ClockSource::LSI:
@@ -63,13 +62,15 @@ RTC::RTC(RTC::ClockSource const source)
       break;
     case ClockSource::LSE:
       RCC::instance()->m_BDCR |= 0x1 <<0; //LSE ON
-      while(! (RCC::instance()->m_BDCR & (0x1 <<1)) ) //LSE Ready
+      while(RCC::instance()->m_BDCR & (0x1 <<1) == 0 ) //LSE Ready
       { }
       RCC::instance()->m_BDCR |= 0x1 <<8; //RTC Clock is LSE
       break;
     default:
       OS::halt("Uninimpelented RCC source selected.");
   }
+
+  auto currentClockSource = RCC::instance()->m_BDCR & (0x3 <<8);
 
   if(currentClockSource != static_cast<uint32_t>(source)) //if clock source is same, no-op
   {
