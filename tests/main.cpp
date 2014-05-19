@@ -25,6 +25,7 @@
 */
 
 #include <driver/EXTI.h>
+#include <driver/I2C.h>
 #include <driver/IVTable.h>
 #include <driver/GPIO.h>
 #include <driver/LCD.h>
@@ -127,6 +128,8 @@ SET_UP_TIM:
   TextWindow textWindow2(desktop, font::arialBold, {0, 0, 16*8, 16});
 
   TextWindow textWindow3(desktop, font::arialBold, {240 - 48, 0, 240, 16});
+
+  I2C i2c(I2C::_3);
 
   //volatile RTC* rtc = RTC::open(RTC::ClockSource::LSI);
   RTC rtc(RTC::ClockSource::LSI);

@@ -44,14 +44,16 @@ public: //Declarations
     _3 = 0x40005C00
   };*/
 
-  util::Module2 _1 {0x40023800 + 0x40, 0x1 <<21, 0x40005400};
-  util::Module2 _2 {0x40023800 + 0x40, 0x1 <<22, 0x40005800};
-  util::Module2 _3 {0x40023800 + 0x40, 0x1 <<23, 0x40005C00};
+  using Module = util::Module2<I2C>;
+
+  static constexpr Module _1 {0x40023800 + 0x40, 0x1 <<21, 0x40005400};
+  static constexpr Module _2 {0x40023800 + 0x40, 0x1 <<22, 0x40005800};
+  static constexpr Module _3 {0x40023800 + 0x40, 0x1 <<23, 0x40005C00};
 
 public:
 
 public: //Methods
-  I2C(util::Module2 const& module);
+  I2C(const Module& module);
   I2C(I2C&& other);
   ~I2C();
 
@@ -77,7 +79,7 @@ public:
 
 private:
   bool m_isValid;
-  util::Module2 const& m_module;
+  util::Module2<I2C> const& m_module;
 };
 
 }

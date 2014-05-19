@@ -58,23 +58,24 @@ struct Module
   static constexpr std::size_t regAddress = moduleAddr_;
 };
 
+template<class T>
 struct Module2
 {
-  uint32_t* const m_rccAddr;
+  const std::size_t m_rccAddr;
   const uint32_t m_rccVal;
-  void* m_moduleAddr;
+  const std::size_t m_moduleAddr;
 
-  Module2(const std::size_t rccAddr, const uint32_t val, const std::size_t moduleAddr)
-    : m_rccAddr(reinterpret_cast<decltype(m_rccAddr)>(rccAddr))
+  constexpr Module2(const std::size_t rccAddr, const uint32_t val, const std::size_t moduleAddr)
+    : m_rccAddr(rccAddr)
     , m_rccVal(val)
-    , m_moduleAddr(reinterpret_cast<decltype(m_moduleAddr)>(moduleAddr))
+    , m_moduleAddr(moduleAddr)
   {}
-};
 
-inline bool operator==(const Module2& lhs, const Module2& rhs)
-{
-  return &lhs == &rhs;
-}
+  friend bool operator==(const Module2& lhs, const Module2& rhs)
+  {
+    return &lhs == &rhs;
+  }
+};
 
 typedef std::function<bool()> ISR;
 

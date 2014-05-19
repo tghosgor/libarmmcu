@@ -26,13 +26,23 @@
 
 #include <driver/I2C.h>
 
+#include <OS.h>
+#include <driver/GPIO.h>
+#include <driver/RCC.h>
+
 namespace stm32f429
 {
 
-I2C::I2C(const util::Module2& module)
+constexpr I2C::Module I2C::_1;
+constexpr I2C::Module I2C::_2;
+constexpr I2C::Module I2C::_3;
+
+I2C::I2C(const Module& module)
   : m_module(module)
 {
-  if(*module.m_rccAddr & module.m_rccVal != 0)
+  uint32_t& rccReg = *reinterpret_cast<uint32_t* const>(module.m_rccAddr);
+
+  if(rccReg & module.m_rccVal != 0)
   {
     m_isValid = false;
   }
@@ -40,7 +50,17 @@ I2C::I2C(const util::Module2& module)
   {
     m_isValid = true;
 
-    *module.m_rccAddr |= module.m_rccVal;
+    if(module == _3)
+    {
+      RCC::enablePeriph<RCC::GPIOA>()->createPin(8, GPIO::Port::AlternatePin).setAF(GPIO::Port::APin::AF::_10);
+      RCC::enablePeriph<RCC::GPIOC>()->createPin(9, GPIO::Port::AlternatePin).setAF(GPIO::Port::APin::AF::_10);
+    }
+    else
+    {
+      OS::halt("Unimplemented I2C module selected.");
+    }
+
+    rccReg |= module.m_rccVal;
     m_registers = reinterpret_cast<Registers*>(module.m_moduleAddr);
   }
 }
@@ -57,7 +77,9 @@ I2C::~I2C()
 {
   if(isValid())
   {
-    *m_module.m_rccAddr &= ~(m_module.m_rccVal);
+    uint32_t& rccReg = *reinterpret_cast<uint32_t* const>(m_module.m_rccAddr);
+
+    rccReg &= ~(m_module.m_rccVal);
   }
 }
 
