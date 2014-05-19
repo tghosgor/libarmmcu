@@ -19,7 +19,7 @@ if (NOT CMAKE_BUILD_TYPE)
 endif()
 
 set(CMAKE_C_FLAGS "-std=c11 -mcpu=cortex-m4 -mthumb")
-set(CMAKE_CXX_FLAGS "-std=c++11 -mcpu=cortex-m4 -mthumb -fno-exceptions")
+set(CMAKE_CXX_FLAGS "-std=c++11 -mcpu=cortex-m4 -mthumb")
 set(CMAKE_CXX_FLAGS_DEBUG "-g2")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -g2 -fno-inline")
 set(CMAKE_ASM_FLAGS "-mcpu=cortex-m4 -mthumb")

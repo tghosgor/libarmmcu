@@ -27,6 +27,7 @@
 #include <driver/RTC.h>
 
 #include <OS.h>
+#include <exception.h>
 #include <driver/PWR.h>
 #include <driver/RCC.h>
 
@@ -43,14 +44,18 @@ namespace stm32f429
   rtc->~RTC();
 }*/
 
+bool RTC::m_initialized;
+
 RTC::RTC(RTC::ClockSource const source)
 {
-  if(RCC::instance()->m_BDCR & 0x1 <<15 != 0) //RTC is already on
+  if(m_initialized) //RTC is already on
   {
     m_isValid = false;
+    throw exception::EnableError("RTC is already enabled.");
   }
   else
   {
+    m_initialized = true;
     m_isValid = true;
 
     m_registers = reinterpret_cast<Registers*>(BaseAddress);
@@ -75,7 +80,7 @@ RTC::RTC(RTC::ClockSource const source)
         RCC::instance()->m_BDCR |= 0x1 <<8; //RTC Clock is LSE
         break;
       default:
-        OS::halt("Unimplemented RCC source selected.");
+        throw exception::FatalError("Unimplemented RCC source selected.");
     }
 
     auto currentClockSource = RCC::instance()->m_BDCR & (0x3 <<8);
@@ -104,6 +109,8 @@ RTC::~RTC()
 {
   if(isValid())
   {
+    m_initialized = false;
+
     auto pwr = RCC::enablePeriph<RCC::PWR>();
 
     pwr->enableBDWriteProtection();

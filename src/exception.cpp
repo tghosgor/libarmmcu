@@ -24,22 +24,36 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef OS_H_
-#define OS_H_
-
-#include <driver/fwd.h>
-#include <util.h>
-
-#include <cstdint>
+#include <exception.h>
 
 namespace stm32f429
 {
-namespace OS
+namespace exception
 {
 
-void halt(const char* errorMsg);
+EnableError::EnableError(const char* const str) throw()
+  : m_str(str)
+{ }
 
-} //NS OS
+EnableError::~EnableError() throw()
+{ }
+
+const char* const& EnableError::what() const throw()
+{
+  return m_str;
+}
+
+FatalError::FatalError(const char* const str) throw()
+  : m_str(str)
+{ }
+
+FatalError::~FatalError() throw()
+{ }
+
+const char* const& FatalError::what() const throw()
+{
+  return m_str;
+}
+
+} //NS exception
 } //NS stm32f429
-
-#endif /* OS_H_ */

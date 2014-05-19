@@ -73,6 +73,8 @@ public:
 
 private:
   bool m_isValid;
+
+  static bool m_initialized;
 };
 
 }

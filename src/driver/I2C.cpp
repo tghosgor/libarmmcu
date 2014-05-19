@@ -26,6 +26,7 @@
 
 #include <driver/I2C.h>
 
+#include <exception.h>
 #include <OS.h>
 #include <driver/GPIO.h>
 #include <driver/RCC.h>
@@ -57,7 +58,7 @@ I2C::I2C(const Module& module)
     }
     else
     {
-      OS::halt("Unimplemented I2C module selected.");
+      throw exception::FatalError("Unimplemented I2C module selected.");
     }
 
     rccReg |= module.m_rccVal;
