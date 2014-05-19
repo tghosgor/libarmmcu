@@ -27,8 +27,6 @@
 #ifndef RTC_H_
 #define RTC_H_
 
-#include <util.h>
-
 #include <cstdint>
 
 namespace stm32f429

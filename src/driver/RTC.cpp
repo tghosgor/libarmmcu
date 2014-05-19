@@ -102,7 +102,7 @@ RTC::RTC(RTC&& other)
 
 RTC::~RTC()
 {
-  if(m_isValid)
+  if(isValid())
   {
     auto pwr = RCC::enablePeriph<RCC::PWR>();
 

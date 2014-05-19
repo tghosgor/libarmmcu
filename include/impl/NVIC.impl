@@ -35,13 +35,13 @@ namespace stm32f429
 template<class Module>
 typename Module::RegType volatile* NVIC::enable()
 {
-  reinterpret_cast<NVIC volatile*>(BaseAddress)->m_ISER[Module::ccShift / 32] |= 0x1 <<(Module::ccShift % 32);
+  reinterpret_cast<NVIC volatile*>(BaseAddress)->m_ISER[Module::rccVal / 32] |= 0x1 <<(Module::rccVal % 32);
 }
 
 template<class Module>
 void NVIC::disable()
 {
-  reinterpret_cast<NVIC volatile*>(BaseAddress)->m_ICER[Module::ccShift / 32] &= ~(0x1 <<(Module::ccShift % 32));
+  reinterpret_cast<NVIC volatile*>(BaseAddress)->m_ICER[Module::rccVal / 32] &= ~(0x1 <<(Module::rccVal % 32));
 }
 
 template<class Module>

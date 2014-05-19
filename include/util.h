@@ -48,15 +48,33 @@ struct EnableSequence
   };
 };
 
-template<std::size_t ccAddress_, uint8_t ccShift_, class T = void, std::size_t regAddress_ = 0>
+template<std::size_t rccAddr_, uint8_t rccVal_, class T = void, std::size_t moduleAddr_ = 0>
 struct Module
 {
-  static constexpr uint32_t ccAddress = ccAddress_;
-  static constexpr uint8_t ccShift = ccShift_;
+  static constexpr uint32_t rccAddr = rccAddr_;
+  static constexpr uint8_t rccVal = rccVal_;
 
   typedef T RegType;
-  static constexpr std::size_t regAddress = regAddress_;
+  static constexpr std::size_t regAddress = moduleAddr_;
 };
+
+struct Module2
+{
+  uint32_t* const m_rccAddr;
+  const uint32_t m_rccVal;
+  void* m_moduleAddr;
+
+  Module2(const std::size_t rccAddr, const uint32_t val, const std::size_t moduleAddr)
+    : m_rccAddr(reinterpret_cast<decltype(m_rccAddr)>(rccAddr))
+    , m_rccVal(val)
+    , m_moduleAddr(reinterpret_cast<decltype(m_moduleAddr)>(moduleAddr))
+  {}
+};
+
+inline bool operator==(const Module2& lhs, const Module2& rhs)
+{
+  return &lhs == &rhs;
+}
 
 typedef std::function<bool()> ISR;
 
