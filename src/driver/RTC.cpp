@@ -45,57 +45,76 @@ namespace stm32f429
 
 RTC::RTC(RTC::ClockSource const source)
 {
-  m_registers = reinterpret_cast<Registers*>(BaseAddress);
-
-  auto pwr = RCC::enablePeriph<RCC::PWR>();
-
-  pwr->disableBDWriteProtection();
-
-  //enable selected clock in case it is not enabled
-  switch(source)
+  if(RCC::instance()->m_BDCR & 0x1 <<15 != 0) //RTC is already on
   {
-    case ClockSource::LSI:
-      RCC::instance()->m_CSR |= 0x1 <<0; //LSI ON
-      while(RCC::instance()->m_CSR & (0x1 <<1) == 0) //LSI Ready
-      { }
-      RCC::instance()->m_BDCR |= 0x2 <<8; //RTC Clock is LSI
-      break;
-    case ClockSource::LSE:
-      RCC::instance()->m_BDCR |= 0x1 <<0; //LSE ON
-      while(RCC::instance()->m_BDCR & (0x1 <<1) == 0 ) //LSE Ready
-      { }
-      RCC::instance()->m_BDCR |= 0x1 <<8; //RTC Clock is LSE
-      break;
-    default:
-      OS::halt("Uninimpelented RCC source selected.");
+    m_isValid = false;
   }
-
-  auto currentClockSource = RCC::instance()->m_BDCR & (0x3 <<8);
-
-  if(currentClockSource != static_cast<uint32_t>(source)) //if clock source is same, no-op
+  else
   {
-    RCC::instance()->m_BDCR |= 0x1 <<16; //Backup Domain Reset
-    RCC::instance()->m_BDCR &= ~(0x3 <<8);
-    RCC::instance()->m_BDCR &= ~(0x1 <<16); //Disable Backup Domain Reset
-  }//if
+    m_isValid = true;
 
-  RCC::instance()->m_BDCR = 0x1 <<15; //RTC ON
+    m_registers = reinterpret_cast<Registers*>(BaseAddress);
 
-  pwr->enableBDWriteProtection();
+    auto pwr = RCC::enablePeriph<RCC::PWR>();
+
+    pwr->disableBDWriteProtection();
+
+    //enable selected clock in case it is not enabled
+    switch(source)
+    {
+      case ClockSource::LSI:
+        RCC::instance()->m_CSR |= 0x1 <<0; //LSI ON
+        while(RCC::instance()->m_CSR & (0x1 <<1) == 0) //LSI Ready
+        { }
+        RCC::instance()->m_BDCR |= 0x2 <<8; //RTC Clock is LSI
+        break;
+      case ClockSource::LSE:
+        RCC::instance()->m_BDCR |= 0x1 <<0; //LSE ON
+        while(RCC::instance()->m_BDCR & (0x1 <<1) == 0 ) //LSE Ready
+        { }
+        RCC::instance()->m_BDCR |= 0x1 <<8; //RTC Clock is LSE
+        break;
+      default:
+        OS::halt("Unimplemented RCC source selected.");
+    }
+
+    auto currentClockSource = RCC::instance()->m_BDCR & (0x3 <<8);
+
+    if(currentClockSource != static_cast<uint32_t>(source)) //if clock source is same, no-op
+    {
+      RCC::instance()->m_BDCR |= 0x1 <<16; //Backup Domain Reset
+      RCC::instance()->m_BDCR &= ~(0x3 <<8);
+      RCC::instance()->m_BDCR &= ~(0x1 <<16); //Disable Backup Domain Reset
+    }//if
+
+    RCC::instance()->m_BDCR = 0x1 <<15; //RTC ON
+
+    pwr->enableBDWriteProtection();
+  }
+}
+
+RTC::RTC(RTC&& other)
+  : m_registers(other.m_registers)
+  , m_isValid(other.m_isValid)
+{
+  other.m_isValid = false;
 }
 
 RTC::~RTC()
 {
-  auto pwr = RCC::enablePeriph<RCC::PWR>();
+  if(m_isValid)
+  {
+    auto pwr = RCC::enablePeriph<RCC::PWR>();
 
-  pwr->enableBDWriteProtection();
+    pwr->enableBDWriteProtection();
 
-  RCC::instance()->m_CSR &= ~(0x1 <<0); //LSI OFF
-  RCC::instance()->m_BDCR &= ~(0x1 <<0); //LSE OFF
+    RCC::instance()->m_CSR &= ~(0x1 <<0); //LSI OFF
+    RCC::instance()->m_BDCR &= ~(0x1 <<0); //LSE OFF
 
-  RCC::instance()->m_BDCR &= ~(0x1 <<15); //RTC OFF
+    RCC::instance()->m_BDCR &= ~(0x1 <<15); //RTC OFF
 
-  pwr->disableBDWriteProtection();
+    pwr->disableBDWriteProtection();
+  }
 }
 
 } //NS stm32f429

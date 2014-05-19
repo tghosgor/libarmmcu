@@ -50,10 +50,12 @@ public:
 
 public: //Methods
   RTC(ClockSource const source = ClockSource::LSI);
+  RTC(RTC&& other);
   ~RTC();
 
   //static volatile RTC* open(ClockSource const source = ClockSource::LSI);
   //static void close(volatile RTC*);
+  bool const isValid() { return m_isValid; }
 
   uint8_t const getHourTens() const volatile { return (m_registers->m_TR & 0x300000) >>20; }
   uint8_t const getHourUnits() const volatile { return (m_registers->m_TR & 0x0F0000) >>16; }
@@ -61,8 +63,6 @@ public: //Methods
   uint8_t const getMinUnits() const volatile { return (m_registers->m_TR & 0x0F00) >>8; }
   uint8_t const getSecTens() const volatile { return (m_registers->m_TR & 0x70) >>4; }
   uint8_t const getSecUnits() const volatile { return m_registers->m_TR & 0x0F; }
-
-private:
 
 private: //Registers
   struct Registers
@@ -72,6 +72,9 @@ private: //Registers
 
 public:
   Registers* m_registers;
+
+private:
+  bool m_isValid;
 };
 
 }
