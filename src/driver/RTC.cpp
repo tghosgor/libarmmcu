@@ -47,6 +47,7 @@ namespace stm32f429
 bool RTC::m_initialized;
 
 RTC::RTC(RTC::ClockSource const source)
+  : m_registers(*reinterpret_cast<Registers*>(BaseAddress))
 {
   if(m_initialized) //RTC is already on
   {
@@ -57,8 +58,6 @@ RTC::RTC(RTC::ClockSource const source)
   {
     m_initialized = true;
     m_isValid = true;
-
-    m_registers = reinterpret_cast<Registers*>(BaseAddress);
 
     auto pwr = RCC::enablePeriph<RCC::PWR>();
 

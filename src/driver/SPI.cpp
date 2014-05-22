@@ -40,17 +40,17 @@ void SPI::enable(DataFrame const dataFrameFormat, bool const enableHardwareCRC) 
   auto pin8 = portF->createPin(8, GPIO::Port::AlternatePin);
   auto pin9 = portF->createPin(9, GPIO::Port::AlternatePin);
 
-  pin7.setPullMode(GPIO::Port::APin::PullMode::PullDown);
-  pin8.setPullMode(GPIO::Port::APin::PullMode::PullDown);
-  pin9.setPullMode(GPIO::Port::APin::PullMode::PullDown);
+  pin7.setPullMode(GPIO::Port::AlPin::PullMode::PullDown);
+  pin8.setPullMode(GPIO::Port::AlPin::PullMode::PullDown);
+  pin9.setPullMode(GPIO::Port::AlPin::PullMode::PullDown);
 
-  pin7.setOutputSpeed(GPIO::Port::APin::OutputSpeed::Medium);
-  pin8.setOutputSpeed(GPIO::Port::APin::OutputSpeed::Medium);
-  pin9.setOutputSpeed(GPIO::Port::APin::OutputSpeed::Medium);
+  pin7.setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Medium);
+  pin8.setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Medium);
+  pin9.setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Medium);
 
-  pin7.setAF(GPIO::Port::APin::AF::_5);
-  pin8.setAF(GPIO::Port::APin::AF::_5);
-  pin9.setAF(GPIO::Port::APin::AF::_5);
+  pin7.setAF(GPIO::Port::AlPin::AF::_5);
+  pin8.setAF(GPIO::Port::AlPin::AF::_5);
+  pin9.setAF(GPIO::Port::AlPin::AF::_5);
 
   m_CR1 |= static_cast<uint32_t const>(dataFrameFormat) <<11 | static_cast<uint32_t const>(enableHardwareCRC) <<13;
   m_CR1 |= 0x1u <<6;//TODO: üstteki satır ayarlanmadan SPI açmayın diyor ama bu şekil ayırmaya gerek var mı?

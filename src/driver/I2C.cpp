@@ -53,8 +53,8 @@ I2C::I2C(const Module& module)
 
     if(module == _3)
     {
-      RCC::enablePeriph<RCC::GPIOA>()->createPin(8, GPIO::Port::AlternatePin).setAF(GPIO::Port::APin::AF::_10);
-      RCC::enablePeriph<RCC::GPIOC>()->createPin(9, GPIO::Port::AlternatePin).setAF(GPIO::Port::APin::AF::_10);
+      RCC::enablePeriph<RCC::GPIOA>()->createPin(8, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_10);
+      RCC::enablePeriph<RCC::GPIOC>()->createPin(9, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_10);
     }
     else
     {

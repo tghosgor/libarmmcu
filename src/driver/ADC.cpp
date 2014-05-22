@@ -24,59 +24,53 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef RTC_H_
-#define RTC_H_
+#include <driver/ADC.h>
 
-#include <cstdint>
+#include <driver/GPIO.h>
+#include <driver/RCC.h>
 
 namespace stm32f429
 {
 
-class RTC
+ADC::ADC(const Module& module)
+  : m_registers(*reinterpret_cast<Registers*>(baseModule + static_cast<std::size_t>(module) * 0x100))
 {
-public:
-  uint32_t static constexpr BaseAddress = 0x40002800;
+  RCC::enablePeriph<RCC::GPIOA>()->createPin(0, GPIO::Port::AnalogPin);
 
-public:
-  enum class ClockSource : uint32_t
-  {
-    NoClock = 0x0,
-    LSE = 0x1 <<8,
-    LSI = 0x2 <<8,
-    HSE = 0x3 <<8
-  };
+  RCC::instance()->m_APB2ENR |= 0x1 <<(8 + static_cast<std::size_t>(module));
 
-public: //Methods
-  explicit RTC(ClockSource const source = ClockSource::LSI);
-  RTC(RTC&& other);
-  ~RTC();
-
-  //static volatile RTC* open(ClockSource const source = ClockSource::LSI);
-  //static void close(volatile RTC*);
-  bool const isValid() { return m_isValid; }
-
-  uint8_t const getHourTens() const volatile { return (m_registers.m_TR & 0x300000) >>20; }
-  uint8_t const getHourUnits() const volatile { return (m_registers.m_TR & 0x0F0000) >>16; }
-  uint8_t const getMinTens() const volatile { return (m_registers.m_TR & 0x7000) >>12; }
-  uint8_t const getMinUnits() const volatile { return (m_registers.m_TR & 0x0F00) >>8; }
-  uint8_t const getSecTens() const volatile { return (m_registers.m_TR & 0x70) >>4; }
-  uint8_t const getSecUnits() const volatile { return m_registers.m_TR & 0x0F; }
-
-private: //Registers
-  struct Registers
-  {
-    uint32_t m_TR; //Time register
-  };
-
-public:
-  Registers& m_registers;
-
-private:
-  bool m_isValid;
-
-  static bool m_initialized;
-};
-
+  m_registers.m_CR2 |= 0x1;
 }
 
-#endif /* RTC_H_ */
+void ADC::setResolution(const ADC::Resolution& res) volatile
+{
+  m_registers.m_CR1 &= ~(0x3 <<24); //clear old resolution
+  m_registers.m_CR1 |= static_cast<uint32_t>(res) <<24; //set new resolution
+}
+
+void ADC::enableContinuous() volatile
+{
+  m_registers.m_CR2 |= 0x1 <<1;
+}
+
+void ADC::disableContinous() volatile
+{
+  m_registers.m_CR2 &= ~(0x1 <<1);
+}
+
+void ADC::startConversion() volatile
+{
+  m_registers.m_CR2 |= 0x1 <<30;
+}
+
+bool ADC::isEndOfConversion() volatile
+{
+  return m_registers.m_SR & (0x1 <<1);
+}
+
+const uint16_t ADC::getResult() volatile
+{
+  return m_registers.m_DR;
+}
+
+} //NS stm32f429

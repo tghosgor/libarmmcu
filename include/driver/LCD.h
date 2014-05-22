@@ -129,9 +129,9 @@ public: //Registers
 private: //TODO: this structure is placed on top of LCD-TFT register so the ones below has to be static
          // but there may be more than one LCD connected with different ports so this class should have a pointer
          // to the register along with a seperate "struct LCDRegister"
-  static GPIO::Port::OPin m_RDX;
-  static GPIO::Port::OPin m_WRX;
-  static GPIO::Port::OPin m_CSX;
+  static GPIO::Port::OuPin m_RDX;
+  static GPIO::Port::OuPin m_WRX;
+  static GPIO::Port::OuPin m_CSX;
 
   static SPI volatile* m_spi5;
 

@@ -63,15 +63,16 @@ private: //Internal Declarations
   };
 
 public: //Declarations
-  class IPin;
-  class OPin;
-  class APin;
-
   class Pin;
+  class InPin;
+  class OuPin;
+  class AlPin;
+  class AnPin;
 
-  static constexpr PinType<0x0, IPin> InputPin{};
-  static constexpr PinType<0x1, OPin> OutputPin{};
-  static constexpr PinType<0x2, APin> AlternatePin{};
+  static constexpr PinType<0x0, InPin> InputPin{};
+  static constexpr PinType<0x1, OuPin> OutputPin{};
+  static constexpr PinType<0x2, AlPin> AlternatePin{};
+  static constexpr PinType<0x3, AnPin> AnalogPin{};
 
 public: //Methods
   template<class PinType_>
@@ -113,14 +114,14 @@ protected:
   Port volatile& m_port;
 }; //END Pin
 
-class Port::IPin : public Pin
+class Port::InPin : public Pin
 {
   friend class Port;
 
 public: //Declarations
 
 public: //Methods
-  IPin(uint8_t const nPin, Port volatile& port);
+  InPin(uint8_t const nPin, Port volatile& port);
 
   bool getInputState() volatile;
 
@@ -128,7 +129,7 @@ private:
   static constexpr uint8_t m_moder = 0x0;
 }; //END InputPin
 
-class Port::OPin : public Pin
+class Port::OuPin : public Pin
 {
 public: //Declarations
   enum class OutputSpeed : uint32_t
@@ -140,12 +141,12 @@ public: //Declarations
   };
 
 public: //Methods
-  OPin(uint8_t const nPin, Port volatile& port);
+  OuPin(uint8_t const nPin, Port volatile& port);
 
-  OPin volatile& setOutputSpeed(OutputSpeed const ospeed) volatile;
+  OuPin volatile& setOutputSpeed(OutputSpeed const ospeed) volatile;
 
-  OPin volatile& set() volatile;
-  OPin volatile& reset() volatile;
+  OuPin volatile& set() volatile;
+  OuPin volatile& reset() volatile;
 
   bool getOutputState() volatile;
 
@@ -153,7 +154,7 @@ private:
   static constexpr uint8_t m_moder = 0x1;
 }; //END OutputPin
 
-class Port::APin : public Pin
+class Port::AlPin : public Pin
 {
   friend class Port;
 
@@ -175,13 +176,21 @@ public: //Declarations
   };
 
 public: //Methods
-  APin(uint8_t const nPin, Port volatile& port);
+  AlPin(uint8_t const nPin, Port volatile& port);
 
-  APin volatile& setAF(AF const af) volatile;
-  APin volatile& setOutputSpeed(OutputSpeed const ospeed) volatile;
+  AlPin volatile& setAF(AF const af) volatile;
+  AlPin volatile& setOutputSpeed(OutputSpeed const ospeed) volatile;
 
 private:
   static constexpr uint8_t m_moder = 0x2;
+};
+
+class Port::AnPin : public Pin
+{
+  friend class Port;
+
+public:
+  AnPin(uint8_t const nPin, Port volatile& port);
 };
 
 //END AFPin

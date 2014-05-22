@@ -31,55 +31,65 @@
 
 namespace stm32f429
 {
-namespace ADC
-{
-
-enum : std::size_t
-{
-  _1 = 0x40012000,
-  _2 = 0x40012100,
-  _3 = 0x40012200
-};
 
 namespace
 {
-uint32_t volatile* commonRegisters = 0x40012300;
+constexpr std::size_t baseModule = 0x40012000;
+const volatile uint32_t* commonRegisters = reinterpret_cast<const volatile uint32_t*>(0x40012300);
 }
 
-template<std::size_t module>
-class Periph
+class ADC
 {
 public:
-  Periph() = delete;
+  enum class Module : std::size_t
+  {
+    _1 = 0,
+    _2,
+    _3
+  };
+
+  enum class Resolution : uint8_t
+  {
+    _12Bit = 0,
+    _10Bit = 0x1,
+    _8Bit = 0x2,
+    _6Bit = 0x3
+  };
 
 public:
-//private:
-  uint32_t m_SR;
-  uint32_t m_CR1;
-  uint32_t m_CR2;
-  uint32_t m_SMPR1;
-  uint32_t m_SMPR2;
-  uint32_t m_JOFR1;
-  uint32_t m_JOFR2;
-  uint32_t m_JOFR3;
-  uint32_t m_JOFR4;
-  uint32_t m_HTR;
-  uint32_t m_LTR;
-  uint32_t m_SQR1;
-  uint32_t m_SQR2;
-  uint32_t m_SQR3;
-  uint32_t m_JSQR;
-  uint32_t m_JDR1;
-  uint32_t m_JDR2;
-  uint32_t m_JDR3;
-  uint32_t m_JDR4;
-  uint32_t m_DR;
+  explicit ADC(const Module&);
+
+  void setResolution(const Resolution&) volatile;
+
+  void enableContinuous() volatile;
+  void disableContinous() volatile;
+
+  void startConversion() volatile;
+
+  bool isEndOfConversion() volatile;
+
+  const uint16_t getResult() volatile;
+
+private:
+  struct Registers
+  {
+    uint32_t m_SR;
+    uint32_t m_CR1;
+    uint32_t m_CR2;
+    uint32_t m_SMPR[2];
+    uint32_t m_JOFR[4];
+    uint32_t m_HTR;
+    uint32_t m_LTR;
+    uint32_t m_SQR[3];
+    uint32_t m_JSQR;
+    uint32_t m_JDR[4];
+    uint32_t m_DR;
+  };
+
+public: //Declarations
+  Registers& m_registers;
 };
 
-template<std::size_t module>
-constexpr Periph<module> volatile* getPeriph() { return reinterpret_cast<Periph<module> volatile*>(module); }
-
-} //NS ADC
 } //NS stm32f429
 
 #endif /* ADC_H_ */

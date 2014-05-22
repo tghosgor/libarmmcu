@@ -24,6 +24,7 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <driver/ADC.h>
 #include <driver/EXTI.h>
 #include <driver/I2C.h>
 #include <driver/IVTable.h>
@@ -119,23 +120,41 @@ SET_UP_TIM:
   uint32_t const windowHeight = 300;
 
   Compositor desktop({reinterpret_cast<void*>(fbData), windowWidth * windowHeight * sizeof(uint16_t)}, windowWidth, windowHeight);
-  desktop.update();
 
   TextWindow textWindow(desktop, font::arialBold, {30, 20, 30 + 140, 20 + (16 * 3 - 8)}); //3.5 lines
   textWindow.setText("Naber? test test2");
-  textWindow.update();
 
   TextWindow textWindow2(desktop, font::arialBold, {0, 0, 16*8, 16});
+  textWindow2.setText("0");
 
   TextWindow textWindow3(desktop, font::arialBold, {240 - 48, 0, 240, 16});
+  textWindow3.setText("0");
+
+  TextWindow adcWindow(desktop, font::arialBold, {0, 300 - 16, 240, 300});
+  adcWindow.setText("ADC Result");
 
   I2C i2c(I2C::_3);
 
   //volatile RTC* rtc = RTC::open(RTC::ClockSource::LSI);
-  RTC rtc(RTC::ClockSource::LSI);
+  volatile RTC rtc(RTC::ClockSource::LSI);
+
+  volatile ADC adc(ADC::Module::_1);
+
+  desktop.update();
+
+  //adc.enableContinuous();
 
   while(true)
   {
+    adc.startConversion();
+    while(!adc.isEndOfConversion())
+    { }
+
+    static char adcResult[6];
+    sprintf(adcResult, "%d", adc.getResult());
+    adcWindow.setText(adcResult);
+    adcWindow.update();
+
     static uint8_t i = 0;
     static char str[4];
     sprintf(str, "%d", i++);

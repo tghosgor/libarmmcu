@@ -51,22 +51,28 @@ template
 decltype(Port::OutputPin)::type Port::createPin(uint8_t const nPin, decltype(Port::OutputPin) const) volatile;
 template
 decltype(Port::AlternatePin)::type Port::createPin(uint8_t const nPin, decltype(Port::AlternatePin) const) volatile;
+template
+decltype(Port::AnalogPin)::type Port::createPin(uint8_t const nPin, decltype(Port::AnalogPin) const) volatile;
 
 Port::Pin::Pin(uint8_t const nPin, Port volatile& port)
   : m_nPin(nPin)
   , m_port(port)
 { }
 
-Port::OPin::OPin(uint8_t const nPin, Port volatile& port)
+Port::OuPin::OuPin(uint8_t const nPin, Port volatile& port)
   : Pin(nPin, port)
 { }
 
-Port::IPin::IPin(uint8_t const nPin, Port volatile& port)
+Port::InPin::InPin(uint8_t const nPin, Port volatile& port)
   : Pin(nPin, port)
 { }
 
-Port::APin::APin(uint8_t const nPin, Port volatile& port)
+Port::AlPin::AlPin(uint8_t const nPin, Port volatile& port)
   : Pin(nPin, port)
+{ }
+
+Port::AnPin::AnPin(const uint8_t nPin, volatile Port& port)
+: Pin(nPin, port)
 { }
 
 void Port::Pin::setPullMode(typename Port::Pin::PullMode const ppm) volatile
@@ -76,7 +82,7 @@ void Port::Pin::setPullMode(typename Port::Pin::PullMode const ppm) volatile
   m_port.m_PUPDR |= static_cast<uint32_t>(ppm) <<shiftBy;
 }
 
-Port::OPin volatile& Port::OPin::setOutputSpeed(Port::OPin::OutputSpeed const ospeed) volatile
+Port::OuPin volatile& Port::OuPin::setOutputSpeed(Port::OuPin::OutputSpeed const ospeed) volatile
 {
   const uint32_t shiftBy { m_nPin * 2u };
   m_port.m_OSPEEDR &= ~(0x3u <<shiftBy);
@@ -85,39 +91,39 @@ Port::OPin volatile& Port::OPin::setOutputSpeed(Port::OPin::OutputSpeed const os
   return *this;
 }
 
-Port::OPin volatile& Port::OPin::set() volatile
+Port::OuPin volatile& Port::OuPin::set() volatile
 {
   m_port.m_BSRR |= static_cast<uint16_t>(0x1u) <<m_nPin;
 
   return *this;
 }
 
-Port::OPin volatile& Port::OPin::reset() volatile
+Port::OuPin volatile& Port::OuPin::reset() volatile
 {
   m_port.m_BSRR |= static_cast<uint16_t>(0x1u) <<(m_nPin + 16);
 
   return *this;
 }
 
-bool Port::OPin::getOutputState() volatile
+bool Port::OuPin::getOutputState() volatile
 {
   return (m_port.m_ODR & (static_cast<uint16_t>(0x1u) <<m_nPin));
 }
 
-bool Port::IPin::getInputState() volatile
+bool Port::InPin::getInputState() volatile
 {
   return (m_port.m_IDR & (static_cast<uint16_t>(0x1u) <<m_nPin));
 }
 
-Port::APin volatile& Port::APin::setOutputSpeed(Port::APin::OutputSpeed const ospeed) volatile
+Port::AlPin volatile& Port::AlPin::setOutputSpeed(Port::AlPin::OutputSpeed const ospeed) volatile
 {
-  reinterpret_cast<Port::OPin volatile&>(*this).setOutputSpeed(
-        static_cast<typename Port::OPin::OutputSpeed>(ospeed));
+  reinterpret_cast<Port::OuPin volatile&>(*this).setOutputSpeed(
+        static_cast<typename Port::OuPin::OutputSpeed>(ospeed));
 
   return *this;
 }
 
-Port::APin volatile& Port::APin::setAF(Port::APin::AF const af) volatile
+Port::AlPin volatile& Port::AlPin::setAF(Port::AlPin::AF const af) volatile
 {
   const uint32_t offset{ m_nPin / 8u };
   const uint32_t shift{ (m_nPin * 4u) % 32u };
