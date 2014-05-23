@@ -24,9 +24,9 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <driver/PWR.h>
+#include <driver/PWR.hpp>
 
-#include <driver/RCC.h>
+#include <driver/RCC.hpp>
 
 namespace stm32f429
 {

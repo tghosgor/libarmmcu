@@ -24,9 +24,9 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <window/window.h>
+#include <window/window.hpp>
 
-#include <window/compositor.h>
+#include <window/compositor.hpp>
 
 #include <algorithm>
 

@@ -24,7 +24,7 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <window/compositor.h>
+#include <window/compositor.hpp>
 
 namespace stm32f429
 {

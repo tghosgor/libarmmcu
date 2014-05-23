@@ -24,9 +24,9 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <OS.h>
+#include <OS.hpp>
 
-#include <driver/IVTable.h>
+#include <driver/IVTable.hpp>
 
 #include <sys/types.h>
 

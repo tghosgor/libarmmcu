@@ -27,8 +27,8 @@
 #ifndef EXTI_CPP_
 #define EXTI_CPP_
 
-#include <driver/EXTI.h>
-#include <driver/IVTable.h>
+#include <driver/EXTI.hpp>
+#include <driver/IVTable.hpp>
 
 namespace stm32f429
 {

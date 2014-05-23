@@ -27,9 +27,9 @@
 #ifndef LCD_CPP_
 #define LCD_CPP_
 
-#include <driver/LCD.h>
+#include <driver/LCD.hpp>
 
-#include <driver/SPI.h>
+#include <driver/SPI.hpp>
 
 #include <cstring>
 

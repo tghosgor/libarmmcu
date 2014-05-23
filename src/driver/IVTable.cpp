@@ -24,7 +24,7 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <driver/IVTable.h>
+#include <driver/IVTable.hpp>
 
 namespace stm32f429
 {

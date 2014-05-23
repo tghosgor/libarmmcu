@@ -24,7 +24,7 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <driver/PLL.h>
+#include <driver/PLL.hpp>
 
 namespace stm32f429
 {

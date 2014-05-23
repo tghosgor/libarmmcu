@@ -31,10 +31,10 @@
 #include <cstdint>
 #include <type_traits>
 
-#include <driver/EXTI.h>
-#include <driver/NVIC.h>
+#include <driver/EXTI.hpp>
+#include <driver/NVIC.hpp>
 
-#include <util.h>
+#include <util.hpp>
 
 namespace stm32f429
 {

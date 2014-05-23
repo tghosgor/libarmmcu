@@ -24,9 +24,9 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <driver/RCC.h>
+#include <driver/RCC.hpp>
 
-#include <driver/GPIO.h>
+#include <driver/GPIO.hpp>
 
 #include <type_traits>
 

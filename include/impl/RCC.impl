@@ -27,7 +27,7 @@
 #ifndef RCC_CPP_
 #define RCC_CPP_
 
-#include <driver/RCC.h>
+#include <driver/RCC.hpp>
 
 namespace stm32f429
 {

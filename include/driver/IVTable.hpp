@@ -24,30 +24,30 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef TEXT_WINDOW_H_
-#define TEXT_WINDOW_H_
+#ifndef IVTABLE_H_
+#define IVTABLE_H_
 
-#include <window/window.h>
+#include <cstdint>
+
+#include <array>
+
+#include <util.hpp>
 
 namespace stm32f429
 {
 
-class TextWindow
-  : public Window
+extern "C" void Default_Handler();
+
+struct IVTable
 {
-public:
-  TextWindow(Window& window, uint8_t const* const font, Area const area = {0, 0, 0, 0});
+  uint32_t m_notImplemented[16];
+  std::array<void(*)(), 32> m_IRQ;
 
-  void setText(char const* const cstr);
-
-  std::pair<uint16_t, bool> const virtual getPixel(std::size_t const x, std::size_t const y) const override;
-
-private:
-  uint8_t const* m_font;
-  char const* m_cstr;
-  std::size_t m_cstrLen;
+  IVTable() { std::fill(m_IRQ.begin(), m_IRQ.end(), Default_Handler); }
 };
 
-}//NS stm32f429
+extern IVTable ivTable;
 
-#endif
+} //NS stm32f429
+
+#endif /* IVTABLE_H_ */

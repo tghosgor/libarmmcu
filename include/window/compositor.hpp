@@ -24,44 +24,34 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef EXCEPTION_H_
-#define EXCEPTION_H_
+#ifndef COMPOSITOR_H_
+#define COMPOSITOR_H_
 
-#include <driver/fwd.h>
-#include <util.h>
-
-#include <cstdint>
+#include <window/window.hpp>
 
 namespace stm32f429
 {
-namespace exception
-{
 
-class Error
-{
-public:
-  Error(const char* const str) throw();
-  ~Error() throw();
-
-  const char* const& what() const throw();
-
-private:
-  const char* const m_str;
-};
-
-class FatalError
+class Compositor
+  : public Window
 {
 public:
-  FatalError(const char* const str) throw();
-  ~FatalError() throw();
+  struct FrameBuffer
+  {
+    void* buffer;
+    std::size_t size;
+  };
 
-  const char* const& what() const throw();
+public:
+  Compositor(FrameBuffer const& fb, std::size_t const width, std::size_t const height);
+
+  void render(Area const& area);
 
 private:
-  const char* const m_str;
+  FrameBuffer const m_frameBuffer;
+  uint16_t static constexpr m_defaultPixelColor = 0xFFFF;
 };
 
-} //NS exception
-} //NS stm32f429
+}//NS stm32f429
 
-#endif /* EXCEPTION_H_ */
+#endif

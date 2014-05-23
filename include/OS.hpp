@@ -24,30 +24,22 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef IVTABLE_H_
-#define IVTABLE_H_
+#ifndef OS_H_
+#define OS_H_
+
+#include <driver/fwd.hpp>
+#include <util.hpp>
 
 #include <cstdint>
 
-#include <array>
-
-#include <util.h>
-
 namespace stm32f429
 {
-
-extern "C" void Default_Handler();
-
-struct IVTable
+namespace OS
 {
-  uint32_t m_notImplemented[16];
-  std::array<void(*)(), 32> m_IRQ;
 
-  IVTable() { std::fill(m_IRQ.begin(), m_IRQ.end(), Default_Handler); }
-};
+void halt(const char* errorMsg);
 
-extern IVTable ivTable;
-
+} //NS OS
 } //NS stm32f429
 
-#endif /* IVTABLE_H_ */
+#endif /* OS_H_ */

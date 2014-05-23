@@ -24,34 +24,76 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef COMPOSITOR_H_
-#define COMPOSITOR_H_
+#ifndef SPI_H_
+#define SPI_H_
 
-#include <window/window.h>
+#include <driver/fwd.hpp>
+#include <util.hpp>
+
+#include <cstdint>
 
 namespace stm32f429
 {
 
-class Compositor
-  : public Window
+class SPI
 {
-public:
-  struct FrameBuffer
+  friend class RCC;
+
+public: //Declarations
+  enum : uint32_t
   {
-    void* buffer;
-    std::size_t size;
+    _1 = 0x40013000,
+    _5 = 0x40015000
   };
 
-public:
-  Compositor(FrameBuffer const& fb, std::size_t const width, std::size_t const height);
+  enum class DataFrame : bool
+  {
+    _8Bit = false,
+    _16Bit = true
+  };
 
-  void render(Area const& area);
+  enum class BaudPSC : uint8_t
+  {
+    _0 = 0,
+    _4 = 1,
+    _8 = 2,
+    _16 = 3,
+    _32 = 4,
+    _64 = 5,
+    _128 = 6,
+    _256 = 7
+  };
+
+public: //Methods
+  void enable(DataFrame const dataFrameFormat = DataFrame::_8Bit, bool const enableHardwareCRC = false) volatile;
+  void setMasterMode() volatile;
+  void setSlaveMode() volatile;
+  void setBidirectionalMode() volatile;
+  void setUnidirectionalMode() volatile;
+  void setBaudPrescaler(BaudPSC const psc) volatile;
+  void enableSoftwareSlaveMode() volatile;
+  void disableSoftwareSlaveMode() volatile;
+  void enableInternalSlaveSelect() volatile;
+  void disableInternalSlaveSelect() volatile;
+  void send(uint16_t data) volatile;
+
+  DataFrame getDataFrameFormat() volatile const;
 
 private:
-  FrameBuffer const m_frameBuffer;
-  uint16_t static constexpr m_defaultPixelColor = 0xFFFF;
+  uint32_t m_CR1;
+  uint32_t m_CR2;
+  uint32_t m_SR;
+  uint32_t m_DR;
+  uint32_t m_CRCPR;
+  uint32_t m_RXCRCR;
+  uint32_t m_TXCRCR;
+  uint32_t m_I2SCFGR;
+  uint32_t m_I2SPR;
+
+private:
+  SPI() { }
 };
 
-}//NS stm32f429
+} //NS stm32f429
 
-#endif
+#endif /* SPI_H_ */

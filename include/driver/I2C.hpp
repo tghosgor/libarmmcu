@@ -27,7 +27,7 @@
 #ifndef I2C_H_
 #define I2C_H_
 
-#include <util.h>
+#include <util.hpp>
 
 #include <cstdint>
 

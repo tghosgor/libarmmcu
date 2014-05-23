@@ -39,17 +39,17 @@ file(GLOB global_SRC
 )
 
 file(GLOB driver_SRC
-    "include/driver/*.h"
+    "include/driver/*.hpp"
     "src/driver/*.cpp"
 )
 
 file(GLOB window_SRC
-    "include/window/*.h"
+    "include/window/*.hpp"
     "src/window/*.cpp"
 )
 
 file(GLOB font_SRC
-    "include/font/*.h"
+    "include/font/*.hpp"
     "src/font/*.cpp"
 )
 

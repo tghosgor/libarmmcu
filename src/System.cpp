@@ -1,6 +1,6 @@
 
-#include <driver/RCC.h>
-#include <driver/SCB.h>
+#include <driver/RCC.hpp>
+#include <driver/SCB.hpp>
 
 using namespace stm32f429;
 

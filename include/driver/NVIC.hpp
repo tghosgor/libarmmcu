@@ -30,7 +30,7 @@
 #include <cstddef> //offsetof
 #include <cstdint>
 
-#include <util.h>
+#include <util.hpp>
 
 namespace stm32f429
 {

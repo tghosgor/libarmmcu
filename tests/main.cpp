@@ -24,23 +24,23 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <driver/ADC.h>
-#include <driver/EXTI.h>
-#include <driver/I2C.h>
-#include <driver/IVTable.h>
-#include <driver/GPIO.h>
-#include <driver/LCD.h>
-#include <driver/NVIC.h>
-#include <driver/RCC.h>
-#include <driver/RTC.h>
-#include <driver/SCB.h>
-#include <driver/SYSCFG.h>
-#include <driver/TIM.h>
+#include <driver/ADC.hpp>
+#include <driver/EXTI.hpp>
+#include <driver/I2C.hpp>
+#include <driver/IVTable.hpp>
+#include <driver/GPIO.hpp>
+#include <driver/LCD.hpp>
+#include <driver/NVIC.hpp>
+#include <driver/RCC.hpp>
+#include <driver/RTC.hpp>
+#include <driver/SCB.hpp>
+#include <driver/SYSCFG.hpp>
+#include <driver/TIM.hpp>
 
-#include <window/compositor.h>
-#include <window/text_window.h>
-#include <font/arial_normal.h>
-#include <font/arial_bold.h>
+#include <window/compositor.hpp>
+#include <window/text_window.hpp>
+#include <font/arial_normal.hpp>
+#include <font/arial_bold.hpp>
 
 #include <cstring>
 #include <cstdint>
@@ -143,6 +143,8 @@ SET_UP_TIM:
   desktop.update();
 
   //adc.enableContinuous();
+  auto tim = RCC::enablePeriph<RCC::TIM1>();
+  tim->set
 
   while(true)
   {

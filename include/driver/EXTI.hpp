@@ -31,7 +31,7 @@
 
 #include <functional>
 
-#include <util.h>
+#include <util.hpp>
 
 namespace stm32f429
 {
