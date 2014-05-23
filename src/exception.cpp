@@ -31,14 +31,14 @@ namespace stm32f429
 namespace exception
 {
 
-EnableError::EnableError(const char* const str) throw()
+Error::Error(const char* const str) throw()
   : m_str(str)
 { }
 
-EnableError::~EnableError() throw()
+Error::~Error() throw()
 { }
 
-const char* const& EnableError::what() const throw()
+const char* const& Error::what() const throw()
 {
   return m_str;
 }

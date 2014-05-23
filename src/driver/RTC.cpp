@@ -52,7 +52,7 @@ RTC::RTC(RTC::ClockSource const source)
   if(m_initialized) //RTC is already on
   {
     m_isValid = false;
-    throw exception::EnableError("RTC is already enabled.");
+    throw exception::Error("RTC is already enabled.");
   }
   else
   {

@@ -37,11 +37,11 @@ namespace stm32f429
 namespace exception
 {
 
-class EnableError
+class Error
 {
 public:
-  EnableError(const char* const str) throw();
-  ~EnableError() throw();
+  Error(const char* const str) throw();
+  ~Error() throw();
 
   const char* const& what() const throw();
 

@@ -40,7 +40,7 @@ extern "C" void Default_Handler();
 
 struct IVTable
 {
-  uint32_t notImplemented[16];
+  uint32_t m_notImplemented[16];
   std::array<void(*)(), 32> m_IRQ;
 
   IVTable() { std::fill(m_IRQ.begin(), m_IRQ.end(), Default_Handler); }
