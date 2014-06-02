@@ -145,7 +145,7 @@ template<std::size_t module>
 template<uint8_t idx>
 void Periph<module>::CC<idx>::setValue(uint32_t const value) volatile
 {
-  constexpr uint32_t volatile* CCR1 = &(reinterpret_cast<Periph<module> volatile* const>(module)->m_CCR1);
+  uint32_t volatile* CCR1 = &(reinterpret_cast<Periph<module> volatile* const>(module)->m_CCR1);
   *(CCR1 + (idx - 1)) =  value;
 }
 

@@ -63,8 +63,8 @@ auto portApin0 = portA->createPin(0, GPIO::Port::InputPin);
 auto portD = RCC::enablePeriph<RCC::GPIOD>();
 auto portDpin2 = portD->createPin(2, GPIO::Port::InputPin);*/
 
-auto portG = RCC::enablePeriph<RCC::GPIOG>();
-auto portGpin13 = portG->createPin(13, GPIO::Port::OutputPin);
+GPIO::Port portG(GPIO::Port::G);
+auto portGpin13 = portG.createPin(13, GPIO::Port::OutputPin);
 /*auto portGpin14 = portG->createPin(14, GPIO::Port::OutputPin);
 
 auto syscfg = RCC::enablePeriph<RCC::SYSCFG>();
@@ -115,11 +115,11 @@ SET_UP_TIM:
   TIM1->setPrescalerValue(1000);
   TIM1->enable();
 
-  uint32_t volatile const fbData = reinterpret_cast<uint32_t const volatile>(&layerFrameBuffer);
-  uint32_t const windowWidth = 240;
-  uint32_t const windowHeight = 300;
+  void* const fbData = reinterpret_cast<void* const>(&layerFrameBuffer);
+  constexpr uint32_t windowWidth = 240;
+  constexpr uint32_t windowHeight = 300;
 
-  Compositor desktop({reinterpret_cast<void*>(fbData), windowWidth * windowHeight * sizeof(uint16_t)}, windowWidth, windowHeight);
+  Compositor desktop({fbData, windowWidth * windowHeight * sizeof(uint16_t)}, windowWidth, windowHeight);
 
   TextWindow textWindow(desktop, font::arialBold, {30, 20, 30 + 140, 20 + (16 * 3 - 8)}); //3.5 lines
   textWindow.setText("Naber? test test2");
@@ -139,12 +139,22 @@ SET_UP_TIM:
   volatile RTC rtc(RTC::ClockSource::LSI);
 
   volatile ADC adc(ADC::Module::_1);
+  //adc.enableContinuous();
+
+  GPIO::Port portB(GPIO::Port::B);
+  auto tim43pwm = portB.createPin(6, GPIO::Port::AlternatePin);
+  tim43pwm.setAF(GPIO::Port::AlPin::AF::_2);
+  auto tim4 = RCC::enablePeriph<RCC::TIM4>();
+  tim4->enableAutoReloadPreload();
+  tim4->setAutoReloadValue(15000);
+  tim4->getCC<1>().setOCMode(TIM::Periph<TIM::_4>::CC<1>::OCMode::PWM1);
+  tim4->getCC<1>().setValue(1);
+  tim4->getCC<1>().enableOCPreload();
+  tim4->generateEvent();
+  tim4->enable();
+  tim4->getCC<1>().enable();
 
   desktop.update();
-
-  //adc.enableContinuous();
-  auto tim = RCC::enablePeriph<RCC::TIM1>();
-  tim->set
 
   while(true)
   {
@@ -152,9 +162,13 @@ SET_UP_TIM:
     while(!adc.isEndOfConversion())
     { }
 
-    static char adcResult[6];
-    sprintf(adcResult, "%d", adc.getResult());
-    adcWindow.setText(adcResult);
+    auto adcResult = adc.getResult();
+
+    tim4->getCC<1>().setValue((adcResult * 15000) / 4095);
+
+    static char adcResultStr[6];
+    sprintf(adcResultStr, "%d", adcResult);
+    adcWindow.setText(adcResultStr);
     adcWindow.update();
 
     static uint8_t i = 0;
@@ -172,15 +186,15 @@ SET_UP_TIM:
     if(cntVal >= std::numeric_limits<uint16_t>::max() / 2)
     {
       LCD::Color const green{0, 255, 0};
-      //if(lcd0->getBgColor() != green)
-      //  lcd0->setBgColor(green);
+      if(lcd0->getBgColor() != green)
+        lcd0->setBgColor(green);
       portGpin13.set();
     }
     else
     {
       LCD::Color const red{255, 0, 0};
-      //if(lcd0->getBgColor() != red)
-      //  lcd0->setBgColor(red);
+      if(lcd0->getBgColor() != red)
+        lcd0->setBgColor(red);
       portGpin13.reset();
     }
   }

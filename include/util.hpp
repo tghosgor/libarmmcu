@@ -35,19 +35,6 @@ namespace stm32f429
 namespace util
 {
 
-template<uint32_t ...values>
-struct EnableSequence
-{
-  constexpr EnableSequence() { }
-
-  template<uint32_t addr, uint32_t val, uint32_t ...restValues>
-  void static run()
-  {
-    *reinterpret_cast<uint32_t volatile*>(addr) = val;
-    run<restValues...>();
-  };
-};
-
 template<std::size_t rccAddr_, uint8_t rccVal_, class T = void, std::size_t moduleAddr_ = 0>
 struct Module
 {
@@ -58,26 +45,25 @@ struct Module
   static constexpr std::size_t regAddress = moduleAddr_;
 };
 
-template<class T>
+template<class T, std::size_t N>
 struct Module2
 {
-  const std::size_t m_rccAddr;
-  const uint32_t m_rccVal;
-  const std::size_t m_moduleAddr;
+  using EnablePairList = std::array<std::pair<const std::size_t, const uint32_t>, N>;
 
-  constexpr Module2(const std::size_t rccAddr, const uint32_t val, const std::size_t moduleAddr)
-    : m_rccAddr(rccAddr)
-    , m_rccVal(val)
-    , m_moduleAddr(moduleAddr)
-  {}
+  const std::size_t m_moduleAddress;
+  const EnablePairList m_enablePairs;
+
+  void enable()
+  {
+    for(const auto& it : m_enablePairs)
+      it->first |= it->second;
+  }
 
   friend bool operator==(const Module2& lhs, const Module2& rhs)
   {
     return &lhs == &rhs;
   }
 };
-
-typedef std::function<bool()> ISR;
 
 }
 

@@ -32,12 +32,14 @@
 
 #include <driver/fwd.hpp>
 
+#include <util.hpp>
+
 namespace stm32f429
 {
 namespace GPIO
 {
 
-enum : std::size_t
+enum class Module : std::size_t
 {
   PortA = 0x40020000,
   PortB = 0x40020400,
@@ -62,7 +64,19 @@ private: //Internal Declarations
     using type = typeName_;
   };
 
-public: //Declarations
+  using Module = util::Module2<Port, 1>;
+
+public: //Declarationss
+  static const Module A;
+  static const Module B;
+  static const Module C;
+  static const Module D;
+  static const Module E;
+  static const Module F;
+  static const Module G;
+  static const Module H;
+  static const Module I;
+
   class Pin;
   class InPin;
   class OuPin;
@@ -75,22 +89,27 @@ public: //Declarations
   static constexpr PinType<0x3, AnPin> AnalogPin{};
 
 public: //Methods
+  Port(Module const& module);
+
   template<class PinType_>
-  typename PinType_::type createPin(uint8_t const nPin, PinType_ const) volatile;
+  typename PinType_::type createPin(const uint8_t nPin, const PinType_) volatile;
 
-public: //Registers
-  uint32_t m_MODER;
-  uint32_t m_OTYPER;
-  uint32_t m_OSPEEDR;
-  uint32_t m_PUPDR;
-  uint32_t m_IDR;
-  uint32_t m_ODR;
-  uint32_t m_BSRR;
-  uint32_t m_LCKR;
-  uint32_t m_AFR[2];
+private: //Registers
+  struct Registers
+  {
+    uint32_t m_MODER;
+    uint32_t m_OTYPER;
+    uint32_t m_OSPEEDR;
+    uint32_t m_PUPDR;
+    uint32_t m_IDR;
+    uint32_t m_ODR;
+    uint32_t m_BSRR;
+    uint32_t m_LCKR;
+    uint32_t m_AFR[2];
+  };
 
-private:
-  Port() { }
+public:
+  Registers* const m_registers;
 }; //END Port
 
 class Port::Pin //Common Pin interface

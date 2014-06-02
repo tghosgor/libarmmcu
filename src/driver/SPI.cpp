@@ -34,11 +34,11 @@ namespace stm32f429
 
 void SPI::enable(DataFrame const dataFrameFormat, bool const enableHardwareCRC) volatile
 {
-  auto portF = RCC::enablePeriph<RCC::GPIOF>();
+  GPIO::Port portF(GPIO::Port::F);
 
-  auto pin7 = portF->createPin(7, GPIO::Port::AlternatePin);
-  auto pin8 = portF->createPin(8, GPIO::Port::AlternatePin);
-  auto pin9 = portF->createPin(9, GPIO::Port::AlternatePin);
+  auto pin7 = portF.createPin(7, GPIO::Port::AlternatePin);
+  auto pin8 = portF.createPin(8, GPIO::Port::AlternatePin);
+  auto pin9 = portF.createPin(9, GPIO::Port::AlternatePin);
 
   pin7.setPullMode(GPIO::Port::AlPin::PullMode::PullDown);
   pin8.setPullMode(GPIO::Port::AlPin::PullMode::PullDown);

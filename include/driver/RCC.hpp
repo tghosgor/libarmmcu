@@ -96,7 +96,7 @@ public: //Declarations
 public: //Methods
   RCC() = delete;
 
-  static constexpr RCC volatile* const instance();
+  static RCC volatile* const instance();
 
   template<class Module>
   static typename Module::RegType volatile* enablePeriph();

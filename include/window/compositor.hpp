@@ -43,13 +43,13 @@ public:
   };
 
 public:
-  Compositor(FrameBuffer const& fb, std::size_t const width, std::size_t const height);
+  Compositor(const FrameBuffer& fb, const std::size_t width, const std::size_t height);
 
-  void render(Area const& area);
+  void render(const Area& area);
 
 private:
-  FrameBuffer const m_frameBuffer;
-  uint16_t static constexpr m_defaultPixelColor = 0xFFFF;
+  const FrameBuffer m_frameBuffer;
+  static constexpr uint16_t m_defaultPixelColor = 0xFFFF;
 };
 
 }//NS stm32f429

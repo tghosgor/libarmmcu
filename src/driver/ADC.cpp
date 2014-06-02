@@ -35,7 +35,8 @@ namespace stm32f429
 ADC::ADC(const Module& module)
   : m_registers(*reinterpret_cast<Registers*>(baseModule + static_cast<std::size_t>(module) * 0x100))
 {
-  RCC::enablePeriph<RCC::GPIOA>()->createPin(0, GPIO::Port::AnalogPin);
+  GPIO::Port portA(portA);
+  portA.createPin(0, GPIO::Port::AnalogPin);
 
   RCC::instance()->m_APB2ENR |= 0x1 <<(8 + static_cast<std::size_t>(module));
 

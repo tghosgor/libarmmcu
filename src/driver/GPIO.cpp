@@ -35,12 +35,28 @@ namespace stm32f429
 namespace GPIO
 {
 
+const Port::Module Port::A { 0x40020000, {{ {0x40023800 + 0x30, 0x1 <<0} }} };
+const Port::Module Port::B { 0x40020400, {{ {0x40023800 + 0x30, 0x1 <<1} }} };
+const Port::Module Port::C { 0x40020800, {{ {0x40023800 + 0x30, 0x1 <<2} }} };
+const Port::Module Port::D { 0x40020C00, {{ {0x40023800 + 0x30, 0x1 <<3} }} };
+const Port::Module Port::E { 0x40021000, {{ {0x40023800 + 0x30, 0x1 <<4} }} };
+const Port::Module Port::F { 0x40021400, {{ {0x40023800 + 0x30, 0x1 <<5} }} };
+const Port::Module Port::G { 0x40021800, {{ {0x40023800 + 0x30, 0x1 <<6} }} };
+const Port::Module Port::H { 0x40021C00, {{ {0x40023800 + 0x30, 0x1 <<7} }} };
+const Port::Module Port::I { 0x40022000, {{ {0x40023800 + 0x30, 0x1 <<8} }} };
+
+Port::Port(Module const& module)
+  : m_registers(reinterpret_cast<Registers* const>(module.m_moduleAddress))
+{
+  module.enable();
+}
+
 template<class PinType_>
 typename PinType_::type Port::createPin(uint8_t const nPin, PinType_ const) volatile
 {
   const uint32_t shiftBy { (nPin * 2u) };
-  m_MODER &= ~(0x3u <<shiftBy);
-  m_MODER |= static_cast<uint32_t>(PinType_::moder) <<shiftBy;
+  m_registers->m_MODER &= ~(0x3u <<shiftBy);
+  m_registers->m_MODER |= static_cast<uint32_t>(PinType_::moder) <<shiftBy;
 
   return typename PinType_::type(nPin, *this);
 }
@@ -78,41 +94,41 @@ Port::AnPin::AnPin(const uint8_t nPin, volatile Port& port)
 void Port::Pin::setPullMode(typename Port::Pin::PullMode const ppm) volatile
 {
   const uint32_t shiftBy { m_nPin * 2u };
-  m_port.m_PUPDR &= ~(0x3u <<shiftBy);
-  m_port.m_PUPDR |= static_cast<uint32_t>(ppm) <<shiftBy;
+  m_port.m_registers->m_PUPDR &= ~(0x3u <<shiftBy);
+  m_port.m_registers->m_PUPDR |= static_cast<uint32_t>(ppm) <<shiftBy;
 }
 
 Port::OuPin volatile& Port::OuPin::setOutputSpeed(Port::OuPin::OutputSpeed const ospeed) volatile
 {
   const uint32_t shiftBy { m_nPin * 2u };
-  m_port.m_OSPEEDR &= ~(0x3u <<shiftBy);
-  m_port.m_OSPEEDR |= static_cast<uint32_t>(ospeed) <<shiftBy;
+  m_port.m_registers->m_OSPEEDR &= ~(0x3u <<shiftBy);
+  m_port.m_registers->m_OSPEEDR |= static_cast<uint32_t>(ospeed) <<shiftBy;
 
   return *this;
 }
 
 Port::OuPin volatile& Port::OuPin::set() volatile
 {
-  m_port.m_BSRR |= static_cast<uint16_t>(0x1u) <<m_nPin;
+  m_port.m_registers->m_BSRR |= static_cast<uint16_t>(0x1u) <<m_nPin;
 
   return *this;
 }
 
 Port::OuPin volatile& Port::OuPin::reset() volatile
 {
-  m_port.m_BSRR |= static_cast<uint16_t>(0x1u) <<(m_nPin + 16);
+  m_port.m_registers->m_BSRR |= static_cast<uint16_t>(0x1u) <<(m_nPin + 16);
 
   return *this;
 }
 
 bool Port::OuPin::getOutputState() volatile
 {
-  return (m_port.m_ODR & (static_cast<uint16_t>(0x1u) <<m_nPin));
+  return (m_port.m_registers->m_ODR & (static_cast<uint16_t>(0x1u) <<m_nPin));
 }
 
 bool Port::InPin::getInputState() volatile
 {
-  return (m_port.m_IDR & (static_cast<uint16_t>(0x1u) <<m_nPin));
+  return (m_port.m_registers->m_IDR & (static_cast<uint16_t>(0x1u) <<m_nPin));
 }
 
 Port::AlPin volatile& Port::AlPin::setOutputSpeed(Port::AlPin::OutputSpeed const ospeed) volatile
@@ -127,8 +143,8 @@ Port::AlPin volatile& Port::AlPin::setAF(Port::AlPin::AF const af) volatile
 {
   const uint32_t offset{ m_nPin / 8u };
   const uint32_t shift{ (m_nPin * 4u) % 32u };
-  m_port.m_AFR[offset] &= ~(0xFu <<shift);
-  m_port.m_AFR[offset] |= static_cast<uint32_t const>(af) <<shift;
+  m_port.m_registers->m_AFR[offset] &= ~(0xFu <<shift);
+  m_port.m_registers->m_AFR[offset] |= static_cast<uint32_t const>(af) <<shift;
 
   return *this;
 }

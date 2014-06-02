@@ -37,6 +37,8 @@ namespace stm32f429
 namespace OS
 {
 
+typedef std::function<bool()> ISR;
+
 void halt(const char* errorMsg);
 
 } //NS OS
