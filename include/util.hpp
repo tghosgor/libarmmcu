@@ -53,10 +53,10 @@ struct Module2
   const std::size_t m_moduleAddress;
   const EnablePairList m_enablePairs;
 
-  void enable()
+  void enable() const
   {
     for(const auto& it : m_enablePairs)
-      it->first |= it->second;
+      *reinterpret_cast<uint32_t* const>(it.first) |= it.second;
   }
 
   friend bool operator==(const Module2& lhs, const Module2& rhs)

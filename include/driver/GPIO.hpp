@@ -89,7 +89,7 @@ public: //Declarationss
   static constexpr PinType<0x3, AnPin> AnalogPin{};
 
 public: //Methods
-  Port(Module const& module);
+  Port(const Module& module);
 
   template<class PinType_>
   typename PinType_::type createPin(const uint8_t nPin, const PinType_) volatile;
@@ -123,6 +123,8 @@ public:
   };
 
 public: //Methods
+  ~Pin();
+
   void setPullMode(PullMode const ppm) volatile;
 
 protected:
@@ -131,6 +133,10 @@ protected:
 protected:
   uint8_t const m_nPin;
   Port volatile& m_port;
+
+private:
+  //TODO: this should be converted to std::atomic<bool> if required functions are implemented
+  static std::array<bool, 15> m_isUsed;
 }; //END Pin
 
 class Port::InPin : public Pin

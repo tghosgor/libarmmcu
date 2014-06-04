@@ -24,9 +24,10 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <driver/RCC.hpp>
-
 #include <driver/GPIO.hpp>
+
+#include <driver/RCC.hpp>
+#include <exception.hpp>
 
 #include <type_traits>
 
@@ -45,7 +46,9 @@ const Port::Module Port::G { 0x40021800, {{ {0x40023800 + 0x30, 0x1 <<6} }} };
 const Port::Module Port::H { 0x40021C00, {{ {0x40023800 + 0x30, 0x1 <<7} }} };
 const Port::Module Port::I { 0x40022000, {{ {0x40023800 + 0x30, 0x1 <<8} }} };
 
-Port::Port(Module const& module)
+std::array<bool, 15> Port::Pin::m_isUsed;
+
+Port::Port(const Module& module)
   : m_registers(reinterpret_cast<Registers* const>(module.m_moduleAddress))
 {
   module.enable();
@@ -54,10 +57,6 @@ Port::Port(Module const& module)
 template<class PinType_>
 typename PinType_::type Port::createPin(uint8_t const nPin, PinType_ const) volatile
 {
-  const uint32_t shiftBy { (nPin * 2u) };
-  m_registers->m_MODER &= ~(0x3u <<shiftBy);
-  m_registers->m_MODER |= static_cast<uint32_t>(PinType_::moder) <<shiftBy;
-
   return typename PinType_::type(nPin, *this);
 }
 
@@ -73,23 +72,43 @@ decltype(Port::AnalogPin)::type Port::createPin(uint8_t const nPin, decltype(Por
 Port::Pin::Pin(uint8_t const nPin, Port volatile& port)
   : m_nPin(nPin)
   , m_port(port)
-{ }
+{
+  if(Pin::m_isUsed[nPin] == true)
+    throw exception::Error("Pin already used.");
+  Pin::m_isUsed[nPin] = true;
+  const uint32_t shiftBy { (nPin * 2u) };
+  m_port.m_registers->m_MODER &= ~(0x3u <<shiftBy);
+}
 
-Port::OuPin::OuPin(uint8_t const nPin, Port volatile& port)
-  : Pin(nPin, port)
-{ }
+Port::Pin::~Pin()
+{
+  Pin::m_isUsed[m_nPin] = false;
+}
 
 Port::InPin::InPin(uint8_t const nPin, Port volatile& port)
   : Pin(nPin, port)
 { }
 
+Port::OuPin::OuPin(uint8_t const nPin, Port volatile& port)
+  : Pin(nPin, port)
+{
+  const uint32_t shiftBy { (nPin * 2u) };
+  m_port.m_registers->m_MODER |= static_cast<uint32_t>(0x1) <<shiftBy;
+}
+
 Port::AlPin::AlPin(uint8_t const nPin, Port volatile& port)
   : Pin(nPin, port)
-{ }
+{
+  const uint32_t shiftBy { (nPin * 2u) };
+  m_port.m_registers->m_MODER |= static_cast<uint32_t>(0x2) <<shiftBy;
+}
 
 Port::AnPin::AnPin(const uint8_t nPin, volatile Port& port)
 : Pin(nPin, port)
-{ }
+{
+  const uint32_t shiftBy { (nPin * 2u) };
+  m_port.m_registers->m_MODER |= static_cast<uint32_t>(0x3) <<shiftBy;
+}
 
 void Port::Pin::setPullMode(typename Port::Pin::PullMode const ppm) volatile
 {
@@ -121,14 +140,14 @@ Port::OuPin volatile& Port::OuPin::reset() volatile
   return *this;
 }
 
-bool Port::OuPin::getOutputState() volatile
-{
-  return (m_port.m_registers->m_ODR & (static_cast<uint16_t>(0x1u) <<m_nPin));
-}
-
 bool Port::InPin::getInputState() volatile
 {
   return (m_port.m_registers->m_IDR & (static_cast<uint16_t>(0x1u) <<m_nPin));
+}
+
+bool Port::OuPin::getOutputState() volatile
+{
+  return (m_port.m_registers->m_ODR & (static_cast<uint16_t>(0x1u) <<m_nPin));
 }
 
 Port::AlPin volatile& Port::AlPin::setOutputSpeed(Port::AlPin::OutputSpeed const ospeed) volatile
