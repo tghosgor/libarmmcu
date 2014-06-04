@@ -45,9 +45,14 @@ file(GLOB global_SRC
     "src/*.cpp"
 )
 
-file(GLOB driver_SRC
-    "include/driver/*.hpp"
-    "src/driver/*.cpp"
+file(GLOB peripheral_SRC
+    "include/peripheral/*.hpp"
+    "src/peripheral/*.cpp"
+)
+
+file(GLOB register_SRC
+    "include/register/*.hpp"
+    "src/register/*.cpp"
 )
 
 file(GLOB window_SRC
@@ -67,6 +72,6 @@ include_directories(
 #add_library(driver ${driver_SRC})
 #add_library(window ${window_SRC})
 
-add_executable(stm32f429i-disco tests/main.cpp misc/startup_stm32f429xx.S misc/STM32F429ZI_FLASH.ld ${driver_SRC} ${window_SRC} ${font_SRC} ${global_SRC} README.md)
+add_executable(stm32f429i-disco tests/main.cpp misc/startup_stm32f429xx.S misc/STM32F429ZI_FLASH.ld ${register_SRC} ${peripheral_SRC} ${window_SRC} ${font_SRC} ${global_SRC} README.md)
 #target_link_libraries(stm32f429i-disco driver_OBJ window_OBJ)
 

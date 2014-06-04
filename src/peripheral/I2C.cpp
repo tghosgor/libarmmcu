@@ -24,12 +24,12 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <driver/I2C.hpp>
+#include <peripheral/I2C.hpp>
 
 #include <exception.hpp>
 #include <OS.hpp>
-#include <driver/GPIO.hpp>
-#include <driver/RCC.hpp>
+#include <peripheral/GPIO.hpp>
+#include <register/RCC.hpp>
 
 namespace stm32f429
 {

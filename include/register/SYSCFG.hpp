@@ -31,8 +31,8 @@
 #include <cstdint>
 #include <type_traits>
 
-#include <driver/EXTI.hpp>
-#include <driver/NVIC.hpp>
+#include <register/EXTI.hpp>
+#include <register/NVIC.hpp>
 
 #include <util.hpp>
 

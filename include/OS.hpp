@@ -27,7 +27,7 @@
 #ifndef OS_H_
 #define OS_H_
 
-#include <driver/fwd.hpp>
+#include <register/fwd.hpp>
 #include <util.hpp>
 
 #include <cstdint>

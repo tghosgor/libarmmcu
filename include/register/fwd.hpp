@@ -24,21 +24,25 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <driver/PWR.hpp>
+#ifndef FWD_H_
+#define FWD_H_
 
-#include <driver/RCC.hpp>
+//TODO: split register/fwd.h and peripheral/fwd.h
 
 namespace stm32f429
 {
 
-void PWR::disableBDWriteProtection() volatile
-{
-  m_CR |= 0x1 <<8;
-}
+class RCC;
+class LCD;
+class SPI;
+class RTC;
+class PWR;
 
-void PWR::enableBDWriteProtection() volatile
+namespace GPIO
 {
-  m_CR &= ~(0x1 <<8);
+class Port;
 }
 
 } //NS stm32f429
+
+#endif /* FWD_H_ */

@@ -24,18 +24,18 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <driver/ADC.hpp>
-#include <driver/EXTI.hpp>
-#include <driver/I2C.hpp>
-#include <driver/IVTable.hpp>
-#include <driver/GPIO.hpp>
-#include <driver/LCD.hpp>
-#include <driver/NVIC.hpp>
-#include <driver/RCC.hpp>
-#include <driver/RTC.hpp>
-#include <driver/SCB.hpp>
-#include <driver/SYSCFG.hpp>
-#include <driver/TIM.hpp>
+#include <peripheral/ADC.hpp>
+#include <register/EXTI.hpp>
+#include <peripheral/I2C.hpp>
+#include <register/IVTable.hpp>
+#include <peripheral/GPIO.hpp>
+#include <peripheral/LCD.hpp>
+#include <register/NVIC.hpp>
+#include <register/RCC.hpp>
+#include <peripheral/RTC.hpp>
+#include <register/SCB.hpp>
+#include <register/SYSCFG.hpp>
+#include <peripheral/TIM.hpp>
 
 #include <window/compositor.hpp>
 #include <window/text_window.hpp>

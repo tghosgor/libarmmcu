@@ -24,12 +24,12 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <driver/RTC.hpp>
+#include <peripheral/RTC.hpp>
 
 #include <OS.hpp>
 #include <exception.hpp>
-#include <driver/PWR.hpp>
-#include <driver/RCC.hpp>
+#include <register/PWR.hpp>
+#include <register/RCC.hpp>
 
 namespace stm32f429
 {
