@@ -36,21 +36,23 @@ namespace stm32f429
 namespace GPIO
 {
 
-const Port::Module Port::A { 0x40020000, {{ {0x40023800 + 0x30, 0x1 <<0} }} };
-const Port::Module Port::B { 0x40020400, {{ {0x40023800 + 0x30, 0x1 <<1} }} };
-const Port::Module Port::C { 0x40020800, {{ {0x40023800 + 0x30, 0x1 <<2} }} };
-const Port::Module Port::D { 0x40020C00, {{ {0x40023800 + 0x30, 0x1 <<3} }} };
-const Port::Module Port::E { 0x40021000, {{ {0x40023800 + 0x30, 0x1 <<4} }} };
-const Port::Module Port::F { 0x40021400, {{ {0x40023800 + 0x30, 0x1 <<5} }} };
-const Port::Module Port::G { 0x40021800, {{ {0x40023800 + 0x30, 0x1 <<6} }} };
-const Port::Module Port::H { 0x40021C00, {{ {0x40023800 + 0x30, 0x1 <<7} }} };
-const Port::Module Port::I { 0x40022000, {{ {0x40023800 + 0x30, 0x1 <<8} }} };
+const Port::Module Port::A { 0x40020000, std::make_pair(0x40023800 + 0x30, 0x1 <<0) };
+const Port::Module Port::B { 0x40020400, std::make_pair(0x40023800 + 0x30, 0x1 <<1) };
+const Port::Module Port::C { 0x40020800, std::make_pair(0x40023800 + 0x30, 0x1 <<2) };
+const Port::Module Port::D { 0x40020C00, std::make_pair(0x40023800 + 0x30, 0x1 <<3) };
+const Port::Module Port::E { 0x40021000, std::make_pair(0x40023800 + 0x30, 0x1 <<4) };
+const Port::Module Port::F { 0x40021400, std::make_pair(0x40023800 + 0x30, 0x1 <<5) };
+const Port::Module Port::G { 0x40021800, std::make_pair(0x40023800 + 0x30, 0x1 <<6) };
+const Port::Module Port::H { 0x40021C00, std::make_pair(0x40023800 + 0x30, 0x1 <<7) };
+const Port::Module Port::I { 0x40022000, std::make_pair(0x40023800 + 0x30, 0x1 <<8) };
 
 std::array<bool, 15> Port::Pin::m_isUsed;
 
 Port::Port(const Module& module)
   : m_registers(reinterpret_cast<Registers* const>(module.m_moduleAddress))
 {
+  if(module.isEnabled())
+    throw exception::Error("Port is already enabled.");
   module.enable();
 }
 

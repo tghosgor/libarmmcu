@@ -46,9 +46,9 @@ public: //Declarations
 
   using Module = util::Module2<I2C, 1>;
 
-  static constexpr Module _1 { 0x40005400, {{ {0x40023800 + 0x40, 0x1 <<21} }} };
-  static constexpr Module _2 { 0x40005800, {{ {0x40023800 + 0x40, 0x1 <<22} }} };
-  static constexpr Module _3 { 0x40005C00, {{ {0x40023800 + 0x40, 0x1 <<23} }} };
+  static const Module _1;
+  static const Module _2;
+  static const Module _3;
 
 public:
 

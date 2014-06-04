@@ -135,7 +135,7 @@ protected:
   Port volatile& m_port;
 
 private:
-  //TODO: this should be converted to std::atomic<bool> if required functions are implemented
+  //TODO: this should be converted to std::atomic<bool> if required functions for atomics are implemented
   static std::array<bool, 15> m_isUsed;
 }; //END Pin
 

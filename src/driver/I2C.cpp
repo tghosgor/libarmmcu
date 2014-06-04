@@ -34,9 +34,9 @@
 namespace stm32f429
 {
 
-constexpr I2C::Module I2C::_1;
-constexpr I2C::Module I2C::_2;
-constexpr I2C::Module I2C::_3;
+const I2C::Module I2C::_1(0x40005400, std::make_pair(0x40023800 + 0x40, 0x1 <<21));
+const I2C::Module I2C::_2(0x40005800, std::make_pair(0x40023800 + 0x40, 0x1 <<22));
+const I2C::Module I2C::_3(0x40005C00, std::make_pair(0x40023800 + 0x40, 0x1 <<23));
 
 I2C::I2C(const Module& module)
   : m_module(module)

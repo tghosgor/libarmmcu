@@ -31,7 +31,6 @@
 
 namespace stm32f429
 {
-
 namespace util
 {
 
@@ -48,15 +47,31 @@ struct Module
 template<class T, std::size_t N>
 struct Module2
 {
-  using EnablePairList = std::array<std::pair<const std::size_t, const uint32_t>, N>;
+  using EnablePair = std::pair<const std::size_t, const uint32_t>;
+  using EnablePairList = std::array<EnablePair, N>;
 
-  const std::size_t m_moduleAddress;
+  uint32_t* const m_moduleAddress;
   const EnablePairList m_enablePairs;
+
+  template<typename... E>
+  Module2(const std::size_t moduleAddress, E... e)
+    : m_moduleAddress(reinterpret_cast<uint32_t* const>(moduleAddress))
+    , m_enablePairs{e...}
+  { }
 
   void enable() const
   {
     for(const auto& it : m_enablePairs)
       *reinterpret_cast<uint32_t* const>(it.first) |= it.second;
+  }
+
+  bool isEnabled() const
+  {
+    //the first one must be enabler (RCC)
+    if( (*reinterpret_cast<uint32_t* const>(m_enablePairs[0].first) & m_enablePairs[0].second) != 0 )
+      return true;
+    else
+      return false;
   }
 
   friend bool operator==(const Module2& lhs, const Module2& rhs)
@@ -65,8 +80,8 @@ struct Module2
   }
 };
 
-}
 
+} //NS util
 } //NS stm32f429
 
 #endif /* UTIL_H */
