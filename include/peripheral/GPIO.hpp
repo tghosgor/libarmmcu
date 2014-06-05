@@ -109,7 +109,7 @@ private: //Registers
   };
 
 public:
-  Registers* const m_registers;
+  Registers* m_registers;
 }; //END Port
 
 class Port::Pin //Common Pin interface

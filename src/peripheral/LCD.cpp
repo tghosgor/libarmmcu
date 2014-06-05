@@ -30,6 +30,7 @@
 #include <peripheral/LCD.hpp>
 
 #include <peripheral/SPI.hpp>
+#include <exception.hpp>
 
 #include <cstring>
 
@@ -46,13 +47,17 @@ LCD::Color::Color(uint8_t const red, uint8_t const green, uint8_t const blue)
   : m_color(static_cast<uint32_t>(red) <<16 | static_cast<uint32_t>(green) <<8 | static_cast<uint32_t>(blue) <<0)
 { }
 
-LCD::LCD()
-{ }
-
-void LCD::enable(
+LCD::LCD(GPIO::Port& portA, GPIO::Port& portB, GPIO::Port& portC, GPIO::Port& portD, GPIO::Port& portF, GPIO::Port& portG,
     uint16_t const activeWidth, uint16_t const hSync, uint16_t const hBackPorch, uint16_t const HFP,
-    uint16_t const activeHeight, uint16_t const vSync, uint16_t const vBackPorch, uint16_t const VFP) volatile
+    uint16_t const activeHeight, uint16_t const vSync, uint16_t const vBackPorch, uint16_t const VFP)
 {
+  if((RCC::instance()->m_APB2ENR & 0x1 <<26) != 0) //is LTDC clock enabled
+    throw exception::Error("LCD is already enabled.");
+
+  RCC::instance()->m_APB2ENR |= 0x1 <<26;
+
+  m_registers = reinterpret_cast<Registers* const>(LCD::BaseAddress);
+
   RCC::instance()->m_CR &= ~(0x1 <<24); //PLLON OFF
   while (RCC::instance()->m_CR & (0x1 <<25))
   { }
@@ -88,13 +93,6 @@ void LCD::enable(
   m_RDX.setOutputSpeed(GPIO::Port::OuPin::OutputSpeed::Fast);
   m_WRX.setOutputSpeed(GPIO::Port::OuPin::OutputSpeed::Fast);
   m_CSX.setOutputSpeed(GPIO::Port::OuPin::OutputSpeed::Fast);
-
-  GPIO::Port portA(GPIO::Port::A);
-  GPIO::Port portB(GPIO::Port::B);
-  GPIO::Port portC(GPIO::Port::C);
-  GPIO::Port portD(GPIO::Port::D);
-  GPIO::Port portF(GPIO::Port::F);
-  GPIO::Port portG(GPIO::Port::G);
 
   /*
    +------------------------+-----------------------+----------------------------+
@@ -303,7 +301,7 @@ void LCD::enable(
   setActiveWidth(activeWidth + hSync + hBackPorch, activeHeight + vSync + vBackPorch);
   setTotalWidth(activeWidth + hSync + hBackPorch + HFP, activeHeight + vSync + vBackPorch + VFP);
 
-  m_GCR |= 0x1 <<0;
+  m_registers->m_GCR |= 0x1 <<0;
 
   /*uint32_t const imageWidth = smiley.width;
   uint32_t const imageHeight = smiley.height;
@@ -317,87 +315,90 @@ void LCD::enable(
   uint32_t volatile const fbData = reinterpret_cast<uint32_t const volatile>(&layerFrameBuffer);
   uint8_t const bytesPerPixel = 2;
 
-  m_layer1.m_WHPCR &= ~(0xF000F000);
-  m_layer1.m_WHPCR |= ((0 + ((m_BPCR & 0x0FFF0000) >> 16) + 1) | ((windowWidth + ((m_BPCR & 0x0FFF0000) >> 16)) << 16));
-  m_layer1.m_WVPCR &= ~(0xF800F800);
-  m_layer1.m_WVPCR |= ((0 + (m_BPCR & 0x000007FF) + 1) | ((windowHeight + (m_BPCR & 0x000007FF)) << 16));
+  m_registers->m_layer1.m_WHPCR &= ~(0xF000F000);
+  m_registers->m_layer1.m_WHPCR |= ((0 + ((m_registers->m_BPCR & 0x0FFF0000) >> 16) + 1)
+                                   | ((windowWidth + ((m_registers->m_BPCR & 0x0FFF0000) >> 16)) << 16));
+  m_registers->m_layer1.m_WVPCR &= ~(0xF800F800);
+  m_registers->m_layer1.m_WVPCR |= ((0 + (m_registers->m_BPCR & 0x000007FF) + 1)
+                                   | ((windowHeight + (m_registers->m_BPCR & 0x000007FF)) << 16));
   //m_layer1.m_WHPCR = 240 <<16;
   //m_layer1.m_WVPCR = 160 <<16;
 
-  m_layer1.m_PFCR &= ~0x7;
-  m_layer1.m_PFCR |= 0x2; //LTDC_PIXEL_FORMAT_RGB565
+  m_registers->m_layer1.m_PFCR &= ~0x7;
+  m_registers->m_layer1.m_PFCR |= 0x2; //LTDC_PIXEL_FORMAT_RGB565
   //m_layer1.m_PFCR |= 0x4; //ARGB4444
   //m_layer1.m_PFCR |= 0; //ARGB8888
   //m_layer1.m_PFCR |= 0x7; //AL88
-  m_layer1.m_DCCR = 0;//default color
-  m_layer1.m_CACR |= 255;
-  m_layer1.m_BFCR |= 0x6 <<6 | 0x7; //LTDC_BLENDING_FACTOR2_PAxCA
+  m_registers->m_layer1.m_DCCR = 0;//default color
+  m_registers->m_layer1.m_CACR |= 255;
+  m_registers->m_layer1.m_BFCR |= 0x6 <<6 | 0x7; //LTDC_BLENDING_FACTOR2_PAxCA
   //m_layer1.m_CFBAR = reinterpret_cast<uint32_t>(&ST_LOGO_1);
-  m_layer1.m_CFBAR = fbData;
-  m_layer1.m_CFBLR &= ~(0xE000E000);
-  m_layer1.m_CFBLR |= ((windowWidth * bytesPerPixel) <<16) | (windowWidth * bytesPerPixel + 3); //pitch increment from one line of pixels to another <<16 | Active high width x number of bytes per pixel + 3
-  m_layer1.m_CFBLNR &= ~(0x3FF);
-  m_layer1.m_CFBLNR |= windowHeight;
-  m_layer1.m_CR |= 0x1;
+  m_registers->m_layer1.m_CFBAR = fbData;
+  m_registers->m_layer1.m_CFBLR &= ~(0xE000E000);
+  m_registers->m_layer1.m_CFBLR |= ((windowWidth * bytesPerPixel) <<16) | (windowWidth * bytesPerPixel + 3); //pitch increment from one line of pixels to another <<16 | Active high width x number of bytes per pixel + 3
+  m_registers->m_layer1.m_CFBLNR &= ~(0x3FF);
+  m_registers->m_layer1.m_CFBLNR |= windowHeight;
+  m_registers->m_layer1.m_CR |= 0x1;
 
-  m_layer2.m_CR = 0;
+  m_registers->m_layer2.m_CR = 0;
 
   immediateReload();
 }
 
 void LCD::setSync(uint16_t const hSync, uint16_t const vSync) volatile
 {
-  m_SSCR &= ~(0x0FFF <<16 | 0x07FF);
-  m_SSCR |= (hSync - 1) <<16 | (vSync - 1);
+  m_registers->m_SSCR &= ~(0x0FFF <<16 | 0x07FF);
+  m_registers->m_SSCR |= (hSync - 1) <<16 | (vSync - 1);
 }
 
 void LCD::setBackPorch(uint16_t const hBP, uint16_t vBP) volatile
 {
-  m_BPCR &= ~(0x0FFF <<16 | 0x07FF);
-  m_BPCR |= (hBP - 1) <<16 | (vBP - 1);
+  m_registers->m_BPCR &= ~(0x0FFF <<16 | 0x07FF);
+  m_registers->m_BPCR |= (hBP - 1) <<16 | (vBP - 1);
 }
 
 void LCD::setActiveWidth(uint16_t const width, uint16_t height) volatile
 {
-  m_AWCR &= ~(0x0FFF <<16 | 0x07FF);
-  m_AWCR |= (width - 1) <<16 | (height - 1);
+  m_registers->m_AWCR &= ~(0x0FFF <<16 | 0x07FF);
+  m_registers->m_AWCR |= (width - 1) <<16 | (height - 1);
 }
 
 void LCD::setTotalWidth(uint16_t const width, uint16_t height) volatile
 {
-  m_TWCR &= ~(0x0FFF <<16 | 0x07FF);
-  m_TWCR |= (width - 1) <<16 | (height - 1);
+  m_registers->m_TWCR &= ~(0x0FFF <<16 | 0x07FF);
+  m_registers->m_TWCR |= (width - 1) <<16 | (height - 1);
 }
 
 void LCD::immediateReload() volatile
 {
-  m_SRCR |= 0x1 <<0;
+  m_registers->m_SRCR |= 0x1 <<0;
 }
 
 void LCD::blankingReload() volatile
 {
-  m_SRCR |= 0x1 <<1;
+  m_registers->m_SRCR |= 0x1 <<1;
 }
 
-LCD::Color const volatile& LCD::getBgColor() volatile
+//TODO: this actually does not need to return volatile, but maybe need not to return reference for it
+const volatile LCD::Color& LCD::getBgColor() volatile
 {
-  return reinterpret_cast<Color const volatile&>(m_BCCR);
+  return reinterpret_cast<Color const volatile&>(m_registers->m_BCCR);
 }
 
 void LCD::setBgColor(Color const color) volatile
 {
-  m_BCCR &= 0xFF000000;
-  m_BCCR |= *reinterpret_cast<uint32_t const* const>(&color);
+  m_registers->m_BCCR &= 0xFF000000;
+  m_registers->m_BCCR |= *reinterpret_cast<uint32_t const* const>(&color);
 }
 
 void LCD::enableInterrupt(Interrupt const interrupt) volatile
 {
-  m_IER |= static_cast<uint32_t>(interrupt);
+  m_registers->m_IER |= static_cast<uint32_t>(interrupt);
 }
 
 void LCD::disableInterrupt(Interrupt const interrupt) volatile
 {
-  m_IER &= ~(static_cast<uint32_t>(interrupt));
+  m_registers->m_IER &= ~(static_cast<uint32_t>(interrupt));
 }
 
 void LCD::selectReg(uint8_t const reg) volatile

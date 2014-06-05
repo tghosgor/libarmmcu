@@ -63,6 +63,11 @@ auto portApin0 = portA->createPin(0, GPIO::Port::InputPin);
 auto portD = RCC::enablePeriph<RCC::GPIOD>();
 auto portDpin2 = portD->createPin(2, GPIO::Port::InputPin);*/
 
+GPIO::Port portA(GPIO::Port::A);
+GPIO::Port portB(GPIO::Port::B);
+GPIO::Port portC(GPIO::Port::C);
+GPIO::Port portD(GPIO::Port::D);
+GPIO::Port portF(GPIO::Port::F);
 GPIO::Port portG(GPIO::Port::G);
 auto portGpin13 = portG.createPin(13, GPIO::Port::OutputPin);
 /*auto portGpin14 = portG->createPin(14, GPIO::Port::OutputPin);
@@ -90,10 +95,11 @@ SET_UP_LCD:
   constexpr unsigned VBP = 2;
   constexpr unsigned VFP = 4;
 
-  auto lcd0 = RCC::enablePeriph<RCC::LTDC>();
-  lcd0->enable(ActiveWidth, hSync, HBP, HFP, ActiveHeight, vSync, VBP, VFP);
+  LCD lcd(portA, portB, portC, portD, portF, portG,
+          ActiveWidth, hSync, HBP, HFP,
+          ActiveHeight, vSync, VBP, VFP);
   //lcd0->setBgColor({255, 0, 0});
-  lcd0->setBgColor({255, 255, 255});
+  lcd.setBgColor({255, 255, 255});
 
 SET_UP_EXTI0:
   //Configure EXTI0 to PA0 Rising Edge
@@ -186,15 +192,15 @@ SET_UP_TIM:
     if(cntVal >= std::numeric_limits<uint16_t>::max() / 2)
     {
       LCD::Color const green{0, 255, 0};
-      if(lcd0->getBgColor() != green)
-        lcd0->setBgColor(green);
+      if(lcd.getBgColor() != green)
+        lcd.setBgColor(green);
       portGpin13.set();
     }
     else
     {
       LCD::Color const red{255, 0, 0};
-      if(lcd0->getBgColor() != red)
-        lcd0->setBgColor(red);
+      if(lcd.getBgColor() != red)
+        lcd.setBgColor(red);
       portGpin13.reset();
     }
   }

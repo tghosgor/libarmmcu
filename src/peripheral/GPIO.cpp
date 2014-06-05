@@ -49,10 +49,10 @@ const Port::Module Port::I { 0x40022000, std::make_pair(0x40023800 + 0x30, 0x1 <
 std::array<bool, 15> Port::Pin::m_isUsed;
 
 Port::Port(const Module& module)
-  : m_registers(reinterpret_cast<Registers* const>(module.m_moduleAddress))
 {
   if(module.isEnabled())
     throw exception::Error("Port is already enabled.");
+  m_registers = reinterpret_cast<Registers* const>(module.m_moduleAddress);
   module.enable();
 }
 
