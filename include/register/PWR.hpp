@@ -38,12 +38,20 @@ public:
   uint32_t static constexpr BaseAddress{ 0x40007000 };
 
 public:
+  PWR();
+
   void disableBDWriteProtection() volatile;
   void enableBDWriteProtection() volatile;
 
-public: //Registers
-  uint32_t m_CR; //Power control register
-  uint32_t m_CSR; //Power control status register
+private:
+  struct Registers
+  {
+    uint32_t m_CR; //Power control register
+    uint32_t m_CSR; //Power control status register
+  };
+
+private:
+  Registers* m_registers;
 };
 
 }

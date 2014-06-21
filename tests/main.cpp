@@ -31,10 +31,12 @@
 #include <peripheral/GPIO.hpp>
 #include <peripheral/LCD.hpp>
 #include <register/NVIC.hpp>
+#include <register/PWR.hpp>
 #include <register/RCC.hpp>
 #include <peripheral/RTC.hpp>
 #include <register/SCB.hpp>
 #include <register/SYSCFG.hpp>
+#include <peripheral/SPI.hpp>
 #include <peripheral/TIM.hpp>
 
 #include <window/compositor.hpp>
@@ -95,7 +97,9 @@ SET_UP_LCD:
   constexpr unsigned VBP = 2;
   constexpr unsigned VFP = 4;
 
+  SPI spi5(SPI::_5);
   LCD lcd(portA, portB, portC, portD, portF, portG,
+          spi5,
           ActiveWidth, hSync, HBP, HFP,
           ActiveHeight, vSync, VBP, VFP);
   //lcd0->setBgColor({255, 0, 0});
@@ -116,10 +120,11 @@ SET_UP_EXTI0:
 
 //Temporary Test Loop
 SET_UP_TIM:
-  auto TIM1 = RCC::enablePeriph<RCC::TIM1>();
-  TIM1->setAutoReloadValue(std::numeric_limits<uint16_t>::max());
-  TIM1->setPrescalerValue(1000);
-  TIM1->enable();
+  TIM tim1(TIM::TIM1);
+
+  tim1.setAutoReloadValue(std::numeric_limits<uint16_t>::max());
+  tim1.setPrescalerValue(1000);
+  tim1.enable();
 
   void* const fbData = reinterpret_cast<void* const>(&layerFrameBuffer);
   constexpr uint32_t windowWidth = 240;
@@ -142,23 +147,24 @@ SET_UP_TIM:
   I2C i2c(I2C::_3);
 
   //volatile RTC* rtc = RTC::open(RTC::ClockSource::LSI);
-  volatile RTC rtc(RTC::ClockSource::LSI);
+  PWR pwr;
 
-  volatile ADC adc(ADC::Module::_1);
+  RTC rtc(pwr, RTC::ClockSource::LSI);
+
+  ADC adc(ADC::Module::_1);
   //adc.enableContinuous();
 
   GPIO::Port portB(GPIO::Port::B);
   auto tim43pwm = portB.createPin(6, GPIO::Port::AlternatePin);
   tim43pwm.setAF(GPIO::Port::AlPin::AF::_2);
-  auto tim4 = RCC::enablePeriph<RCC::TIM4>();
-  tim4->enableAutoReloadPreload();
-  tim4->setAutoReloadValue(15000);
-  tim4->getCC<1>().setOCMode(TIM::Periph<TIM::_4>::CC<1>::OCMode::PWM1);
-  tim4->getCC<1>().setValue(1);
-  tim4->getCC<1>().enableOCPreload();
-  tim4->generateEvent();
-  tim4->enable();
-  tim4->getCC<1>().enable();
+  TIM tim4(TIM::TIM4);
+  tim4.enableAutoReloadPreload();
+  tim4.setAutoReloadValue(15000);
+  auto tim4cc1 = tim4.enableCC(1);
+  tim4cc1.setOCMode(TIM::CC::OCMode::PWM1);
+  tim4cc1.setValue(1);
+  tim4cc1.enableOCPreload();
+  tim4.generateEvent();
 
   desktop.update();
 
@@ -170,7 +176,7 @@ SET_UP_TIM:
 
     auto adcResult = adc.getResult();
 
-    tim4->getCC<1>().setValue((adcResult * 15000) / 4095);
+    tim4cc1.setValue((adcResult * 15000) / 4095);
 
     static char adcResultStr[6];
     sprintf(adcResultStr, "%d", adcResult);
@@ -188,7 +194,7 @@ SET_UP_TIM:
     textWindow2.setText(time);
     textWindow2.update();
 
-    uint16_t cntVal = TIM1->getCounterValue();
+    uint16_t cntVal = tim1.getCounterValue();
     if(cntVal >= std::numeric_limits<uint16_t>::max() / 2)
     {
       LCD::Color const green{0, 255, 0};

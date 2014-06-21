@@ -39,23 +39,8 @@ namespace stm32f429
 namespace GPIO
 {
 
-enum class Module : std::size_t
-{
-  PortA = 0x40020000,
-  PortB = 0x40020400,
-  PortC = 0x40020800,
-  PortD = 0x40020C00,
-  PortE = 0x40021000,
-  PortF = 0x40021400,
-  PortG = 0x40021800,
-  PortH = 0x40021C00,
-  PortI = 0x40022000
-};
-
 class Port
 {
-  friend class stm32f429::RCC;
-
 private: //Internal Declarations
   template<uint8_t moder_, class typeName_>
   struct PinType
@@ -83,10 +68,10 @@ public: //Declarationss
   class AlPin;
   class AnPin;
 
-  static constexpr PinType<0x0, InPin> InputPin{};
-  static constexpr PinType<0x1, OuPin> OutputPin{};
-  static constexpr PinType<0x2, AlPin> AlternatePin{};
-  static constexpr PinType<0x3, AnPin> AnalogPin{};
+  static const PinType<0x0, InPin> InputPin;
+  static const PinType<0x1, OuPin> OutputPin;
+  static const PinType<0x2, AlPin> AlternatePin;
+  static const PinType<0x3, AnPin> AnalogPin;
 
 public: //Methods
   Port(const Module& module);
@@ -131,8 +116,8 @@ protected:
   Pin(uint8_t const nPin, Port volatile& port);
 
 protected:
-  uint8_t const m_nPin;
-  Port volatile& m_port;
+  const uint8_t m_nPin;
+  volatile Port& m_port;
 
 private:
   //TODO: this should be converted to std::atomic<bool> if required functions for atomics are implemented

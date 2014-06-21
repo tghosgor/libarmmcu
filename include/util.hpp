@@ -27,6 +27,7 @@
 #ifndef UTIL_H
 #define UTIL_H
 
+#include <cstdint>
 #include <functional>
 
 namespace stm32f429
@@ -63,6 +64,12 @@ struct Module2
   {
     for(const auto& it : m_enablePairs)
       *reinterpret_cast<uint32_t* const>(it.first) |= it.second;
+  }
+
+  void disable() const
+  {
+    for(const auto& it : m_enablePairs)
+      *reinterpret_cast<uint32_t* const>(it.first) &= ~it.second;
   }
 
   bool isEnabled() const

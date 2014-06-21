@@ -27,9 +27,9 @@
 #ifndef TIM_H_
 #define TIM_H_
 
+#include <util.hpp>
+
 namespace stm32f429
-{
-namespace TIM
 {
 
 enum : std::size_t
@@ -50,14 +50,35 @@ enum : std::size_t
   _14 = 0x40002000
 };
 
-template<std::size_t module>
-class Periph
+class TIM
 {
-public:
-  enum class UEVSource
-  {
+private:
+/*  using TIM1  = Module<0x44, 0,  TIM::Periph<TIM::_1 >, TIM::_1 >;
+  using TIM2  = Module<0x40, 0,  TIM::Periph<TIM::_2 >, TIM::_2 >;
+  using TIM3  = Module<0x40, 1,  TIM::Periph<TIM::_3 >, TIM::_3 >;
+  using TIM4  = Module<0x40, 2,  TIM::Periph<TIM::_4 >, TIM::_4 >;
+  using TIM5  = Module<0x40, 3,  TIM::Periph<TIM::_5 >, TIM::_5 >;
+  using TIM6  = Module<0x40, 4,  TIM::Periph<TIM::_6 >, TIM::_6 >;
+  using TIM7  = Module<0x40, 5,  TIM::Periph<TIM::_7 >, TIM::_7 >;
+  using TIM8  = Module<0x44, 1,  TIM::Periph<TIM::_8 >, TIM::_8 >;
+  using TIM9  = Module<0x44, 16, TIM::Periph<TIM::_9 >, TIM::_9 >;
+  using TIM10 = Module<0x44, 17, TIM::Periph<TIM::_10>, TIM::_10>;
+  using TIM11 = Module<0x44, 18, TIM::Periph<TIM::_11>, TIM::_11>;
+  using TIM12 = Module<0x40, 6,  TIM::Periph<TIM::_12>, TIM::_12>;
+  using TIM13 = Module<0x40, 7,  TIM::Periph<TIM::_13>, TIM::_13>;
+  using TIM14 = Module<0x40, 8,  TIM::Periph<TIM::_14>, TIM::_14>;*/
 
-  };
+  using Module = util::Module2<TIM, 1>;
+
+public:
+  static const Module TIM1;
+  static const Module TIM2;
+  static const Module TIM3;
+  static const Module TIM4;
+  static const Module TIM5;
+
+  enum class UEVSource
+  { };
 
   enum class MasterMode : uint32_t
   {
@@ -66,10 +87,9 @@ public:
     Update = 0x2
   };
 
-  template<uint8_t idx>
   class CC
   {
-    friend class Periph;
+    friend class TIM;
 
   public:
     enum class OCMode : uint32_t
@@ -84,29 +104,24 @@ public:
       PWM2 = 0x7
     };
 
+  public:
+    CC(volatile TIM& tim, const uint8_t& idx);
+    ~CC();
+
     void enable() volatile;
     void disable() volatile;
     void setValue(uint32_t const value) volatile;
     void setOCMode(OCMode const mode) volatile;
     void enableOCPreload() volatile;
+    void disableOCPreload() volatile;
 
   private:
-    template<uint8_t idx_>
-    typename std::enable_if<(idx >= 1 && idx_ <= 2)>::type
-    setOCMode_(OCMode const mode) volatile;
-
-    template<uint8_t idx_>
-    typename std::enable_if<(idx_ >= 3 && idx_ <= 4)>::type
-    setOCMode_(OCMode const mode) volatile;
-
-    template<uint8_t idx_>
-    typename std::enable_if<(idx_ >= 1 && idx_ <= 2)>::type
-    enableOCPreload_() volatile;
-
-    template<uint8_t idx_>
-    typename std::enable_if<(idx_ >= 3 && idx_ <= 4)>::type
-    enableOCPreload_() volatile;
+    volatile TIM& m_tim;
+    const uint8_t m_idx;
   };
+public: // TIM methods
+  TIM(const Module& module);
+  ~TIM();
 
   /* Counter is automatically disabled in one-pulse mode, when an update event occurs. */
   void enable() volatile;
@@ -118,8 +133,7 @@ public:
   uint16_t getCounterValue() volatile;
   void setCounterValue(uint16_t const value) volatile;
 
-  template<uint8_t idx>
-  constexpr CC<idx> getCC() volatile;
+  CC enableCC(const uint8_t& idx) volatile;
 
   void enableUEV() volatile;
   void disableUEV() volatile;
@@ -144,37 +158,34 @@ public:
   void generateEvent() volatile;
 
 private:
-  uint32_t m_CR1;
-  uint32_t m_CR2;
-  uint32_t m_SMCR;
-  uint32_t m_DIER;
-  uint32_t m_SR;
-  uint32_t m_EGR;
-  uint32_t m_CCMR1; //Capture/Compare Register 1
-  uint32_t m_CCMR2; //Capture/Compare Register 2
-  uint32_t m_CCER;
-  uint32_t m_CNT;   //Counter Register
-  uint32_t m_PSC;   //Prescaler Register
-  uint32_t m_ARR;   //Auto-Reload Register
-  uint32_t m_RCR;
-  uint32_t m_CCR1;
-  uint32_t m_CCR2;
-  uint32_t m_CCR3;
-  uint32_t m_CCR4;
-  uint32_t m_BDTR;
-  uint32_t m_DCR;
-  uint32_t m_DMAR;
-  uint32_t m_OR;
+  struct Registers
+  {
+    uint32_t m_CR[2];
+    uint32_t m_SMCR;
+    uint32_t m_DIER;
+    uint32_t m_SR;
+    uint32_t m_EGR;
+    uint32_t m_CCMR[2]; //Capture/Compare Registers
+    uint32_t m_CCER;
+    uint32_t m_CNT;   //Counter Register
+    uint32_t m_PSC;   //Prescaler Register
+    uint32_t m_ARR;   //Auto-Reload Register
+    uint32_t m_RCR;
+    uint32_t m_CCR[4];
+    uint32_t m_BDTR;
+    uint32_t m_DCR;
+    uint32_t m_DMAR;
+    uint32_t m_OR;
+  };
+  static_assert(sizeof(Registers) == 0x54, "TIM size is not correct. Spec says 0x54 bytes.");
+
+public:
+  Registers* m_registers;
+
+private:
+  const Module& m_module;
 };
 
-static_assert(sizeof(Periph<0>) == 0x54, "TIM size is not correct. Spec says 0x54 bytes.");
-
-template<std::size_t module>
-constexpr Periph<module> volatile* const getPeriph();
-
-} //NS TIM
 } //NS stm32f429
 
 #endif /* TIM_H_ */
-
-#include "impl/TIM.impl"

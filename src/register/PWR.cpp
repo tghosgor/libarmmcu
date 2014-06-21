@@ -26,19 +26,30 @@
 
 #include <register/PWR.hpp>
 
+#include <exception.hpp>
 #include <register/RCC.hpp>
 
 namespace stm32f429
 {
 
+PWR::PWR()
+{
+  //TODO: carry below lines to header as standard util::Module2
+  uint32_t& rccReg = *reinterpret_cast<uint32_t*>(RCC::BaseAddress + 0x40);
+  const uint32_t enabler = 0x1 <<28;
+  if (rccReg & enabler)
+    throw exception::Error("PWR is already enabled.");
+  rccReg |= enabler;
+}
+
 void PWR::disableBDWriteProtection() volatile
 {
-  m_CR |= 0x1 <<8;
+  m_registers->m_CR |= 0x1 <<8;
 }
 
 void PWR::enableBDWriteProtection() volatile
 {
-  m_CR &= ~(0x1 <<8);
+  m_registers->m_CR &= ~(0x1 <<8);
 }
 
 } //NS stm32f429

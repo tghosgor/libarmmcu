@@ -32,6 +32,9 @@
 namespace stm32f429
 {
 
+const SPI::Module SPI::_1 { 0x40013000, std::make_pair(0x40023800 + 0x44, 0x1 <<12) };
+const SPI::Module SPI::_5 { 0x40015000, std::make_pair(0x40023800 + 0x44, 0x1 <<20) };
+
 void SPI::enable(DataFrame const dataFrameFormat, bool const enableHardwareCRC) volatile
 {
   GPIO::Port portF(GPIO::Port::F);

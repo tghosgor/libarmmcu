@@ -32,6 +32,7 @@
 namespace stm32f429
 {
 
+class PWR;
 class RTC
 {
 public:
@@ -47,7 +48,7 @@ public:
   };
 
 public: //Methods
-  explicit RTC(ClockSource const source = ClockSource::LSI);
+  explicit RTC(PWR& pwr, ClockSource const source = ClockSource::LSI);
   RTC(RTC&& other);
   ~RTC();
 
@@ -73,6 +74,7 @@ public:
 
 private:
   bool m_isValid;
+  PWR& m_pwr;
 
   static bool m_initialized;
 };

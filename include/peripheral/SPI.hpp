@@ -40,11 +40,10 @@ class SPI
   friend class RCC;
 
 public: //Declarations
-  enum : uint32_t
-  {
-    _1 = 0x40013000,
-    _5 = 0x40015000
-  };
+  using Module = util::Module2<SPI, 1>;
+
+  static const Module _1;
+  static const Module _5;
 
   enum class DataFrame : bool
   {
@@ -65,6 +64,8 @@ public: //Declarations
   };
 
 public: //Methods
+  SPI(const SPI::Module& module) { }
+
   void enable(DataFrame const dataFrameFormat = DataFrame::_8Bit, bool const enableHardwareCRC = false) volatile;
   void setMasterMode() volatile;
   void setSlaveMode() volatile;
@@ -89,9 +90,6 @@ private:
   uint32_t m_TXCRCR;
   uint32_t m_I2SCFGR;
   uint32_t m_I2SPR;
-
-private:
-  SPI() { }
 };
 
 } //NS stm32f429

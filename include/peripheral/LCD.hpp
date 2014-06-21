@@ -83,6 +83,7 @@ public: //Declarations
 
 public: //Methods
   LCD(GPIO::Port& portA, GPIO::Port& portB, GPIO::Port& portC, GPIO::Port& portD, GPIO::Port& portF, GPIO::Port& portG,
+      SPI& m_spi,
       const uint16_t activeWidth, const uint16_t hSync, const uint16_t hBackPorch, const uint16_t HFP, const uint16_t activeHeight,
       const uint16_t vSync, const uint16_t vBackPorch, const uint16_t VFP);
   //TODO: ~LCD();
@@ -143,7 +144,7 @@ private: //TODO: this structure is placed on top of LCD-TFT register so the ones
   static GPIO::Port::OuPin m_WRX;
   static GPIO::Port::OuPin m_CSX;
 
-  static SPI volatile* m_spi5;
+  SPI& m_spi;
 
 private:
 }; //class LCD

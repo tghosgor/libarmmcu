@@ -46,6 +46,11 @@ const Port::Module Port::G { 0x40021800, std::make_pair(0x40023800 + 0x30, 0x1 <
 const Port::Module Port::H { 0x40021C00, std::make_pair(0x40023800 + 0x30, 0x1 <<7) };
 const Port::Module Port::I { 0x40022000, std::make_pair(0x40023800 + 0x30, 0x1 <<8) };
 
+const Port::PinType<0x0, Port::InPin> Port::InputPin{};
+const Port::PinType<0x1, Port::OuPin> Port::OutputPin{};
+const Port::PinType<0x2, Port::AlPin> Port::AlternatePin{};
+const Port::PinType<0x3, Port::AnPin> Port::AnalogPin{};
+
 std::array<bool, 15> Port::Pin::m_isUsed;
 
 Port::Port(const Module& module)

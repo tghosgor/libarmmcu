@@ -41,15 +41,15 @@ GPIO::Port::OuPin LCD::m_RDX = GPIO::Port(GPIO::Port::D).createPin(12, GPIO::Por
 GPIO::Port::OuPin LCD::m_WRX = GPIO::Port(GPIO::Port::D).createPin(13, GPIO::Port::OutputPin);
 GPIO::Port::OuPin LCD::m_CSX = GPIO::Port(GPIO::Port::C).createPin(2 , GPIO::Port::OutputPin);
 
-SPI volatile* LCD::m_spi5 = RCC::enablePeriph<RCC::SPI5>();
-
 LCD::Color::Color(uint8_t const red, uint8_t const green, uint8_t const blue)
   : m_color(static_cast<uint32_t>(red) <<16 | static_cast<uint32_t>(green) <<8 | static_cast<uint32_t>(blue) <<0)
 { }
 
 LCD::LCD(GPIO::Port& portA, GPIO::Port& portB, GPIO::Port& portC, GPIO::Port& portD, GPIO::Port& portF, GPIO::Port& portG,
-    uint16_t const activeWidth, uint16_t const hSync, uint16_t const hBackPorch, uint16_t const HFP,
-    uint16_t const activeHeight, uint16_t const vSync, uint16_t const vBackPorch, uint16_t const VFP)
+         SPI& spi,
+         uint16_t const activeWidth, uint16_t const hSync, uint16_t const hBackPorch, uint16_t const HFP,
+         uint16_t const activeHeight, uint16_t const vSync, uint16_t const vBackPorch, uint16_t const VFP)
+  : m_spi(spi)
 {
   if((RCC::instance()->m_APB2ENR & 0x1 <<26) != 0) //is LTDC clock enabled
     throw exception::Error("LCD is already enabled.");
@@ -163,12 +163,12 @@ LCD::LCD(GPIO::Port& portA, GPIO::Port& portB, GPIO::Port& portC, GPIO::Port& po
   m_CSX.reset();
   m_CSX.set();
 
-  m_spi5->enable(SPI::DataFrame::_8Bit);
-  m_spi5->setBaudPrescaler(SPI::BaudPSC::_16);
-  m_spi5->setUnidirectionalMode();
-  m_spi5->enableSoftwareSlaveMode();
-  m_spi5->enableInternalSlaveSelect();
-  m_spi5->setMasterMode();
+  m_spi.enable(SPI::DataFrame::_8Bit);
+  m_spi.setBaudPrescaler(SPI::BaudPSC::_16);
+  m_spi.setUnidirectionalMode();
+  m_spi.enableSoftwareSlaveMode();
+  m_spi.enableInternalSlaveSelect();
+  m_spi.setMasterMode();
 
   //Configure LCD
   selectReg(0xCA);
@@ -407,7 +407,7 @@ void LCD::selectReg(uint8_t const reg) volatile
   m_WRX.reset();
   //reset LCD control line - SPI select?
   m_CSX.reset();
-  m_spi5->send(reg);
+  m_spi.send(reg);
   //set LCD control line - SPI deselect?
   m_CSX.set();
 }
@@ -418,7 +418,7 @@ void LCD::writeReg(uint8_t const value) volatile
   m_WRX.set();
   //reset LCD control line - SPI select?
   m_CSX.reset();
-  m_spi5->send(value);
+  m_spi.send(value);
   //set LCD control line - SPI deselect?
   m_CSX.set();
 }
