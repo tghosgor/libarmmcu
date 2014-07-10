@@ -44,7 +44,7 @@ void Compositor::render(Area const& area)
     {
       auto pixel = getPixel(x, y);
 
-      uint16_t* const fbPixel = reinterpret_cast<uint16_t*>(m_frameBuffer.buffer + (y * getWidth() + x) * sizeof(uint16_t));
+      uint16_t* const fbPixel = reinterpret_cast<uint16_t*>(reinterpret_cast<std::size_t>(m_frameBuffer.buffer) + (y * getWidth() + x) * sizeof(uint16_t));
 
       if(pixel.second == false)
         *fbPixel = m_defaultPixelColor;

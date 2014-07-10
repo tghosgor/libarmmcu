@@ -27,12 +27,12 @@
 #ifndef SYSCFG_CPP_
 #define SYSCFG_CPP_
 
-#include <driver/SYSCFG.hpp>
+#include <register/SYSCFG.hpp>
 
 namespace stm32f429
 {
 
-constexpr SYSCFG volatile* const SYSCFG::instance() { return reinterpret_cast<SYSCFG volatile* const>(BaseAddress); }
+inline SYSCFG volatile* const SYSCFG::instance() { return reinterpret_cast<SYSCFG volatile* const>(BaseAddress); }
 
 template<class Module>
 typename Module::RegType volatile* SYSCFG::enable() volatile

@@ -24,12 +24,12 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <driver/RTC.hpp>
+#include <peripheral/RTC.hpp>
 
 #include <OS.hpp>
 #include <exception.hpp>
-#include <driver/PWR.hpp>
-#include <driver/RCC.hpp>
+#include <register/PWR.hpp>
+#include <register/RCC.hpp>
 
 namespace stm32f429
 {
@@ -46,8 +46,9 @@ namespace stm32f429
 
 bool RTC::m_initialized;
 
-RTC::RTC(RTC::ClockSource const source)
+RTC::RTC(PWR& pwr, RTC::ClockSource const source)
   : m_registers(*reinterpret_cast<Registers*>(BaseAddress))
+  , m_pwr(pwr)
 {
   if(m_initialized) //RTC is already on
   {
@@ -59,9 +60,7 @@ RTC::RTC(RTC::ClockSource const source)
     m_initialized = true;
     m_isValid = true;
 
-    auto pwr = RCC::enablePeriph<RCC::PWR>();
-
-    pwr->disableBDWriteProtection();
+    pwr.disableBDWriteProtection();
 
     //enable selected clock in case it is not enabled
     switch(source)
@@ -93,13 +92,14 @@ RTC::RTC(RTC::ClockSource const source)
 
     RCC::instance()->m_BDCR = 0x1 <<15; //RTC ON
 
-    pwr->enableBDWriteProtection();
+    pwr.enableBDWriteProtection();
   }
 }
 
 RTC::RTC(RTC&& other)
   : m_registers(other.m_registers)
   , m_isValid(other.m_isValid)
+  , m_pwr(other.m_pwr)
 {
   other.m_isValid = false;
 }
@@ -110,16 +110,14 @@ RTC::~RTC()
   {
     m_initialized = false;
 
-    auto pwr = RCC::enablePeriph<RCC::PWR>();
-
-    pwr->enableBDWriteProtection();
+    m_pwr.enableBDWriteProtection();
 
     RCC::instance()->m_CSR &= ~(0x1 <<0); //LSI OFF
     RCC::instance()->m_BDCR &= ~(0x1 <<0); //LSE OFF
 
     RCC::instance()->m_BDCR &= ~(0x1 <<15); //RTC OFF
 
-    pwr->disableBDWriteProtection();
+    m_pwr.disableBDWriteProtection();
   }
 }
 

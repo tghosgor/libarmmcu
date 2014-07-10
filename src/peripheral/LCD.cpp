@@ -27,32 +27,37 @@
 #ifndef LCD_CPP_
 #define LCD_CPP_
 
-#include <driver/LCD.hpp>
+#include <peripheral/LCD.hpp>
 
-#include <driver/SPI.hpp>
+#include <peripheral/SPI.hpp>
+#include <exception.hpp>
 
 #include <cstring>
 
 namespace stm32f429
 {
 
-GPIO::Port::OuPin LCD::m_RDX = RCC::enablePeriph<RCC::GPIOD>()->createPin(12, GPIO::Port::OutputPin);
-GPIO::Port::OuPin LCD::m_WRX = RCC::enablePeriph<RCC::GPIOD>()->createPin(13, GPIO::Port::OutputPin);
-GPIO::Port::OuPin LCD::m_CSX = RCC::enablePeriph<RCC::GPIOC>()->createPin(2 , GPIO::Port::OutputPin);
-
-SPI volatile* LCD::m_spi5 = RCC::enablePeriph<RCC::SPI5>();
+GPIO::Port::OuPin LCD::m_RDX = GPIO::Port(GPIO::Port::D).createPin(12, GPIO::Port::OutputPin);
+GPIO::Port::OuPin LCD::m_WRX = GPIO::Port(GPIO::Port::D).createPin(13, GPIO::Port::OutputPin);
+GPIO::Port::OuPin LCD::m_CSX = GPIO::Port(GPIO::Port::C).createPin(2 , GPIO::Port::OutputPin);
 
 LCD::Color::Color(uint8_t const red, uint8_t const green, uint8_t const blue)
   : m_color(static_cast<uint32_t>(red) <<16 | static_cast<uint32_t>(green) <<8 | static_cast<uint32_t>(blue) <<0)
 { }
 
-LCD::LCD()
-{ }
-
-void LCD::enable(
-    uint16_t const activeWidth, uint16_t const hSync, uint16_t const hBackPorch, uint16_t const HFP,
-    uint16_t const activeHeight, uint16_t const vSync, uint16_t const vBackPorch, uint16_t const VFP) volatile
+LCD::LCD(GPIO::Port& portA, GPIO::Port& portB, GPIO::Port& portC, GPIO::Port& portD, GPIO::Port& portF, GPIO::Port& portG,
+         SPI& spi,
+         uint16_t const activeWidth, uint16_t const hSync, uint16_t const hBackPorch, uint16_t const HFP,
+         uint16_t const activeHeight, uint16_t const vSync, uint16_t const vBackPorch, uint16_t const VFP)
+  : m_spi(spi)
 {
+  if((RCC::instance()->m_APB2ENR & 0x1 <<26) != 0) //is LTDC clock enabled
+    throw exception::Error("LCD is already enabled.");
+
+  RCC::instance()->m_APB2ENR |= 0x1 <<26;
+
+  m_registers = reinterpret_cast<Registers* const>(LCD::BaseAddress);
+
   RCC::instance()->m_CR &= ~(0x1 <<24); //PLLON OFF
   while (RCC::instance()->m_CR & (0x1 <<25))
   { }
@@ -89,13 +94,6 @@ void LCD::enable(
   m_WRX.setOutputSpeed(GPIO::Port::OuPin::OutputSpeed::Fast);
   m_CSX.setOutputSpeed(GPIO::Port::OuPin::OutputSpeed::Fast);
 
-  auto portA = RCC::enablePeriph<RCC::GPIOA>();
-  auto portB = RCC::enablePeriph<RCC::GPIOB>();
-  auto portC = RCC::enablePeriph<RCC::GPIOC>();
-  auto portD = RCC::enablePeriph<RCC::GPIOD>();
-  auto portF = RCC::enablePeriph<RCC::GPIOF>();
-  auto portG = RCC::enablePeriph<RCC::GPIOG>();
-
   /*
    +------------------------+-----------------------+----------------------------+
    +                       LCD pins assignment                                   +
@@ -113,64 +111,64 @@ void LCD::enable(
 
   */
 
-  portC->createPin(6, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
+  portC.createPin(6, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
       .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//HSYNC
-  portA->createPin(4, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
+  portA.createPin(4, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
       .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//VSYNC
-  portG->createPin(7, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
+  portG.createPin(7, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
       .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//CLK
-  portF->createPin(10, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
+  portF.createPin(10, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
       .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//DE
 
-  portC->createPin(10, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
+  portC.createPin(10, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
       .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//R2
-  portB->createPin(0, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
+  portB.createPin(0, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
       .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//R3
-  portA->createPin(11, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
+  portA.createPin(11, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
       .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//R4
-  portA->createPin(12, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
+  portA.createPin(12, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
       .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//R5
-  portB->createPin(1, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
+  portB.createPin(1, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
       .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//R6
-  portG->createPin(6, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
+  portG.createPin(6, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
       .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//R7
 
-  portA->createPin(6, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
+  portA.createPin(6, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
       .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//G2
-  portG->createPin(10, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
+  portG.createPin(10, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
       .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//G3
-  portB->createPin(10, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
+  portB.createPin(10, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
       .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//G4
-  portB->createPin(11, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
+  portB.createPin(11, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
       .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//G5
-  portC->createPin(7, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
+  portC.createPin(7, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
       .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//G6
-  portD->createPin(3, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
+  portD.createPin(3, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
       .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//G7
 
-  portD->createPin(6, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
+  portD.createPin(6, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
       .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//B2
-  portG->createPin(11, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
+  portG.createPin(11, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
       .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//B3
-  portG->createPin(12, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
+  portG.createPin(12, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
       .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//B4
-  portA->createPin(3, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
+  portA.createPin(3, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
       .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//B5
-  portB->createPin(8, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
+  portB.createPin(8, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
       .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//B6
-  portB->createPin(9, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
+  portB.createPin(9, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
       .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//B7
 
   /* Set or Reset the control line */
   m_CSX.reset();
   m_CSX.set();
 
-  m_spi5->enable(SPI::DataFrame::_8Bit);
-  m_spi5->setBaudPrescaler(SPI::BaudPSC::_16);
-  m_spi5->setUnidirectionalMode();
-  m_spi5->enableSoftwareSlaveMode();
-  m_spi5->enableInternalSlaveSelect();
-  m_spi5->setMasterMode();
+  m_spi.enable(SPI::DataFrame::_8Bit);
+  m_spi.setBaudPrescaler(SPI::BaudPSC::_16);
+  m_spi.setUnidirectionalMode();
+  m_spi.enableSoftwareSlaveMode();
+  m_spi.enableInternalSlaveSelect();
+  m_spi.setMasterMode();
 
   //Configure LCD
   selectReg(0xCA);
@@ -303,7 +301,7 @@ void LCD::enable(
   setActiveWidth(activeWidth + hSync + hBackPorch, activeHeight + vSync + vBackPorch);
   setTotalWidth(activeWidth + hSync + hBackPorch + HFP, activeHeight + vSync + vBackPorch + VFP);
 
-  m_GCR |= 0x1 <<0;
+  m_registers->m_GCR |= 0x1 <<0;
 
   /*uint32_t const imageWidth = smiley.width;
   uint32_t const imageHeight = smiley.height;
@@ -317,87 +315,90 @@ void LCD::enable(
   uint32_t volatile const fbData = reinterpret_cast<uint32_t const volatile>(&layerFrameBuffer);
   uint8_t const bytesPerPixel = 2;
 
-  m_layer1.m_WHPCR &= ~(0xF000F000);
-  m_layer1.m_WHPCR |= ((0 + ((m_BPCR & 0x0FFF0000) >> 16) + 1) | ((windowWidth + ((m_BPCR & 0x0FFF0000) >> 16)) << 16));
-  m_layer1.m_WVPCR &= ~(0xF800F800);
-  m_layer1.m_WVPCR |= ((0 + (m_BPCR & 0x000007FF) + 1) | ((windowHeight + (m_BPCR & 0x000007FF)) << 16));
+  m_registers->m_layer1.m_WHPCR &= ~(0xF000F000);
+  m_registers->m_layer1.m_WHPCR |= ((0 + ((m_registers->m_BPCR & 0x0FFF0000) >> 16) + 1)
+                                   | ((windowWidth + ((m_registers->m_BPCR & 0x0FFF0000) >> 16)) << 16));
+  m_registers->m_layer1.m_WVPCR &= ~(0xF800F800);
+  m_registers->m_layer1.m_WVPCR |= ((0 + (m_registers->m_BPCR & 0x000007FF) + 1)
+                                   | ((windowHeight + (m_registers->m_BPCR & 0x000007FF)) << 16));
   //m_layer1.m_WHPCR = 240 <<16;
   //m_layer1.m_WVPCR = 160 <<16;
 
-  m_layer1.m_PFCR &= ~0x7;
-  m_layer1.m_PFCR |= 0x2; //LTDC_PIXEL_FORMAT_RGB565
+  m_registers->m_layer1.m_PFCR &= ~0x7;
+  m_registers->m_layer1.m_PFCR |= 0x2; //LTDC_PIXEL_FORMAT_RGB565
   //m_layer1.m_PFCR |= 0x4; //ARGB4444
   //m_layer1.m_PFCR |= 0; //ARGB8888
   //m_layer1.m_PFCR |= 0x7; //AL88
-  m_layer1.m_DCCR = 0;//default color
-  m_layer1.m_CACR |= 255;
-  m_layer1.m_BFCR |= 0x6 <<6 | 0x7; //LTDC_BLENDING_FACTOR2_PAxCA
+  m_registers->m_layer1.m_DCCR = 0;//default color
+  m_registers->m_layer1.m_CACR |= 255;
+  m_registers->m_layer1.m_BFCR |= 0x6 <<6 | 0x7; //LTDC_BLENDING_FACTOR2_PAxCA
   //m_layer1.m_CFBAR = reinterpret_cast<uint32_t>(&ST_LOGO_1);
-  m_layer1.m_CFBAR = fbData;
-  m_layer1.m_CFBLR &= ~(0xE000E000);
-  m_layer1.m_CFBLR |= ((windowWidth * bytesPerPixel) <<16) | (windowWidth * bytesPerPixel + 3); //pitch increment from one line of pixels to another <<16 | Active high width x number of bytes per pixel + 3
-  m_layer1.m_CFBLNR &= ~(0x3FF);
-  m_layer1.m_CFBLNR |= windowHeight;
-  m_layer1.m_CR |= 0x1;
+  m_registers->m_layer1.m_CFBAR = fbData;
+  m_registers->m_layer1.m_CFBLR &= ~(0xE000E000);
+  m_registers->m_layer1.m_CFBLR |= ((windowWidth * bytesPerPixel) <<16) | (windowWidth * bytesPerPixel + 3); //pitch increment from one line of pixels to another <<16 | Active high width x number of bytes per pixel + 3
+  m_registers->m_layer1.m_CFBLNR &= ~(0x3FF);
+  m_registers->m_layer1.m_CFBLNR |= windowHeight;
+  m_registers->m_layer1.m_CR |= 0x1;
 
-  m_layer2.m_CR = 0;
+  m_registers->m_layer2.m_CR = 0;
 
   immediateReload();
 }
 
 void LCD::setSync(uint16_t const hSync, uint16_t const vSync) volatile
 {
-  m_SSCR &= ~(0x0FFF <<16 | 0x07FF);
-  m_SSCR |= (hSync - 1) <<16 | (vSync - 1);
+  m_registers->m_SSCR &= ~(0x0FFF <<16 | 0x07FF);
+  m_registers->m_SSCR |= (hSync - 1) <<16 | (vSync - 1);
 }
 
 void LCD::setBackPorch(uint16_t const hBP, uint16_t vBP) volatile
 {
-  m_BPCR &= ~(0x0FFF <<16 | 0x07FF);
-  m_BPCR |= (hBP - 1) <<16 | (vBP - 1);
+  m_registers->m_BPCR &= ~(0x0FFF <<16 | 0x07FF);
+  m_registers->m_BPCR |= (hBP - 1) <<16 | (vBP - 1);
 }
 
 void LCD::setActiveWidth(uint16_t const width, uint16_t height) volatile
 {
-  m_AWCR &= ~(0x0FFF <<16 | 0x07FF);
-  m_AWCR |= (width - 1) <<16 | (height - 1);
+  m_registers->m_AWCR &= ~(0x0FFF <<16 | 0x07FF);
+  m_registers->m_AWCR |= (width - 1) <<16 | (height - 1);
 }
 
 void LCD::setTotalWidth(uint16_t const width, uint16_t height) volatile
 {
-  m_TWCR &= ~(0x0FFF <<16 | 0x07FF);
-  m_TWCR |= (width - 1) <<16 | (height - 1);
+  m_registers->m_TWCR &= ~(0x0FFF <<16 | 0x07FF);
+  m_registers->m_TWCR |= (width - 1) <<16 | (height - 1);
 }
 
 void LCD::immediateReload() volatile
 {
-  m_SRCR |= 0x1 <<0;
+  m_registers->m_SRCR |= 0x1 <<0;
 }
 
 void LCD::blankingReload() volatile
 {
-  m_SRCR |= 0x1 <<1;
+  m_registers->m_SRCR |= 0x1 <<1;
 }
 
-LCD::Color const volatile& LCD::getBgColor() volatile
+//TODO: this actually does not need to return volatile, but maybe need not to return reference for it
+const volatile LCD::Color& LCD::getBgColor() volatile
 {
-  return reinterpret_cast<Color const volatile&>(m_BCCR);
+  return reinterpret_cast<Color const volatile&>(m_registers->m_BCCR);
 }
 
 void LCD::setBgColor(Color const color) volatile
 {
-  m_BCCR &= 0xFF000000;
-  m_BCCR |= *reinterpret_cast<uint32_t const* const>(&color);
+  m_registers->m_BCCR &= 0xFF000000;
+  m_registers->m_BCCR |= *reinterpret_cast<uint32_t const* const>(&color);
 }
 
 void LCD::enableInterrupt(Interrupt const interrupt) volatile
 {
-  m_IER |= static_cast<uint32_t>(interrupt);
+  m_registers->m_IER |= static_cast<uint32_t>(interrupt);
 }
 
 void LCD::disableInterrupt(Interrupt const interrupt) volatile
 {
-  m_IER &= ~(static_cast<uint32_t>(interrupt));
+  m_registers->m_IER &= ~(static_cast<uint32_t>(interrupt));
 }
 
 void LCD::selectReg(uint8_t const reg) volatile
@@ -406,7 +407,7 @@ void LCD::selectReg(uint8_t const reg) volatile
   m_WRX.reset();
   //reset LCD control line - SPI select?
   m_CSX.reset();
-  m_spi5->send(reg);
+  m_spi.send(reg);
   //set LCD control line - SPI deselect?
   m_CSX.set();
 }
@@ -417,7 +418,7 @@ void LCD::writeReg(uint8_t const value) volatile
   m_WRX.set();
   //reset LCD control line - SPI select?
   m_CSX.reset();
-  m_spi5->send(value);
+  m_spi.send(value);
   //set LCD control line - SPI deselect?
   m_CSX.set();
 }

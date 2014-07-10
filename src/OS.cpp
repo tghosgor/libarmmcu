@@ -26,7 +26,7 @@
 
 #include <OS.hpp>
 
-#include <driver/IVTable.hpp>
+#include <register/IVTable.hpp>
 
 #include <sys/types.h>
 

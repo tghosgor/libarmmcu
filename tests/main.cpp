@@ -24,18 +24,20 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <driver/ADC.hpp>
-#include <driver/EXTI.hpp>
-#include <driver/I2C.hpp>
-#include <driver/IVTable.hpp>
-#include <driver/GPIO.hpp>
-#include <driver/LCD.hpp>
-#include <driver/NVIC.hpp>
-#include <driver/RCC.hpp>
-#include <driver/RTC.hpp>
-#include <driver/SCB.hpp>
-#include <driver/SYSCFG.hpp>
-#include <driver/TIM.hpp>
+#include <peripheral/ADC.hpp>
+#include <register/EXTI.hpp>
+#include <peripheral/I2C.hpp>
+#include <register/IVTable.hpp>
+#include <peripheral/GPIO.hpp>
+#include <peripheral/LCD.hpp>
+#include <register/NVIC.hpp>
+#include <register/PWR.hpp>
+#include <register/RCC.hpp>
+#include <peripheral/RTC.hpp>
+#include <register/SCB.hpp>
+#include <register/SYSCFG.hpp>
+#include <peripheral/SPI.hpp>
+#include <peripheral/TIM.hpp>
 
 #include <window/compositor.hpp>
 #include <window/text_window.hpp>
@@ -63,8 +65,13 @@ auto portApin0 = portA->createPin(0, GPIO::Port::InputPin);
 auto portD = RCC::enablePeriph<RCC::GPIOD>();
 auto portDpin2 = portD->createPin(2, GPIO::Port::InputPin);*/
 
-auto portG = RCC::enablePeriph<RCC::GPIOG>();
-auto portGpin13 = portG->createPin(13, GPIO::Port::OutputPin);
+GPIO::Port portA(GPIO::Port::A);
+GPIO::Port portB(GPIO::Port::B);
+GPIO::Port portC(GPIO::Port::C);
+GPIO::Port portD(GPIO::Port::D);
+GPIO::Port portF(GPIO::Port::F);
+GPIO::Port portG(GPIO::Port::G);
+auto portGpin13 = portG.createPin(13, GPIO::Port::OutputPin);
 /*auto portGpin14 = portG->createPin(14, GPIO::Port::OutputPin);
 
 auto syscfg = RCC::enablePeriph<RCC::SYSCFG>();
@@ -90,10 +97,13 @@ SET_UP_LCD:
   constexpr unsigned VBP = 2;
   constexpr unsigned VFP = 4;
 
-  auto lcd0 = RCC::enablePeriph<RCC::LTDC>();
-  lcd0->enable(ActiveWidth, hSync, HBP, HFP, ActiveHeight, vSync, VBP, VFP);
+  SPI spi5(SPI::_5);
+  LCD lcd(portA, portB, portC, portD, portF, portG,
+          spi5,
+          ActiveWidth, hSync, HBP, HFP,
+          ActiveHeight, vSync, VBP, VFP);
   //lcd0->setBgColor({255, 0, 0});
-  lcd0->setBgColor({255, 255, 255});
+  lcd.setBgColor({255, 255, 255});
 
 SET_UP_EXTI0:
   //Configure EXTI0 to PA0 Rising Edge
@@ -110,16 +120,17 @@ SET_UP_EXTI0:
 
 //Temporary Test Loop
 SET_UP_TIM:
-  auto TIM1 = RCC::enablePeriph<RCC::TIM1>();
-  TIM1->setAutoReloadValue(std::numeric_limits<uint16_t>::max());
-  TIM1->setPrescalerValue(1000);
-  TIM1->enable();
+  TIM tim1(TIM::TIM1);
 
-  uint32_t volatile const fbData = reinterpret_cast<uint32_t const volatile>(&layerFrameBuffer);
-  uint32_t const windowWidth = 240;
-  uint32_t const windowHeight = 300;
+  tim1.setAutoReloadValue(std::numeric_limits<uint16_t>::max());
+  tim1.setPrescalerValue(1000);
+  tim1.enable();
 
-  Compositor desktop({reinterpret_cast<void*>(fbData), windowWidth * windowHeight * sizeof(uint16_t)}, windowWidth, windowHeight);
+  void* const fbData = reinterpret_cast<void* const>(&layerFrameBuffer);
+  constexpr uint32_t windowWidth = 240;
+  constexpr uint32_t windowHeight = 300;
+
+  Compositor desktop({fbData, windowWidth * windowHeight * sizeof(uint16_t)}, windowWidth, windowHeight);
 
   TextWindow textWindow(desktop, font::arialBold, {30, 20, 30 + 140, 20 + (16 * 3 - 8)}); //3.5 lines
   textWindow.setText("Naber? test test2");
@@ -136,14 +147,30 @@ SET_UP_TIM:
   I2C i2c(I2C::_3);
 
   //volatile RTC* rtc = RTC::open(RTC::ClockSource::LSI);
-  volatile RTC rtc(RTC::ClockSource::LSI);
+  PWR pwr;
 
-  volatile ADC adc(ADC::Module::_1);
+  RTC rtc(pwr, RTC::ClockSource::LSI);
+
+  ADC adc(ADC::Module::_1);
+  //adc.enableContinuous();
+<<<<<<< HEAD
+  auto tim = RCC::enablePeriph<RCC::TIM1>();
+=======
+
+  GPIO::Port portB(GPIO::Port::B);
+  auto tim43pwm = portB.createPin(6, GPIO::Port::AlternatePin);
+  tim43pwm.setAF(GPIO::Port::AlPin::AF::_2);
+  TIM tim4(TIM::TIM4);
+  tim4.enableAutoReloadPreload();
+  tim4.setAutoReloadValue(15000);
+  auto tim4cc1 = tim4.enableCC(1);
+  tim4cc1.setOCMode(TIM::CC::OCMode::PWM1);
+  tim4cc1.setValue(1);
+  tim4cc1.enableOCPreload();
+  tim4.generateEvent();
 
   desktop.update();
-
-  //adc.enableContinuous();
-  auto tim = RCC::enablePeriph<RCC::TIM1>();
+>>>>>>> d343c3bc1e4f214f2a08eb4cde26a9fd6754a9c4
 
   while(true)
   {
@@ -151,9 +178,13 @@ SET_UP_TIM:
     while(!adc.isEndOfConversion())
     { }
 
-    static char adcResult[6];
-    sprintf(adcResult, "%d", adc.getResult());
-    adcWindow.setText(adcResult);
+    auto adcResult = adc.getResult();
+
+    tim4cc1.setValue((adcResult * 15000) / 4095);
+
+    static char adcResultStr[6];
+    sprintf(adcResultStr, "%d", adcResult);
+    adcWindow.setText(adcResultStr);
     adcWindow.update();
 
     static uint8_t i = 0;
@@ -167,19 +198,19 @@ SET_UP_TIM:
     textWindow2.setText(time);
     textWindow2.update();
 
-    uint16_t cntVal = TIM1->getCounterValue();
+    uint16_t cntVal = tim1.getCounterValue();
     if(cntVal >= std::numeric_limits<uint16_t>::max() / 2)
     {
       LCD::Color const green{0, 255, 0};
-      //if(lcd0->getBgColor() != green)
-      //  lcd0->setBgColor(green);
+      if(lcd.getBgColor() != green)
+        lcd.setBgColor(green);
       portGpin13.set();
     }
     else
     {
       LCD::Color const red{255, 0, 0};
-      //if(lcd0->getBgColor() != red)
-      //  lcd0->setBgColor(red);
+      if(lcd.getBgColor() != red)
+        lcd.setBgColor(red);
       portGpin13.reset();
     }
   }

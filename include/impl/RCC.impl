@@ -27,22 +27,22 @@
 #ifndef RCC_CPP_
 #define RCC_CPP_
 
-#include <driver/RCC.hpp>
+#include <register/RCC.hpp>
 
 namespace stm32f429
 {
 
-constexpr RCC volatile* const RCC::instance()
+inline RCC volatile* const RCC::instance()
 {
   return reinterpret_cast<RCC volatile* const>(RCC::BaseAddress);
 }
 
-template<class Module>
+/*template<class Module>
 typename Module::RegType volatile* RCC::enablePeriph()
 {
   *reinterpret_cast<uint32_t volatile*>(Module::rccAddr) |= 0x1 <<Module::rccVal;
   return new (reinterpret_cast<void*>(Module::regAddress)) typename Module::RegType();
-}
+}*/
 
 } //NS stm32f429
 

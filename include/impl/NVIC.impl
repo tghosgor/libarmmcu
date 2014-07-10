@@ -27,12 +27,12 @@
 #ifndef NVIC_CPP_
 #define NVIC_CPP_
 
-#include <driver/NVIC.hpp>
+#include <register/NVIC.hpp>
 
 namespace stm32f429
 {
 
-template<class Module>
+/*template<class Module>
 typename Module::RegType volatile* NVIC::enable()
 {
   reinterpret_cast<NVIC volatile*>(BaseAddress)->m_ISER[Module::rccVal / 32] |= 0x1 <<(Module::rccVal % 32);
@@ -42,7 +42,7 @@ template<class Module>
 void NVIC::disable()
 {
   reinterpret_cast<NVIC volatile*>(BaseAddress)->m_ICER[Module::rccVal / 32] &= ~(0x1 <<(Module::rccVal % 32));
-}
+}*/
 
 template<class Module>
 void NVIC::setPending()

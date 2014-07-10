@@ -24,26 +24,27 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <driver/I2C.hpp>
+#include <peripheral/I2C.hpp>
 
 #include <exception.hpp>
 #include <OS.hpp>
-#include <driver/GPIO.hpp>
-#include <driver/RCC.hpp>
+#include <peripheral/GPIO.hpp>
+#include <register/RCC.hpp>
 
 namespace stm32f429
 {
 
-constexpr I2C::Module I2C::_1;
-constexpr I2C::Module I2C::_2;
-constexpr I2C::Module I2C::_3;
+const I2C::Module I2C::_1(0x40005400, std::make_pair(0x40023800 + 0x40, 0x1 <<21));
+const I2C::Module I2C::_2(0x40005800, std::make_pair(0x40023800 + 0x40, 0x1 <<22));
+const I2C::Module I2C::_3(0x40005C00, std::make_pair(0x40023800 + 0x40, 0x1 <<23));
 
 I2C::I2C(const Module& module)
   : m_module(module)
 {
-  uint32_t& rccReg = *reinterpret_cast<uint32_t* const>(module.m_rccAddr);
+  uint32_t& rccReg = *reinterpret_cast<uint32_t* const>(module.m_enablePairs[0].first);
+  const uint32_t& rccVal = module.m_enablePairs[0].second;
 
-  if(rccReg & module.m_rccVal != 0)
+  if(rccReg & rccVal != 0)
   {
     m_isValid = false;
   }
@@ -53,16 +54,18 @@ I2C::I2C(const Module& module)
 
     if(module == _3)
     {
-      RCC::enablePeriph<RCC::GPIOA>()->createPin(8, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_10);
-      RCC::enablePeriph<RCC::GPIOC>()->createPin(9, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_10);
+      GPIO::Port portA(GPIO::Port::A);
+      GPIO::Port portC(GPIO::Port::C);
+      portA.createPin(8, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_10);
+      portC.createPin(9, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_10);
     }
     else
     {
       throw exception::FatalError("Unimplemented I2C module selected.");
     }
 
-    rccReg |= module.m_rccVal;
-    m_registers = reinterpret_cast<Registers*>(module.m_moduleAddr);
+    rccReg |= rccVal;
+    m_registers = reinterpret_cast<Registers*>(module.m_moduleAddress);
   }
 }
 
@@ -78,9 +81,10 @@ I2C::~I2C()
 {
   if(isValid())
   {
-    uint32_t& rccReg = *reinterpret_cast<uint32_t* const>(m_module.m_rccAddr);
+    uint32_t& rccReg = *reinterpret_cast<uint32_t* const>(m_module.m_enablePairs[0].first);
+    const uint32_t& rccVal = m_module.m_enablePairs[0].second;
 
-    rccReg &= ~(m_module.m_rccVal);
+    rccReg &= ~(rccVal);
   }
 }
 

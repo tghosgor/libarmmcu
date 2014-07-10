@@ -24,28 +24,26 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef PWR_H_
-#define PWR_H_
-
-#include <cstdint>
+#include <register/PLL.hpp>
 
 namespace stm32f429
 {
 
-class PWR
+void PLL::setMultiplicationFactor(uint16_t const factor) volatile
 {
-public:
-  uint32_t static constexpr BaseAddress{ 0x40007000 };
-
-public:
-  void disableBDWriteProtection() volatile;
-  void enableBDWriteProtection() volatile;
-
-public: //Registers
-  uint32_t m_CR; //Power control register
-  uint32_t m_CSR; //Power control status register
-};
-
+//  m_PLLSAICFGR &= ~(0x01FF <<6);
+//  m_PLLSAICFGR |= factor <<6;
 }
 
-#endif /* RTC_H_ */
+void PLL::setDivisionFactor(uint8_t const factor) volatile
+{
+//  m_PLLSAICFGR &= ~(0x07 <<28);
+//  m_PLLSAICFGR |= (factor & 0x0F) <<28;
+}
+
+bool PLL::isReady() volatile
+{
+//  return ( *(&m_PLLSAICFGR - 1) ) & (0x1 <<29);
+}
+
+} //NS stm32f429

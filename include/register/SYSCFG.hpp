@@ -31,8 +31,8 @@
 #include <cstdint>
 #include <type_traits>
 
-#include <driver/EXTI.hpp>
-#include <driver/NVIC.hpp>
+#include <register/EXTI.hpp>
+#include <register/NVIC.hpp>
 
 #include <util.hpp>
 
@@ -74,7 +74,7 @@ public: //Declarations
   using EXTI4 = NVICEXTIModule<10, EXTI<EXTIModule<4>>>;
 
 public:
-  static constexpr SYSCFG volatile* const instance();
+  static SYSCFG volatile* const instance();
 
   template<class Module>
   typename Module::RegType volatile* enable() volatile;

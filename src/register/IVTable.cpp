@@ -24,64 +24,11 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef I2C_H_
-#define I2C_H_
-
-#include <util.hpp>
-
-#include <cstdint>
+#include <register/IVTable.hpp>
 
 namespace stm32f429
 {
 
-class I2C
-{
-public: //Declarations
-  /*enum class Module : uint32_t
-  {
-    _1 = 0x40005400,
-    _2 = 0x40005800,
-    _3 = 0x40005C00
-  };*/
+IVTable ivTable alignas(64 * 4);
 
-  using Module = util::Module2<I2C>;
-
-  static constexpr Module _1 {0x40023800 + 0x40, 0x1 <<21, 0x40005400};
-  static constexpr Module _2 {0x40023800 + 0x40, 0x1 <<22, 0x40005800};
-  static constexpr Module _3 {0x40023800 + 0x40, 0x1 <<23, 0x40005C00};
-
-public:
-
-public: //Methods
-  I2C(const Module& module);
-  I2C(I2C&& other);
-  ~I2C();
-
-  bool const isValid() { return m_isValid; }
-
-private: //Registers
-  struct Registers
-  {
-    uint32_t m_CR1; //control register 1
-    uint32_t m_CR2; //control register 2
-    uint32_t m_OAR1; //own address register 1
-    uint32_t m_OAR2; //own address register 2
-    uint32_t m_DR; //data register
-    uint32_t m_SR1; //status register 1
-    uint32_t m_SR2; //status register 2
-    uint32_t m_CCR; //clock control register
-    uint32_t m_TRISE;
-    uint32_t m_FLTR;
-  };
-
-public:
-  Registers* m_registers;
-
-private:
-  bool m_isValid;
-  util::Module2<I2C> const& m_module;
-};
-
-}
-
-#endif /* I2C_H_ */
+} //NS stm32f429

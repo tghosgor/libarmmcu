@@ -27,7 +27,7 @@
 #ifndef OS_H_
 #define OS_H_
 
-#include <driver/fwd.hpp>
+#include <register/fwd.hpp>
 #include <util.hpp>
 
 #include <cstdint>
@@ -36,6 +36,8 @@ namespace stm32f429
 {
 namespace OS
 {
+
+typedef std::function<bool()> ISR;
 
 void halt(const char* errorMsg);
 

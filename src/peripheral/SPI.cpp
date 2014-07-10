@@ -24,21 +24,24 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <driver/GPIO.hpp>
-#include <driver/RCC.hpp>
+#include <peripheral/GPIO.hpp>
+#include <register/RCC.hpp>
 
-#include <driver/SPI.hpp>
+#include <peripheral/SPI.hpp>
 
 namespace stm32f429
 {
 
+const SPI::Module SPI::_1 { 0x40013000, std::make_pair(0x40023800 + 0x44, 0x1 <<12) };
+const SPI::Module SPI::_5 { 0x40015000, std::make_pair(0x40023800 + 0x44, 0x1 <<20) };
+
 void SPI::enable(DataFrame const dataFrameFormat, bool const enableHardwareCRC) volatile
 {
-  auto portF = RCC::enablePeriph<RCC::GPIOF>();
+  GPIO::Port portF(GPIO::Port::F);
 
-  auto pin7 = portF->createPin(7, GPIO::Port::AlternatePin);
-  auto pin8 = portF->createPin(8, GPIO::Port::AlternatePin);
-  auto pin9 = portF->createPin(9, GPIO::Port::AlternatePin);
+  auto pin7 = portF.createPin(7, GPIO::Port::AlternatePin);
+  auto pin8 = portF.createPin(8, GPIO::Port::AlternatePin);
+  auto pin9 = portF.createPin(9, GPIO::Port::AlternatePin);
 
   pin7.setPullMode(GPIO::Port::AlPin::PullMode::PullDown);
   pin8.setPullMode(GPIO::Port::AlPin::PullMode::PullDown);

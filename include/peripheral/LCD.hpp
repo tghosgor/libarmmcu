@@ -29,8 +29,8 @@
 
 #include <cstdint>
 
-#include <driver/GPIO.hpp>
-#include <driver/RCC.hpp>
+#include <peripheral/GPIO.hpp>
+#include <register/RCC.hpp>
 
 namespace stm32f429
 {
@@ -82,8 +82,12 @@ public: //Declarations
   static_assert(sizeof(Layer) == 17 * 4, "Layer size is wrong");
 
 public: //Methods
-  void enable(uint16_t const activeWidth, uint16_t const hSync, uint16_t const hBackPorch, uint16_t const HFP,
-              uint16_t const activeHeight, uint16_t const vSync, uint16_t const vBackPorch, uint16_t const VFP) volatile;
+  LCD(GPIO::Port& portA, GPIO::Port& portB, GPIO::Port& portC, GPIO::Port& portD, GPIO::Port& portF, GPIO::Port& portG,
+      SPI& m_spi,
+      const uint16_t activeWidth, const uint16_t hSync, const uint16_t hBackPorch, const uint16_t HFP, const uint16_t activeHeight,
+      const uint16_t vSync, const uint16_t vBackPorch, const uint16_t VFP);
+  //TODO: ~LCD();
+
   void setSync(uint16_t const hSync, uint16_t const vSync) volatile;
   void setBackPorch(uint16_t const hBP, uint16_t const vBP) volatile;
   void setActiveWidth(uint16_t const width, uint16_t const height) volatile;
@@ -99,32 +103,39 @@ public: //Methods
   void selectReg(uint8_t offset) volatile;
   void writeReg(uint8_t value) volatile;
 
+private:
+  struct Registers
+  {
+    uint32_t PADDING1[2];
+    uint32_t m_SSCR;
+    uint32_t m_BPCR;
+    uint32_t m_AWCR;
+    uint32_t m_TWCR;
+    uint32_t m_GCR;
+    uint32_t PADDING2[2];
+    uint32_t m_SRCR;
+    uint32_t PADDING3[1];
+    uint32_t m_BCCR;
+    uint32_t PADDING4[1];
+    uint32_t m_IER;
+    uint32_t m_ISR;
+    uint32_t m_ICR;
+    uint32_t m_LIPCR;
+    uint32_t m_CPSR;
+    uint32_t m_CDSR;
+
+    uint32_t PADDING5[14]; // 19 * 4 bytes until here
+
+    Layer m_layer1;
+
+    uint32_t PADDING8[15];
+
+    Layer m_layer2;
+  };
+  static_assert(sizeof(Registers) == 0x148, "LCD size is not correct, spec says 0x148 bytes.");
+
 public: //Registers
-  uint32_t PADDING1[2];
-  uint32_t m_SSCR;
-  uint32_t m_BPCR;
-  uint32_t m_AWCR;
-  uint32_t m_TWCR;
-  uint32_t m_GCR;
-  uint32_t PADDING2[2];
-  uint32_t m_SRCR;
-  uint32_t PADDING3[1];
-  uint32_t m_BCCR;
-  uint32_t PADDING4[1];
-  uint32_t m_IER;
-  uint32_t m_ISR;
-  uint32_t m_ICR;
-  uint32_t m_LIPCR;
-  uint32_t m_CPSR;
-  uint32_t m_CDSR;
-
-  uint32_t PADDING5[14]; // 19 * 4 bytes until here
-
-  Layer m_layer1;
-
-  uint32_t PADDING8[15];
-
-  Layer m_layer2;
+  Registers* m_registers;
 
 private: //TODO: this structure is placed on top of LCD-TFT register so the ones below has to be static
          // but there may be more than one LCD connected with different ports so this class should have a pointer
@@ -133,16 +144,13 @@ private: //TODO: this structure is placed on top of LCD-TFT register so the ones
   static GPIO::Port::OuPin m_WRX;
   static GPIO::Port::OuPin m_CSX;
 
-  static SPI volatile* m_spi5;
+  SPI& m_spi;
 
 private:
-  LCD();
 }; //class LCD
 
 bool operator==(LCD::Color volatile const& lhs, LCD::Color volatile const& rhs);
 bool operator!=(LCD::Color volatile const& lhs, LCD::Color volatile const& rhs);
-
-static_assert(sizeof(LCD) == 0x148, "LCD size is not correct, spec says 0x148 bytes.");
 
 } //NS stm32f429
 

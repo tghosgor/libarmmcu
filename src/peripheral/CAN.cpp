@@ -24,21 +24,12 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <driver/PWR.hpp>
+#include <peripheral/ADC.hpp>
 
-#include <driver/RCC.hpp>
+#include <peripheral/GPIO.hpp>
+#include <register/RCC.hpp>
 
 namespace stm32f429
 {
-
-void PWR::disableBDWriteProtection() volatile
-{
-  m_CR |= 0x1 <<8;
-}
-
-void PWR::enableBDWriteProtection() volatile
-{
-  m_CR &= ~(0x1 <<8);
-}
 
 } //NS stm32f429

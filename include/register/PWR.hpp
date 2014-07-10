@@ -24,23 +24,36 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FWD_H_
-#define FWD_H_
+#ifndef PWR_H_
+#define PWR_H_
+
+#include <cstdint>
 
 namespace stm32f429
 {
 
-class RCC;
-class LCD;
-class SPI;
-class RTC;
-class PWR;
-
-namespace GPIO
+class PWR
 {
-class Port;
+public:
+  uint32_t static constexpr BaseAddress{ 0x40007000 };
+
+public:
+  PWR();
+
+  void disableBDWriteProtection() volatile;
+  void enableBDWriteProtection() volatile;
+
+private:
+  struct Registers
+  {
+    uint32_t m_CR; //Power control register
+    uint32_t m_CSR; //Power control status register
+  };
+
+private:
+  Registers* m_registers;
+};
+
 }
 
-} //NS stm32f429
-
-#endif /* FWD_H_ */
+#endif /* RTC_H_ */

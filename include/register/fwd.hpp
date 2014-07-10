@@ -24,59 +24,25 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef RTC_H_
-#define RTC_H_
+#ifndef FWD_H_
+#define FWD_H_
 
-#include <cstdint>
+//TODO: split register/fwd.h and peripheral/fwd.h
 
 namespace stm32f429
 {
 
-class RTC
+class RCC;
+class LCD;
+class SPI;
+class RTC;
+class PWR;
+
+namespace GPIO
 {
-public:
-  uint32_t static constexpr BaseAddress = 0x40002800;
-
-public:
-  enum class ClockSource : uint32_t
-  {
-    NoClock = 0x0,
-    LSE = 0x1 <<8,
-    LSI = 0x2 <<8,
-    HSE = 0x3 <<8
-  };
-
-public: //Methods
-  explicit RTC(ClockSource const source = ClockSource::LSI);
-  RTC(RTC&& other);
-  ~RTC();
-
-  //static volatile RTC* open(ClockSource const source = ClockSource::LSI);
-  //static void close(volatile RTC*);
-  bool const isValid() { return m_isValid; }
-
-  uint8_t const getHourTens() const volatile { return (m_registers.m_TR & 0x300000) >>20; }
-  uint8_t const getHourUnits() const volatile { return (m_registers.m_TR & 0x0F0000) >>16; }
-  uint8_t const getMinTens() const volatile { return (m_registers.m_TR & 0x7000) >>12; }
-  uint8_t const getMinUnits() const volatile { return (m_registers.m_TR & 0x0F00) >>8; }
-  uint8_t const getSecTens() const volatile { return (m_registers.m_TR & 0x70) >>4; }
-  uint8_t const getSecUnits() const volatile { return m_registers.m_TR & 0x0F; }
-
-private: //Registers
-  struct Registers
-  {
-    uint32_t m_TR; //Time register
-  };
-
-public:
-  Registers& m_registers;
-
-private:
-  bool m_isValid;
-
-  static bool m_initialized;
-};
-
+class Port;
 }
 
-#endif /* RTC_H_ */
+} //NS stm32f429
+
+#endif /* FWD_H_ */

@@ -24,34 +24,64 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef COMPOSITOR_H_
-#define COMPOSITOR_H_
+#ifndef I2C_H_
+#define I2C_H_
 
-#include <window/window.hpp>
+#include <util.hpp>
+
+#include <cstdint>
 
 namespace stm32f429
 {
 
-class Compositor
-  : public Window
+class I2C
 {
-public:
-  struct FrameBuffer
+public: //Declarations
+  /*enum class Module : uint32_t
   {
-    void* buffer;
-    std::size_t size;
+    _1 = 0x40005400,
+    _2 = 0x40005800,
+    _3 = 0x40005C00
+  };*/
+
+  using Module = util::Module2<I2C, 1>;
+
+  static const Module _1;
+  static const Module _2;
+  static const Module _3;
+
+public:
+
+public: //Methods
+  I2C(const Module& module);
+  I2C(I2C&& other);
+  ~I2C();
+
+  bool const isValid() { return m_isValid; }
+
+private: //Registers
+  struct Registers
+  {
+    uint32_t m_CR1; //control register 1
+    uint32_t m_CR2; //control register 2
+    uint32_t m_OAR1; //own address register 1
+    uint32_t m_OAR2; //own address register 2
+    uint32_t m_DR; //data register
+    uint32_t m_SR1; //status register 1
+    uint32_t m_SR2; //status register 2
+    uint32_t m_CCR; //clock control register
+    uint32_t m_TRISE;
+    uint32_t m_FLTR;
   };
 
 public:
-  Compositor(const FrameBuffer& fb, const std::size_t width, const std::size_t height);
-
-  void render(const Area& area);
+  Registers* m_registers;
 
 private:
-  const FrameBuffer m_frameBuffer;
-  static constexpr uint16_t m_defaultPixelColor = 0xFFFF;
+  bool m_isValid;
+  Module const& m_module;
 };
 
-}//NS stm32f429
+}
 
-#endif
+#endif /* I2C_H_ */

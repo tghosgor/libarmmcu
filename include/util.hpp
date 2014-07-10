@@ -27,26 +27,13 @@
 #ifndef UTIL_H
 #define UTIL_H
 
+#include <cstdint>
 #include <functional>
 
 namespace stm32f429
 {
-
 namespace util
 {
-
-template<uint32_t ...values>
-struct EnableSequence
-{
-  constexpr EnableSequence() { }
-
-  template<uint32_t addr, uint32_t val, uint32_t ...restValues>
-  void static run()
-  {
-    *reinterpret_cast<uint32_t volatile*>(addr) = val;
-    run<restValues...>();
-  };
-};
 
 template<std::size_t rccAddr_, uint8_t rccVal_, class T = void, std::size_t moduleAddr_ = 0>
 struct Module
@@ -58,18 +45,41 @@ struct Module
   static constexpr std::size_t regAddress = moduleAddr_;
 };
 
-template<class T>
+template<class T, std::size_t N>
 struct Module2
 {
-  const std::size_t m_rccAddr;
-  const uint32_t m_rccVal;
-  const std::size_t m_moduleAddr;
+  using EnablePair = std::pair<const std::size_t, const uint32_t>;
+  using EnablePairList = std::array<EnablePair, N>;
 
-  constexpr Module2(const std::size_t rccAddr, const uint32_t val, const std::size_t moduleAddr)
-    : m_rccAddr(rccAddr)
-    , m_rccVal(val)
-    , m_moduleAddr(moduleAddr)
-  {}
+  uint32_t* const m_moduleAddress;
+  const EnablePairList m_enablePairs;
+
+  template<typename... E>
+  Module2(const std::size_t moduleAddress, E... e)
+    : m_moduleAddress(reinterpret_cast<uint32_t* const>(moduleAddress))
+    , m_enablePairs{e...}
+  { }
+
+  void enable() const
+  {
+    for(const auto& it : m_enablePairs)
+      *reinterpret_cast<uint32_t* const>(it.first) |= it.second;
+  }
+
+  void disable() const
+  {
+    for(const auto& it : m_enablePairs)
+      *reinterpret_cast<uint32_t* const>(it.first) &= ~it.second;
+  }
+
+  bool isEnabled() const
+  {
+    //the first one must be enabler (RCC)
+    if( (*reinterpret_cast<uint32_t* const>(m_enablePairs[0].first) & m_enablePairs[0].second) != 0 )
+      return true;
+    else
+      return false;
+  }
 
   friend bool operator==(const Module2& lhs, const Module2& rhs)
   {
@@ -77,10 +87,8 @@ struct Module2
   }
 };
 
-typedef std::function<bool()> ISR;
 
-}
-
+} //NS util
 } //NS stm32f429
 
 #endif /* UTIL_H */

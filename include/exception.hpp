@@ -27,7 +27,7 @@
 #ifndef EXCEPTION_H_
 #define EXCEPTION_H_
 
-#include <driver/fwd.hpp>
+#include <register/fwd.hpp>
 #include <util.hpp>
 
 #include <cstdint>

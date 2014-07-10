@@ -24,76 +24,61 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SPI_H_
-#define SPI_H_
-
-#include <driver/fwd.hpp>
-#include <util.hpp>
+#ifndef RTC_H_
+#define RTC_H_
 
 #include <cstdint>
 
 namespace stm32f429
 {
 
-class SPI
+class PWR;
+class RTC
 {
-  friend class RCC;
+public:
+  uint32_t static constexpr BaseAddress = 0x40002800;
 
-public: //Declarations
-  enum : uint32_t
+public:
+  enum class ClockSource : uint32_t
   {
-    _1 = 0x40013000,
-    _5 = 0x40015000
-  };
-
-  enum class DataFrame : bool
-  {
-    _8Bit = false,
-    _16Bit = true
-  };
-
-  enum class BaudPSC : uint8_t
-  {
-    _0 = 0,
-    _4 = 1,
-    _8 = 2,
-    _16 = 3,
-    _32 = 4,
-    _64 = 5,
-    _128 = 6,
-    _256 = 7
+    NoClock = 0x0,
+    LSE = 0x1 <<8,
+    LSI = 0x2 <<8,
+    HSE = 0x3 <<8
   };
 
 public: //Methods
-  void enable(DataFrame const dataFrameFormat = DataFrame::_8Bit, bool const enableHardwareCRC = false) volatile;
-  void setMasterMode() volatile;
-  void setSlaveMode() volatile;
-  void setBidirectionalMode() volatile;
-  void setUnidirectionalMode() volatile;
-  void setBaudPrescaler(BaudPSC const psc) volatile;
-  void enableSoftwareSlaveMode() volatile;
-  void disableSoftwareSlaveMode() volatile;
-  void enableInternalSlaveSelect() volatile;
-  void disableInternalSlaveSelect() volatile;
-  void send(uint16_t data) volatile;
+  explicit RTC(PWR& pwr, ClockSource const source = ClockSource::LSI);
+  RTC(RTC&& other);
+  ~RTC();
 
-  DataFrame getDataFrameFormat() volatile const;
+  //static volatile RTC* open(ClockSource const source = ClockSource::LSI);
+  //static void close(volatile RTC*);
+  bool const isValid() { return m_isValid; }
+
+  uint8_t const getHourTens() const volatile { return (m_registers.m_TR & 0x300000) >>20; }
+  uint8_t const getHourUnits() const volatile { return (m_registers.m_TR & 0x0F0000) >>16; }
+  uint8_t const getMinTens() const volatile { return (m_registers.m_TR & 0x7000) >>12; }
+  uint8_t const getMinUnits() const volatile { return (m_registers.m_TR & 0x0F00) >>8; }
+  uint8_t const getSecTens() const volatile { return (m_registers.m_TR & 0x70) >>4; }
+  uint8_t const getSecUnits() const volatile { return m_registers.m_TR & 0x0F; }
+
+private: //Registers
+  struct Registers
+  {
+    uint32_t m_TR; //Time register
+  };
+
+public:
+  Registers& m_registers;
 
 private:
-  uint32_t m_CR1;
-  uint32_t m_CR2;
-  uint32_t m_SR;
-  uint32_t m_DR;
-  uint32_t m_CRCPR;
-  uint32_t m_RXCRCR;
-  uint32_t m_TXCRCR;
-  uint32_t m_I2SCFGR;
-  uint32_t m_I2SPR;
+  bool m_isValid;
+  PWR& m_pwr;
 
-private:
-  SPI() { }
+  static bool m_initialized;
 };
 
-} //NS stm32f429
+}
 
-#endif /* SPI_H_ */
+#endif /* RTC_H_ */
