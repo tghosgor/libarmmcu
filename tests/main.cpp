@@ -144,7 +144,6 @@ SET_UP_TIM:
 
   //adc.enableContinuous();
   auto tim = RCC::enablePeriph<RCC::TIM1>();
-  tim->set
 
   while(true)
   {
