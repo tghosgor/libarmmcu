@@ -2,39 +2,33 @@
   Copyright (c) 2014, Tolga HOŞGÖR
   All rights reserved.
 
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are met:
+  This file is part of libarmmcu.
 
-  * Redistributions of source code must retain the above copyright notice, this
-    list of conditions and the following disclaimer.
+  libarmmcu is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
 
-  * Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
+  libarmmcu is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  You should have received a copy of the GNU General Public License
+  along with libarmmcu.  If not, see <http://www.gnu.org/licenses/>
 */
 
 #ifndef RCC_H_
 #define RCC_H_
 
+#include "include/driver/PLL.hpp"
+#include "include/driver/SYSCFG.hpp"
+#include "include/driver/TIM.hpp"
+
+#include "include/driver/fwd.hpp"
+#include "include/driver/util.hpp"
+
 #include <cstdint>
-
-#include <driver/PLL.hpp>
-#include <driver/SYSCFG.hpp>
-#include <driver/TIM.hpp>
-
-#include <driver/fwd.hpp>
-#include <util.hpp>
 
 namespace stm32f429
 {
@@ -44,46 +38,17 @@ class RCC
 public:
   static constexpr std::size_t BaseAddress{ 0x40023800 };
 
-private: //Internal Declarations
-  template<std::size_t offset, uint8_t shift, class T, std::size_t regAddress>
-  using Module = util::Module<BaseAddress + offset, shift, T, regAddress>;
-
 public: //Declarations
-  using GPIOA = Module<0x30, 0, GPIO::Port, 0x40020000>;
-  using GPIOB = Module<0x30, 1, GPIO::Port, 0x40020400>;
-  using GPIOC = Module<0x30, 2, GPIO::Port, 0x40020800>;
-  using GPIOD = Module<0x30, 3, GPIO::Port, 0x40020C00>;
-  using GPIOE = Module<0x30, 4, GPIO::Port, 0x40021000>;
-  using GPIOF = Module<0x30, 5, GPIO::Port, 0x40021400>;
-  using GPIOG = Module<0x30, 6, GPIO::Port, 0x40021800>;
-  using GPIOH = Module<0x30, 7, GPIO::Port, 0x40021C00>;
-  using GPIOI = Module<0x30, 8, GPIO::Port, 0x40022000>;
+  //using SYSCFG = Module<0x44, 14, stm32f429::SYSCFG, stm32f429::SYSCFG::BaseAddress>;
 
-  using SYSCFG = Module<0x44, 14, stm32f429::SYSCFG, stm32f429::SYSCFG::BaseAddress>;
+  //using LTDC = Module<0x44, 26, LCD, 0x40016800>;
 
-  using TIM1  = Module<0x44, 0,  TIM::Periph<TIM::_1 >, TIM::_1 >;
-  using TIM2  = Module<0x40, 0,  TIM::Periph<TIM::_2 >, TIM::_2 >;
-  using TIM3  = Module<0x40, 1,  TIM::Periph<TIM::_3 >, TIM::_3 >;
-  using TIM4  = Module<0x40, 2,  TIM::Periph<TIM::_4 >, TIM::_4 >;
-  using TIM5  = Module<0x40, 3,  TIM::Periph<TIM::_5 >, TIM::_5 >;
-  using TIM6  = Module<0x40, 4,  TIM::Periph<TIM::_6 >, TIM::_6 >;
-  using TIM7  = Module<0x40, 5,  TIM::Periph<TIM::_7 >, TIM::_7 >;
-  using TIM8  = Module<0x44, 1,  TIM::Periph<TIM::_8 >, TIM::_8 >;
-  using TIM9  = Module<0x44, 16, TIM::Periph<TIM::_9 >, TIM::_9 >;
-  using TIM10 = Module<0x44, 17, TIM::Periph<TIM::_10>, TIM::_10>;
-  using TIM11 = Module<0x44, 18, TIM::Periph<TIM::_11>, TIM::_11>;
-  using TIM12 = Module<0x40, 6,  TIM::Periph<TIM::_12>, TIM::_12>;
-  using TIM13 = Module<0x40, 7,  TIM::Periph<TIM::_13>, TIM::_13>;
-  using TIM14 = Module<0x40, 8,  TIM::Periph<TIM::_14>, TIM::_14>;
-
-  using LTDC = Module<0x44, 26, LCD, 0x40016800>;
-
-  using PWR = Module<0x40, 28, stm32f429::PWR, 0x40007000>;
+  //using PWR = Module<0x40, 28, stm32f429::PWR, 0x40007000>;
 
   //using RTC = Module<0x70, 15, stm32f429::RTC, 0x40002800>;
 
-  using SPI1 = Module<0x44, 12, SPI, 0x40013000>;
-  using SPI5 = Module<0x44, 20, SPI, 0x40015000>;
+  //using SPI1 = Module<0x44, 12, SPI, 0x40013000>;
+  //using SPI5 = Module<0x44, 20, SPI, 0x40015000>;
 
   enum class PLLSAIDiv : uint32_t
   {
@@ -162,7 +127,5 @@ public: //Registers
 static_assert(sizeof(RCC) == 0x90, "RCC size is wrong. Spec says its 0x8C bytes long.");
 
 } //NS stm32f429
-
-#include "impl/RCC.impl"
 
 #endif /* RCC_H_ */

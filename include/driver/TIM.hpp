@@ -2,62 +2,49 @@
   Copyright (c) 2014, Tolga HOŞGÖR
   All rights reserved.
 
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are met:
+  This file is part of libarmmcu.
 
-  * Redistributions of source code must retain the above copyright notice, this
-    list of conditions and the following disclaimer.
+  libarmmcu is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
 
-  * Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
+  libarmmcu is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  You should have received a copy of the GNU General Public License
+  along with libarmmcu.  If not, see <http://www.gnu.org/licenses/>
 */
 
 #ifndef TIM_H_
 #define TIM_H_
 
+#include "include/driver/util.hpp"
+
 namespace stm32f429
 {
-namespace TIM
-{
 
-enum : std::size_t
-{
-  _1 = 0x40010000,
-  _2 = 0x40000000,
-  _3 = 0x40000400,
-  _4 = 0x40000800,
-  _5 = 0x40000C00,
-  _6 = 0x40001000,
-  _7 = 0x40001400,
-  _8 = 0x40010000,
-  _9 = 0x40014000,
-  _10 = 0x40014400,
-  _11 = 0x40014800,
-  _12 = 0x40001800,
-  _13 = 0x40001C00,
-  _14 = 0x40002000
-};
-
-template<std::size_t module>
-class Periph
+class TIM
 {
 public:
-  enum class UEVSource
-  {
+  using Module = util::Module<1>;
 
-  };
+  static const Module _1;
+  static const Module _2;
+  static const Module _3;
+  static const Module _4;
+  static const Module _5;
+  static const Module _6;
+  static const Module _7;
+  static const Module _8;
+  static const Module _9;
+  static const Module _10;
+  static const Module _11;
+  static const Module _12;
+  static const Module _13;
+  static const Module _14;
 
   enum class MasterMode : uint32_t
   {
@@ -67,9 +54,8 @@ public:
   };
 
   template<uint8_t idx>
-  class CC
-  {
-    friend class Periph;
+  class CC {
+    friend class TIM;
 
   public:
     enum class OCMode : uint32_t
@@ -106,7 +92,10 @@ public:
     template<uint8_t idx_>
     typename std::enable_if<(idx_ >= 3 && idx_ <= 4)>::type
     enableOCPreload_() volatile;
-  };
+  };// class CC
+
+public:
+  TIM(const Module& module);
 
   /* Counter is automatically disabled in one-pulse mode, when an update event occurs. */
   void enable() volatile;
@@ -123,7 +112,7 @@ public:
 
   void enableUEV() volatile;
   void disableUEV() volatile;
-  void setUEVSource(UEVSource const source) volatile;
+  //void setUEVSource(UEVSource const source) volatile;
 
   void enableOnePulseMode() volatile;
   void disableOnePulseMode() volatile;
@@ -144,37 +133,34 @@ public:
   void generateEvent() volatile;
 
 private:
-  uint32_t m_CR1;
-  uint32_t m_CR2;
-  uint32_t m_SMCR;
-  uint32_t m_DIER;
-  uint32_t m_SR;
-  uint32_t m_EGR;
-  uint32_t m_CCMR1; //Capture/Compare Register 1
-  uint32_t m_CCMR2; //Capture/Compare Register 2
-  uint32_t m_CCER;
-  uint32_t m_CNT;   //Counter Register
-  uint32_t m_PSC;   //Prescaler Register
-  uint32_t m_ARR;   //Auto-Reload Register
-  uint32_t m_RCR;
-  uint32_t m_CCR1;
-  uint32_t m_CCR2;
-  uint32_t m_CCR3;
-  uint32_t m_CCR4;
-  uint32_t m_BDTR;
-  uint32_t m_DCR;
-  uint32_t m_DMAR;
-  uint32_t m_OR;
+  struct Registers {
+    uint32_t m_CR1;
+    uint32_t m_CR2;
+    uint32_t m_SMCR;
+    uint32_t m_DIER;
+    uint32_t m_SR;
+    uint32_t m_EGR;
+    uint32_t m_CCMR1; //Capture/Compare Register 1
+    uint32_t m_CCMR2; //Capture/Compare Register 2
+    uint32_t m_CCER;
+    uint32_t m_CNT;   //Counter Register
+    uint32_t m_PSC;   //Prescaler Register
+    uint32_t m_ARR;   //Auto-Reload Register
+    uint32_t m_RCR;
+    uint32_t m_CCR1;
+    uint32_t m_CCR2;
+    uint32_t m_CCR3;
+    uint32_t m_CCR4;
+    uint32_t m_BDTR;
+    uint32_t m_DCR;
+    uint32_t m_DMAR;
+    uint32_t m_OR;
+  };
+  static_assert(sizeof(TIM::Registers) == 0x54, "TIM size is not correct. Spec says 0x54 bytes.");
+
+  Registers* m_registers;
 };
 
-static_assert(sizeof(Periph<0>) == 0x54, "TIM size is not correct. Spec says 0x54 bytes.");
-
-template<std::size_t module>
-constexpr Periph<module> volatile* const getPeriph();
-
-} //NS TIM
 } //NS stm32f429
 
 #endif /* TIM_H_ */
-
-#include "impl/TIM.impl"

@@ -2,35 +2,29 @@
   Copyright (c) 2014, Tolga HOŞGÖR
   All rights reserved.
 
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are met:
+  This file is part of libarmmcu.
 
-  * Redistributions of source code must retain the above copyright notice, this
-    list of conditions and the following disclaimer.
+  libarmmcu is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
 
-  * Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
+  libarmmcu is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  You should have received a copy of the GNU General Public License
+  along with libarmmcu.  If not, see <http://www.gnu.org/licenses/>
 */
 
 #ifndef LCD_H_
 #define LCD_H_
 
-#include <cstdint>
+#include "include/driver/GPIO.hpp"
+#include "include/driver/RCC.hpp"
 
-#include <driver/GPIO.hpp>
-#include <driver/RCC.hpp>
+#include <cstdint>
 
 namespace stm32f429
 {
@@ -82,6 +76,8 @@ public: //Declarations
   static_assert(sizeof(Layer) == 17 * 4, "Layer size is wrong");
 
 public: //Methods
+  LCD();
+
   void enable(uint16_t const activeWidth, uint16_t const hSync, uint16_t const hBackPorch, uint16_t const HFP,
               uint16_t const activeHeight, uint16_t const vSync, uint16_t const vBackPorch, uint16_t const VFP) volatile;
   void setSync(uint16_t const hSync, uint16_t const vSync) volatile;
@@ -100,49 +96,49 @@ public: //Methods
   void writeReg(uint8_t value) volatile;
 
 public: //Registers
-  uint32_t PADDING1[2];
-  uint32_t m_SSCR;
-  uint32_t m_BPCR;
-  uint32_t m_AWCR;
-  uint32_t m_TWCR;
-  uint32_t m_GCR;
-  uint32_t PADDING2[2];
-  uint32_t m_SRCR;
-  uint32_t PADDING3[1];
-  uint32_t m_BCCR;
-  uint32_t PADDING4[1];
-  uint32_t m_IER;
-  uint32_t m_ISR;
-  uint32_t m_ICR;
-  uint32_t m_LIPCR;
-  uint32_t m_CPSR;
-  uint32_t m_CDSR;
+  struct Registers {
+    uint32_t PADDING1[2];
+    uint32_t m_SSCR;
+    uint32_t m_BPCR;
+    uint32_t m_AWCR;
+    uint32_t m_TWCR;
+    uint32_t m_GCR;
+    uint32_t PADDING2[2];
+    uint32_t m_SRCR;
+    uint32_t PADDING3[1];
+    uint32_t m_BCCR;
+    uint32_t PADDING4[1];
+    uint32_t m_IER;
+    uint32_t m_ISR;
+    uint32_t m_ICR;
+    uint32_t m_LIPCR;
+    uint32_t m_CPSR;
+    uint32_t m_CDSR;
 
-  uint32_t PADDING5[14]; // 19 * 4 bytes until here
+    uint32_t PADDING5[14]; // 19 * 4 bytes until here
 
-  Layer m_layer1;
+    Layer m_layer1;
 
-  uint32_t PADDING8[15];
+    uint32_t PADDING8[15];
 
-  Layer m_layer2;
+    Layer m_layer2;
+  };
+  static_assert(sizeof(Registers) == 0x148, "LCD size is not correct, spec says 0x148 bytes.");
+
+  Registers* m_registers;
 
 private: //TODO: this structure is placed on top of LCD-TFT register so the ones below has to be static
          // but there may be more than one LCD connected with different ports so this class should have a pointer
          // to the register along with a seperate "struct LCDRegister"
-  static GPIO::Port::OuPin m_RDX;
-  static GPIO::Port::OuPin m_WRX;
-  static GPIO::Port::OuPin m_CSX;
+  GPIO::OuPin m_RDX;
+  GPIO::OuPin m_WRX;
+  GPIO::OuPin m_CSX;
 
   static SPI volatile* m_spi5;
-
-private:
-  LCD();
 }; //class LCD
 
 bool operator==(LCD::Color volatile const& lhs, LCD::Color volatile const& rhs);
 bool operator!=(LCD::Color volatile const& lhs, LCD::Color volatile const& rhs);
-
-static_assert(sizeof(LCD) == 0x148, "LCD size is not correct, spec says 0x148 bytes.");
 
 } //NS stm32f429
 

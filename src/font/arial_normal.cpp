@@ -6,7 +6,7 @@
 
 //http://www.henningkarlsen.com/electronics/r_fonts.php
 
-#include <font/arial_normal.hpp>
+#include "include/font/arial_normal.hpp"
 
 namespace stm32f429
 {

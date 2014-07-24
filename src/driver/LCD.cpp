@@ -2,52 +2,44 @@
   Copyright (c) 2014, Tolga HOŞGÖR
   All rights reserved.
 
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are met:
+  This file is part of libarmmcu.
 
-  * Redistributions of source code must retain the above copyright notice, this
-    list of conditions and the following disclaimer.
+  libarmmcu is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
 
-  * Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
+  libarmmcu is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  You should have received a copy of the GNU General Public License
+  along with libarmmcu.  If not, see <http://www.gnu.org/licenses/>
 */
 
 #ifndef LCD_CPP_
 #define LCD_CPP_
 
-#include <driver/LCD.hpp>
+#include "include/driver/LCD.hpp"
 
-#include <driver/SPI.hpp>
+#include "include/driver/SPI.hpp"
 
 #include <cstring>
 
 namespace stm32f429
 {
 
-GPIO::Port::OuPin LCD::m_RDX = RCC::enablePeriph<RCC::GPIOD>()->createPin(12, GPIO::Port::OutputPin);
-GPIO::Port::OuPin LCD::m_WRX = RCC::enablePeriph<RCC::GPIOD>()->createPin(13, GPIO::Port::OutputPin);
-GPIO::Port::OuPin LCD::m_CSX = RCC::enablePeriph<RCC::GPIOC>()->createPin(2 , GPIO::Port::OutputPin);
-
-SPI volatile* LCD::m_spi5 = RCC::enablePeriph<RCC::SPI5>();
-
 LCD::Color::Color(uint8_t const red, uint8_t const green, uint8_t const blue)
   : m_color(static_cast<uint32_t>(red) <<16 | static_cast<uint32_t>(green) <<8 | static_cast<uint32_t>(blue) <<0)
 { }
 
-LCD::LCD()
-{ }
+LCD::LCD() {
+  GPIO portD(GPIO::D);
+  GPIO portC(GPIO::C);
+
+  SPI spi5(SPI::_5);
+}
 
 void LCD::enable(
     uint16_t const activeWidth, uint16_t const hSync, uint16_t const hBackPorch, uint16_t const HFP,
@@ -85,9 +77,9 @@ void LCD::enable(
   while(!RCC::instance()->isPLLSAILocked())
   { }
 
-  m_RDX.setOutputSpeed(GPIO::Port::OuPin::OutputSpeed::Fast);
-  m_WRX.setOutputSpeed(GPIO::Port::OuPin::OutputSpeed::Fast);
-  m_CSX.setOutputSpeed(GPIO::Port::OuPin::OutputSpeed::Fast);
+  m_RDX.setOutputSpeed(GPIO::OuPin::OutputSpeed::Fast);
+  m_WRX.setOutputSpeed(GPIO::OuPin::OutputSpeed::Fast);
+  m_CSX.setOutputSpeed(GPIO::OuPin::OutputSpeed::Fast);
 
   auto portA = RCC::enablePeriph<RCC::GPIOA>();
   auto portB = RCC::enablePeriph<RCC::GPIOB>();
@@ -113,53 +105,53 @@ void LCD::enable(
 
   */
 
-  portC->createPin(6, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
-      .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//HSYNC
-  portA->createPin(4, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
-      .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//VSYNC
-  portG->createPin(7, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
-      .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//CLK
-  portF->createPin(10, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
-      .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//DE
+  portC->createPin(6, GPIO::AlternatePin).setAF(GPIO::AlPin::AF::_14)
+      .setOutputSpeed(GPIO::AlPin::OutputSpeed::Fast).setPullMode(GPIO::AlPin::PullMode::None);//HSYNC
+  portA->createPin(4, GPIO::AlternatePin).setAF(GPIO::AlPin::AF::_14)
+      .setOutputSpeed(GPIO::AlPin::OutputSpeed::Fast).setPullMode(GPIO::AlPin::PullMode::None);//VSYNC
+  portG->createPin(7, GPIO::AlternatePin).setAF(GPIO::AlPin::AF::_14)
+      .setOutputSpeed(GPIO::AlPin::OutputSpeed::Fast).setPullMode(GPIO::AlPin::PullMode::None);//CLK
+  portF->createPin(10, GPIO::AlternatePin).setAF(GPIO::AlPin::AF::_14)
+      .setOutputSpeed(GPIO::AlPin::OutputSpeed::Fast).setPullMode(GPIO::AlPin::PullMode::None);//DE
 
-  portC->createPin(10, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
-      .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//R2
-  portB->createPin(0, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
-      .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//R3
-  portA->createPin(11, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
-      .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//R4
-  portA->createPin(12, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
-      .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//R5
-  portB->createPin(1, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
-      .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//R6
-  portG->createPin(6, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
-      .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//R7
+  portC->createPin(10, GPIO::AlternatePin).setAF(GPIO::AlPin::AF::_14)
+      .setOutputSpeed(GPIO::AlPin::OutputSpeed::Fast).setPullMode(GPIO::AlPin::PullMode::None);//R2
+  portB->createPin(0, GPIO::AlternatePin).setAF(GPIO::AlPin::AF::_14)
+      .setOutputSpeed(GPIO::AlPin::OutputSpeed::Fast).setPullMode(GPIO::AlPin::PullMode::None);//R3
+  portA->createPin(11, GPIO::AlternatePin).setAF(GPIO::AlPin::AF::_14)
+      .setOutputSpeed(GPIO::AlPin::OutputSpeed::Fast).setPullMode(GPIO::AlPin::PullMode::None);//R4
+  portA->createPin(12, GPIO::AlternatePin).setAF(GPIO::AlPin::AF::_14)
+      .setOutputSpeed(GPIO::AlPin::OutputSpeed::Fast).setPullMode(GPIO::AlPin::PullMode::None);//R5
+  portB->createPin(1, GPIO::AlternatePin).setAF(GPIO::AlPin::AF::_14)
+      .setOutputSpeed(GPIO::AlPin::OutputSpeed::Fast).setPullMode(GPIO::AlPin::PullMode::None);//R6
+  portG->createPin(6, GPIO::AlternatePin).setAF(GPIO::AlPin::AF::_14)
+      .setOutputSpeed(GPIO::AlPin::OutputSpeed::Fast).setPullMode(GPIO::AlPin::PullMode::None);//R7
 
-  portA->createPin(6, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
-      .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//G2
-  portG->createPin(10, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
-      .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//G3
-  portB->createPin(10, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
-      .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//G4
-  portB->createPin(11, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
-      .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//G5
-  portC->createPin(7, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
-      .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//G6
-  portD->createPin(3, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
-      .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//G7
+  portA->createPin(6, GPIO::AlternatePin).setAF(GPIO::AlPin::AF::_14)
+      .setOutputSpeed(GPIO::AlPin::OutputSpeed::Fast).setPullMode(GPIO::AlPin::PullMode::None);//G2
+  portG->createPin(10, GPIO::AlternatePin).setAF(GPIO::AlPin::AF::_14)
+      .setOutputSpeed(GPIO::AlPin::OutputSpeed::Fast).setPullMode(GPIO::AlPin::PullMode::None);//G3
+  portB->createPin(10, GPIO::AlternatePin).setAF(GPIO::AlPin::AF::_14)
+      .setOutputSpeed(GPIO::AlPin::OutputSpeed::Fast).setPullMode(GPIO::AlPin::PullMode::None);//G4
+  portB->createPin(11, GPIO::AlternatePin).setAF(GPIO::AlPin::AF::_14)
+      .setOutputSpeed(GPIO::AlPin::OutputSpeed::Fast).setPullMode(GPIO::AlPin::PullMode::None);//G5
+  portC->createPin(7, GPIO::AlternatePin).setAF(GPIO::AlPin::AF::_14)
+      .setOutputSpeed(GPIO::AlPin::OutputSpeed::Fast).setPullMode(GPIO::AlPin::PullMode::None);//G6
+  portD->createPin(3, GPIO::AlternatePin).setAF(GPIO::AlPin::AF::_14)
+      .setOutputSpeed(GPIO::AlPin::OutputSpeed::Fast).setPullMode(GPIO::AlPin::PullMode::None);//G7
 
-  portD->createPin(6, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
-      .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//B2
-  portG->createPin(11, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
-      .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//B3
-  portG->createPin(12, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
-      .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//B4
-  portA->createPin(3, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
-      .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//B5
-  portB->createPin(8, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
-      .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//B6
-  portB->createPin(9, GPIO::Port::AlternatePin).setAF(GPIO::Port::AlPin::AF::_14)
-      .setOutputSpeed(GPIO::Port::AlPin::OutputSpeed::Fast).setPullMode(GPIO::Port::AlPin::PullMode::None);//B7
+  portD->createPin(6, GPIO::AlternatePin).setAF(GPIO::AlPin::AF::_14)
+      .setOutputSpeed(GPIO::AlPin::OutputSpeed::Fast).setPullMode(GPIO::AlPin::PullMode::None);//B2
+  portG->createPin(11, GPIO::AlternatePin).setAF(GPIO::AlPin::AF::_14)
+      .setOutputSpeed(GPIO::AlPin::OutputSpeed::Fast).setPullMode(GPIO::AlPin::PullMode::None);//B3
+  portG->createPin(12, GPIO::AlternatePin).setAF(GPIO::AlPin::AF::_14)
+      .setOutputSpeed(GPIO::AlPin::OutputSpeed::Fast).setPullMode(GPIO::AlPin::PullMode::None);//B4
+  portA->createPin(3, GPIO::AlternatePin).setAF(GPIO::AlPin::AF::_14)
+      .setOutputSpeed(GPIO::AlPin::OutputSpeed::Fast).setPullMode(GPIO::AlPin::PullMode::None);//B5
+  portB->createPin(8, GPIO::AlternatePin).setAF(GPIO::AlPin::AF::_14)
+      .setOutputSpeed(GPIO::AlPin::OutputSpeed::Fast).setPullMode(GPIO::AlPin::PullMode::None);//B6
+  portB->createPin(9, GPIO::AlternatePin).setAF(GPIO::AlPin::AF::_14)
+      .setOutputSpeed(GPIO::AlPin::OutputSpeed::Fast).setPullMode(GPIO::AlPin::PullMode::None);//B7
 
   /* Set or Reset the control line */
   m_CSX.reset();
