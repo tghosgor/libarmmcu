@@ -13,4 +13,4 @@ This project is licensed under:
 ##P.S.
 This project is incomplete and API is expected to change very quickly.
 
-**My bitcoin address:** 13vw56mgsFj6g2AV6j9RgS4hmWfnoMgc68
+**My bitcoin address:** 1LtsLW5n3jGXHoWGffh8njvh8MQcWmzxVD
